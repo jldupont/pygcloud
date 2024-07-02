@@ -3,7 +3,7 @@
 """
 import pytest
 from pygcloud.core import CommandLine, GCloud
-from pygcloud.models import GCPService
+
 
 def test_cmd_line():
     cmd = CommandLine("echo")
@@ -11,15 +11,18 @@ def test_cmd_line():
     assert result.success
     assert result.message == "help"
 
+
 def test_cmd_not_found():
     cmd = CommandLine("--no-exec--")
     with pytest.raises(FileNotFoundError):
         cmd.exec(["no-exec"])
 
+
 def test_cmd_line_exec_invalid():
     cmd = CommandLine("")
     with pytest.raises(PermissionError):
         cmd.exec(["no-exec"])
+
 
 def test_cmd_directory():
 
@@ -38,7 +41,8 @@ def test_gcloud():
     ])
 
     assert r.success
-    assert r.message == f"head group command --param=value tail --last=value", r.message
+    assert r.message == "head group command --param=value tail --last=value", \
+        r.message
 
 
 def test_gcloud_flatten():
@@ -50,7 +54,9 @@ def test_gcloud_flatten():
     ])
 
     assert r.success
-    assert r.message == f"head group command --param=value tail --last=value", r.message
+    assert r.message == "head group command --param=value tail --last=value", \
+        r.message
+
 
 def _test_gcloud_service_does_not_exist():
 
@@ -68,4 +74,3 @@ def _test_gcloud_service_does_not_exist():
     """
 
     assert not r.success
-

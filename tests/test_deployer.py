@@ -6,6 +6,7 @@ from pygcloud.core import CommandLine
 
 cmd_echo = CommandLine("echo")
 
+
 class ServiceBase(GCPService):
 
     COMMON = [
@@ -21,11 +22,11 @@ class ServiceBase(GCPService):
     def params_update(self):
         return ["update", "param_update", self.COMMON]
 
-    def after_create(self, result:Result):
+    def after_create(self, result: Result):
         super().after_create(result)
         self.created = True
-        
-    def after_update(self, result:Result):
+
+    def after_update(self, result: Result):
         super().after_update(result)
         self.updated = True
 
@@ -36,9 +37,10 @@ class ServiceAlreadyExists(ServiceBase):
         self.already_exists = True
         return self
 
+
 class ServiceDoesNotExists(ServiceBase):
 
-    def after_describe(self, _result:Result):
+    def after_describe(self, _result: Result):
         self.already_exists = False
         return self
 
@@ -52,7 +54,7 @@ def test_deployer_already_exists():
 
     assert s.last_result.success
     assert s.updated
-    
+
     with pytest.raises(AttributeError):
         assert s.created is None
 

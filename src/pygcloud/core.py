@@ -2,14 +2,14 @@
 @author: jldupont
 """
 import subprocess
-import json
 from typing import List, Tuple, Any
-from .models import GCPService, Result, Param
+from .models import Result, Param
 from .utils import prepare_params
+
 
 class CommandLine:
 
-    def __init__(self, exec_path:str):
+    def __init__(self, exec_path: str):
         assert isinstance(exec_path, str)
         self.exec_path = exec_path
         self._last_command_args = None
@@ -18,7 +18,7 @@ class CommandLine:
     def last_command_args(self) -> List[Any]:
         return self._last_command_args
 
-    def exec(self, params:List[str]) -> Result:
+    def exec(self, params: List[str]) -> Result:
         assert isinstance(params, list)
 
         command_args = prepare_params([self.exec_path] + params)
@@ -33,7 +33,8 @@ class CommandLine:
         except FileNotFoundError:
             raise FileNotFoundError(f"Command not found: {self.exec_path}")
         except PermissionError:
-            raise PermissionError(f"Permission denied (or possibly invalid exec path): {self.exec_path}")
+            raise PermissionError("Permission denied (or possibly "
+                                  f"invalid exec path): {self.exec_path}")
 
         self._last_command_args = command_args
 
@@ -42,8 +43,7 @@ class CommandLine:
                 success=True,
                 message=result.stdout.strip(),
                 code=0
-            )               
-
+            )
         return Result(
             success=False,
             message=result.stderr.strip(),
@@ -66,14 +66,15 @@ class GCloud(CommandLine):
     gcloud run services list
     """
 
-    def __init__(self, *head_tail:List[str|Tuple[str, str]|Param], cmd="gcloud"):
+    def __init__(self, *head_tail: List[str | Tuple[str, str] | Param],
+                 cmd="gcloud"):
         """
         head_tail: [head_parameters ...] tail_parameters
         """
         super().__init__(cmd)
         self.head_tail = head_tail
 
-    def __call__(self, *head:List[str|Tuple[str, str]|Param]) -> Result:
+    def __call__(self, *head: List[str | Tuple[str, str] | Param]) -> Result:
         """
         head: parameters that will be added at the head of the list
               following what was provided during initialization

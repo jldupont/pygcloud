@@ -1,12 +1,10 @@
 """
 @author: jldupont
 """
-import functools
-import operator
 from typing import List, Any, Tuple
 
 
-def flatten(*liste:List[Any]|Tuple[Any]):
+def flatten(*liste: List[Any] | Tuple[Any]):
     """
     Flatten a list of lists
     """
@@ -33,7 +31,7 @@ def split_head_tail(liste) -> Tuple[List[Any], List[Any]]:
     head = []
     tail = []
 
-    current = head        
+    current = head
 
     for item in liste:
 
@@ -41,18 +39,12 @@ def split_head_tail(liste) -> Tuple[List[Any], List[Any]]:
             current = tail
             continue
 
-        if isinstance(item, str):
-            current.append(item)
-            continue
-
-        if isinstance(item, tuple) or isinstance(item, list):
-            current.extend(self.build_kv_strings(item))
-            continue
+        current.append(item)
 
     return (head, tail)
 
 
-def prepare_params(params:List[Any]|List[Tuple[str, str]]) -> List[Any]:
+def prepare_params(params: List[Any] | List[Tuple[str, str]]) -> List[Any]:
     """
     Prepare a list of parameters for a command line invocation
     """

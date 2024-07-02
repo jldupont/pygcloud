@@ -1,20 +1,24 @@
-import pytest
+"""@author: jldupont"""
 from dataclasses import dataclass
 
 from pygcloud.models import Param
 
+
 @dataclass
 class X:
-    NAME="X"
-    PARAM="X"
+    NAME = "X"
+    PARAM = "X"
+
 
 @dataclass
 class Y(X):
-    NAME="Y"
+    NAME = "Y"
+
 
 def test_param():
     p = Param("key", "value")
     assert p.key == "key"
+
 
 def test_unpack_tuple():
 
@@ -23,6 +27,7 @@ def test_unpack_tuple():
 
     assert key == "key"
     assert value == "value"
+
 
 def test_param_as_tuple():
     p = Param("key", "value")
@@ -35,7 +40,8 @@ def test_param_as_tuple():
     assert key == "key"
     assert value == "value"
 
+
 def test_dataclass():
-    y=Y()
+    y = Y()
     assert y.NAME == "Y"
     assert y.PARAM == "X"

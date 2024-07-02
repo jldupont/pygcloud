@@ -1,10 +1,11 @@
 """
 @author: jldupont
 """
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 from dataclasses import dataclass
 
-type Params = List[Tuple[str, str]|List[Param]];
+type Params = List[Tuple[str, str] | List[Param]]
+
 
 @dataclass
 class Param:
@@ -19,7 +20,7 @@ class Param:
 
         if index == 0:
             return self.key
-        if index == 1: 
+        if index == 1:
             return self.value
 
         # unpacking tuple requires
@@ -37,7 +38,7 @@ class Result:
 class GCPService:
 
     def __init__(self):
-        self.already_exists = None # indeterminated
+        self.already_exists = None  # indeterminated
         self.last_result = None
 
     def before_describe(self):
@@ -68,20 +69,20 @@ class GCPService:
         """This is service specific"""
         raise NotImplementedError
 
-    def after_describe(self, result:Result):
+    def after_describe(self, result: Result):
         self.last_result = result
         if result.success:
             self.already_exists = True
         return self
 
-    def after_create(self, result:Result):
+    def after_create(self, result: Result):
         self.last_result = result
         return self
 
-    def after_update(self, result:Result):
+    def after_update(self, result: Result):
         self.last_result = result
         return self
 
-    def after_delete(self, result:Result):
+    def after_delete(self, result: Result):
         self.last_result = result
         return self
