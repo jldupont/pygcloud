@@ -28,3 +28,9 @@ The above features are supported by employing the `after_*` methods of the `GCPS
 # How to use
 
 TODO
+
+# Links
+
+* [Repository](https://github.com/jldupont/pygcloud)
+* [Pypi](https://pypi.org/project/pygcloud/)
+
