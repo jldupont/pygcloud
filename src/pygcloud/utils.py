@@ -1,10 +1,10 @@
 """
 @author: jldupont
 """
-from typing import List, Any, Tuple
+from typing import List, Any, Tuple, Union
 
 
-def flatten(*liste: List[Any] | Tuple[Any]):
+def flatten(*liste: Union[List[Any], Tuple[Any]]):
     """
     Flatten a list of lists
     """
@@ -44,7 +44,8 @@ def split_head_tail(liste) -> Tuple[List[Any], List[Any]]:
     return (head, tail)
 
 
-def prepare_params(params: List[Any] | List[Tuple[str, str]]) -> List[Any]:
+def prepare_params(params: Union[List[Any], List[Tuple[str, str]]]) \
+        -> List[Any]:
     """
     Prepare a list of parameters for a command line invocation
     """

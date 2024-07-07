@@ -2,7 +2,7 @@
 @author: jldupont
 """
 import subprocess
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Union
 from .models import Result, Param
 from .utils import prepare_params
 
@@ -66,15 +66,16 @@ class GCloud(CommandLine):
     gcloud run services list
     """
 
-    def __init__(self, *head_tail: List[str | Tuple[str, str] | Param],
-                 cmd="gcloud"):
+    def __init__(self, *head_tail: Union[List[Union[str, Tuple[str, str]]],
+                                         Param], cmd="gcloud"):
         """
         head_tail: [head_parameters ...] tail_parameters
         """
         super().__init__(cmd)
         self.head_tail = head_tail
 
-    def __call__(self, *head: List[str | Tuple[str, str] | Param]) -> Result:
+    def __call__(self, *head: List[Union[str, Tuple[str, str], Param]]) \
+            -> Result:
         """
         head: parameters that will be added at the head of the list
               following what was provided during initialization

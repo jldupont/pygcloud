@@ -1,7 +1,7 @@
 """
 @author: jldupont
 """
-from typing import List, Tuple, TypeAlias
+from typing import List, Tuple, NewType, Union
 from dataclasses import dataclass
 
 
@@ -26,7 +26,7 @@ class Param:
         raise StopIteration
 
 
-Params: TypeAlias = List[Tuple[str, str] | List[Param]]
+Params = NewType("Param", Union[List[Tuple[str, str]], List[Param]])
 
 
 @dataclass(frozen=True)
