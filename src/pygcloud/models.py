@@ -1,10 +1,8 @@
 """
 @author: jldupont
 """
-from typing import List, Tuple
+from typing import List, Tuple, TypeAlias
 from dataclasses import dataclass
-
-type Params = List[Tuple[str, str] | List[Param]]
 
 
 @dataclass
@@ -26,6 +24,9 @@ class Param:
         # unpacking tuple requires
         # iteration protocol
         raise StopIteration
+
+
+Params: TypeAlias = List[Tuple[str, str] | List[Param]]
 
 
 @dataclass(frozen=True)
