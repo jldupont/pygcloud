@@ -3,7 +3,7 @@
 """
 import subprocess
 from typing import List, Tuple, Any, Union
-from .models import Result, Param
+from .models import Result, Param, Params
 from .utils import prepare_params
 
 
@@ -18,10 +18,13 @@ class CommandLine:
     def last_command_args(self) -> List[Any]:
         return self._last_command_args
 
-    def exec(self, params: List[str]) -> Result:
+    def exec(self, params: Params, common: Params = None) -> Result:
         assert isinstance(params, list)
 
-        command_args = prepare_params([self.exec_path] + params)
+        if common is None:
+            common = []
+
+        command_args = prepare_params([self.exec_path] + params + common)
 
         try:
             result = subprocess.run(

@@ -25,7 +25,19 @@ This package simplifies the deployment of GCP services through the gcloud comman
 
 The above features are supported by employing the `after_*` methods of the `GCPService` class.
 
-# How to use
+# Categories of Services
+
+1. SingletonImmutable e.g. Firestore indexes
+2. RevisionBased e.g. Cloud Run service with revisions
+3. Updatable e.g. GCS bucket
+
+For the "SingletonImmutable" category, we ignore exceptions arising from the service already being created. The "describe" facility might be or not available.
+
+For the "RevisionBased", we skip the "update" step. The "create" method will be called. The "describe" facility might be or not available.
+
+For the "Updatable", we do the complete steps i.e. describe, create or update.
+
+# Usage
 
 TODO
 

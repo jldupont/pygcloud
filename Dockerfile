@@ -1,5 +1,3 @@
-from python3.12
+from google/cloud-sdk
 
 RUN pip3 install pygcloud
-
-from google/cloud-sdk
