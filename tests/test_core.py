@@ -41,7 +41,7 @@ def test_gcloud():
     ])
 
     assert r.success
-    assert r.message == "head group command --param=value tail --last=value", \
+    assert r.message == "head group command --param value tail --last value", \
         r.message
 
 
@@ -54,7 +54,7 @@ def test_gcloud_flatten():
     ])
 
     assert r.success
-    assert r.message == "head group command --param=value tail --last=value", \
+    assert r.message == "head group command --param value tail --last value", \
         r.message
 
 

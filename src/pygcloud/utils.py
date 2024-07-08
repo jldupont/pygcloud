@@ -55,7 +55,7 @@ def prepare_params(params: Union[List[Any], List[Tuple[str, str]]]) \
 
     for item in liste:
         if isinstance(item, tuple) or isinstance(item, Param):
-            new_item = f"{item[0]}={item[1]}"
+            new_item = f"{item[0]} {item[1]}"
             new_liste.append(new_item)
             continue
         new_liste.append(item)

@@ -61,7 +61,7 @@ def test_deployer_already_exists(deployer):
         assert s.created is None
 
     assert deployer.cmd.last_command_args == \
-        ["echo", "update", "param_update", "--param=value"]
+        ["echo", "update", "param_update", "--param value"]
 
 
 def test_deployer_needs_creation(deployer):
@@ -76,7 +76,7 @@ def test_deployer_needs_creation(deployer):
         assert s.updated is not None
 
     assert deployer.cmd.last_command_args == \
-        ["echo", "create", "param_create", "--param=value"]
+        ["echo", "create", "param_create", "--param value"]
 
 
 def test_deployer_with_common_params(deployer, common_params):
@@ -87,7 +87,7 @@ def test_deployer_with_common_params(deployer, common_params):
     deployer.deploy(s)
 
     assert deployer.cmd.last_command_args == \
-        ["echo", "update", "param_update", "--param=value", "--common=value"]
+        ["echo", "update", "param_update", "--param value", "--common value"]
 
 # ==============================================================
 

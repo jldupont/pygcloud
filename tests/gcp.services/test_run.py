@@ -18,4 +18,4 @@ def test_run_deploy(deployer):
 
     assert deployer.cmd.last_command_args == \
         ["echo", "beta", "run", "deploy",
-            "my-service", "--p1=v1", "--project=my-project"]
+            "my-service", "--p1 v1", "--project my-project"]
