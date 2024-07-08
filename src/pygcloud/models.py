@@ -3,8 +3,10 @@
 """
 import os
 from typing import List, Tuple, NewType, Union
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from .constants import ServiceCategory
+from .helpers import validate_name
 
 
 @dataclass
@@ -48,6 +50,7 @@ class EnvParam(Param):
 
 
 Params = NewType("Param", Union[List[Tuple[str, str]], List[Param]])
+Label = NewType("Label", Tuple[str, str])
 
 
 @dataclass(frozen=True)
@@ -57,17 +60,74 @@ class Result:
     code: int
 
 
-class GCPService:
+class ServiceNode(ABC):
+    """
+    Protocol to establish "use" relationships
+    between services
+    """
+    @property
+    @abstractmethod
+    def name(self):
+        raise NotImplementedError
 
+    @property
+    @abstractmethod
+    def ns(self):
+        raise NotImplementedError
+
+
+class GCPService(ServiceNode):
+    """
+    Base class for GCP services
+
+    The 'name' and 'ns' (namespace) parameters are
+    only useful when the relationship "use" feature is used.
+
+    We do not use the class name as namespace because
+    it might happen we will extend the classes to support
+    more usecases.
+
+    REQUIRES_UPDATE_AFTER_CREATE: provides support for services
+    which cannot be fully configured during the creation phase.
+    For example, Google GCS cannot set labels during creation.
+    """
     SERVICE_CATEGORY = ServiceCategory.INDETERMINATE
+    REQUIRES_UPDATE_AFTER_CREATE = False
 
     @property
     def category(self):
         return self.SERVICE_CATEGORY
 
-    def __init__(self):
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def ns(self):
+        return self.ns_
+
+    def __init__(self, name=None, ns=None):
+        """
+        name: string (optional)
+        ns: string (optional)
+        """
+        if name is not None:
+            if not validate_name(name):
+                raise Exception(f"Invalid name: {name}")
+
         self.already_exists = None  # indeterminated
         self.last_result = None
+        self._name = name
+        self._ns = ns
+        self._uses: List[ServiceNode] = []
+
+    def use(self, service: ServiceNode):
+        self._uses.append(service)
+        return self
+
+    @property
+    def uses(self) -> List[ServiceNode]:
+        return self._uses
 
     def __repr__(self):
         return f"""

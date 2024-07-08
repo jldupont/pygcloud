@@ -13,14 +13,25 @@ gcloud beta run deploy ${_COMPONENT}  \
 --add-volume-mount volume="blobs",mount-path="${BLOB_MOUNT_PATH}" \
 --set-env-vars "BLOB_MOUNT_PATH=${BLOB_MOUNT_PATH}" \
 --command "/app/run.sh"
+
+# Labels
+
+* The parameter `--labels` is an alias for `--update-labels`.
+* When `--clear-labels` is also specified along with `--labels`,
+  clearing takes precedence
+
+# References
+
+* [Cloud Run](https://cloud.google.com/run/docs/deploying)
 """
 from pygcloud.models import GCPServiceRevisionBased, Params
+from pygcloud.gcp.labels import LabelGenerator
 
 
-class CloudRun(GCPServiceRevisionBased):
+class CloudRun(GCPServiceRevisionBased, LabelGenerator):
 
     def __init__(self, name: str, *params: Params):
-        self.name = name
+        super().__init__(name, "run")
         self.params = list(params)
 
     def params_create(self):
@@ -29,5 +40,6 @@ class CloudRun(GCPServiceRevisionBased):
         be injected through the Deployer.
         """
         return [
-            "beta", "run", "deploy", self.name
-        ] + self.params
+            "beta", "run", "deploy", self.name,
+            "--clear-labels"
+        ] + self.params + self.generate_use_labels()

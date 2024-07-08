@@ -132,6 +132,10 @@ class Deployer:
         result = self.cmd.exec(params, common=self.common_params)
         result = service.after_create(result)
         self.after_create(service, result)
+
+        if service.REQUIRES_UPDATE_AFTER_CREATE:
+            result = self.update(service)
+
         return result
 
     def update(self, service: GCPService) -> Result:
