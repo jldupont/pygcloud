@@ -34,27 +34,29 @@ def test_cmd_directory():
 
 
 def test_gcloud():
-    gcloud = GCloud("tail", [("--last", "value")], cmd="echo")
+    gcloud = GCloud("head", ..., [("--last", "value")], cmd="echo")
 
-    r = gcloud("head", "group", "command", [
+    r = gcloud("head_after", "group", "command", [
         ("--param", "value")
     ])
 
     assert r.success
-    assert r.message == "head group command --param value tail --last value", \
+    assert r.message == \
+        "head head_after group command --param value --last value", \
         r.message
 
 
 def test_gcloud_flatten():
 
-    gcloud = GCloud("tail", [("--last", "value")], cmd="echo")
+    gcloud = GCloud("head", ..., [("--tail", "value")], cmd="echo")
 
-    r = gcloud("head", "group", "command", [
+    r = gcloud("head_after", "group", "command", [
         [("--param", "value")]
     ])
 
     assert r.success
-    assert r.message == "head group command --param value tail --last value", \
+    assert r.message == \
+        "head head_after group command --param value --tail value", \
         r.message
 
 

@@ -4,7 +4,7 @@
 import subprocess
 from typing import List, Tuple, Any, Union
 from .models import Result, Param, Params
-from .utils import prepare_params
+from .utils import prepare_params, split_head_tail
 
 
 class CommandLine:
@@ -77,14 +77,15 @@ class GCloud(CommandLine):
         super().__init__(cmd)
         self.head_tail = head_tail
 
-    def __call__(self, *head: List[Union[str, Tuple[str, str], Param]]) \
+    def __call__(self, *head_after: List[Union[str, Tuple[str, str], Param]]) \
             -> Result:
         """
-        head: parameters that will be added at the head of the list
+        head_after: parameters that will be added at the head of the list
               following what was provided during initialization
         """
-        liste = list(head)
-        liste.extend(self.head_tail)
+        head, tail = split_head_tail(self.head_tail)
+        liste = head + list(head_after)
+        liste.extend(tail)
         return self.exec(liste)
 
 

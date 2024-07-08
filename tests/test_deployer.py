@@ -39,7 +39,6 @@ class ServiceAlreadyExists(ServiceUpdatable):
 
     def before_describe(self):
         self.already_exists = True
-        return self
 
 
 class ServiceDoesNotExists(ServiceUpdatable):
