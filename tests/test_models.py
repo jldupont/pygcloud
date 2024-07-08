@@ -1,7 +1,8 @@
 """@author: jldupont"""
+import os
 from dataclasses import dataclass
 
-from pygcloud.models import Param
+from pygcloud.models import Param, EnvParam
 
 
 @dataclass
@@ -45,3 +46,14 @@ def test_dataclass():
     y = Y()
     assert y.NAME == "Y"
     assert y.PARAM == "X"
+
+
+def test_sys_env():
+
+    first_key = list(os.environ.keys())[0]
+    first_value = os.environ.get(first_key)
+
+    p = EnvParam("--key", first_key)
+
+    assert p[0] == "--key"
+    assert p[1] == first_value

@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+import os
 from typing import List, Tuple, NewType, Union
 from dataclasses import dataclass
 from .constants import ServiceCategory
@@ -19,12 +20,31 @@ class Param:
 
         if index == 0:
             return self.key
+
         if index == 1:
             return self.value
 
         # unpacking tuple requires
         # iteration protocol
         raise StopIteration
+
+
+class EnvParam(Param):
+    """
+    For parameters coming from environment variables
+    """
+    def __init__(self, key: str, env_var_name: str):
+        """
+        key: parameter name
+        env_var_name: environment variable name
+        """
+        assert isinstance(key, str)
+        assert isinstance(env_var_name, str)
+
+        value = os.environ.get(env_var_name, None)
+        if value is None:
+            raise ValueError(f"Environment variable {env_var_name} not found")
+        super().__init__(key, value)
 
 
 Params = NewType("Param", Union[List[Tuple[str, str]], List[Param]])

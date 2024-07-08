@@ -10,7 +10,7 @@ This package simplifies the deployment of GCP services through the gcloud comman
 
 `pip install pygcloud`
 
-# Requirements
+# Features
 
 * Leverage `gcloud` command line tool
 * Be as transparent to `gcloud` as possible
@@ -39,7 +39,10 @@ For the "Updatable", we do the complete steps i.e. describe, create or update.
 
 # Usage
 
-TODO
+```
+from pygcloud.models import Param, EnvParam
+from pygcloud.deployer import Deployer
+```
 
 # Links
 

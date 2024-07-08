@@ -19,7 +19,7 @@ class CommandLine:
         return self._last_command_args
 
     def exec(self, params: Params, common: Params = None) -> Result:
-        assert isinstance(params, list)
+        assert isinstance(params, list), f"Expected list, got: {type(params)}"
 
         if common is None:
             common = []

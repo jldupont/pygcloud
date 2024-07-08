@@ -2,15 +2,6 @@
 import pytest
 from pygcloud.models import Result, Param, \
     GCPServiceSingletonImmutable, GCPServiceRevisionBased, GCPServiceUpdatable
-from pygcloud.deployer import Deployer
-from pygcloud.core import CommandLine
-
-cmd_echo = CommandLine("echo")
-
-
-@pytest.fixture
-def deployer():
-    return Deployer(cmd_echo)
 
 
 @pytest.fixture
@@ -69,7 +60,7 @@ def test_deployer_already_exists(deployer):
     with pytest.raises(AttributeError):
         assert s.created is None
 
-    assert cmd_echo.last_command_args == \
+    assert deployer.cmd.last_command_args == \
         ["echo", "update", "param_update", "--param=value"]
 
 
@@ -84,7 +75,7 @@ def test_deployer_needs_creation(deployer):
     with pytest.raises(AttributeError):
         assert s.updated is not None
 
-    assert cmd_echo.last_command_args == \
+    assert deployer.cmd.last_command_args == \
         ["echo", "create", "param_create", "--param=value"]
 
 
@@ -95,7 +86,7 @@ def test_deployer_with_common_params(deployer, common_params):
     s = ServiceAlreadyExists()
     deployer.deploy(s)
 
-    assert cmd_echo.last_command_args == \
+    assert deployer.cmd.last_command_args == \
         ["echo", "update", "param_update", "--param=value", "--common=value"]
 
 # ==============================================================

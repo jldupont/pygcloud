@@ -11,18 +11,29 @@ from .constants import ServiceCategory
 class Deployer:
 
     def __init__(self, cmd: CommandLine = None, exit_on_error=True,
+                 log_error=True,
                  common_params: Params = None):
         """
         exit_on_error (bool): by default, applies to create
         and update operations
         """
-
         self.cmd = cmd or GCloud()
         self.exit_on_error = exit_on_error
-        self.common_params = common_params
+        self.log_error = log_error
+        self.common_params = common_params or []
+
+    @property
+    def command(self):
+        return self.cmd
 
     def set_common_params(self, params: Params):
+        assert isinstance(params, list)
         self.common_params = params
+        return self
+
+    def add_common_params(self, params: Params):
+        assert isinstance(params, list)
+        self.common_params.extend(params)
         return self
 
     def before_describe(self, service: GCPService): pass
@@ -39,7 +50,8 @@ class Deployer:
             raise Exception("Expecting a valid Result")
 
         if self.exit_on_error and not result.success:
-            logging.error(result.message)
+            if self.log_error:
+                logging.error(result.message)
             sys.exit(1)
 
     def after_update(self, service: GCPService, result: Result):
@@ -47,7 +59,8 @@ class Deployer:
             raise Exception("Expecting a valid Result")
 
         if self.exit_on_error and not result.success:
-            logging.error(result.message)
+            if self.log_error:
+                logging.error(result.message)
             sys.exit(1)
 
     def after_delete(self, service: GCPService, result: Result): pass
