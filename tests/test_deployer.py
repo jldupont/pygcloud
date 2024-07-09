@@ -1,7 +1,9 @@
 """@author: jldupont"""
 import pytest
-from pygcloud.models import Result, Param, \
-    GCPServiceSingletonImmutable, GCPServiceRevisionBased, GCPServiceUpdatable
+from pygcloud.models import Result, Param, EnvValue, \
+    GCPServiceSingletonImmutable, GCPServiceRevisionBased, \
+    GCPServiceUpdatable, \
+    service_groups
 
 
 @pytest.fixture
@@ -176,3 +178,36 @@ def test_revision_based_not_deployable(deployer):
 
     with pytest.raises(SystemExit):
         deployer.deploy(s)
+
+
+def test_deploy_service_group(deployer, mock_service):
+
+    service_groups.clear()
+
+    sg = service_groups.create("sg")
+
+    sg.append(mock_service)
+
+    deployer.deploy(sg)
+
+    assert mock_service.last_result.success
+
+
+def test_deploy_service_groups_retrieve_by_name(deployer, env_first_key,
+                                                mock_service):
+
+    service_groups.clear()
+
+    # Pretend the deployment group name comes from an environment variable
+    group_name = EnvValue(env_first_key)
+
+    # Pretend we have a group of services we want to deploy together
+    sg = service_groups.create(group_name)
+    sg.append(mock_service)
+    sg.append(mock_service)
+    sg.append(mock_service)
+
+    # Reference the deployment by some environment name
+    deployer.deploy(group_name)
+
+    assert mock_service.last_result.success

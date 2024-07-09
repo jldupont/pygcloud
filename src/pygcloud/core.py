@@ -9,6 +9,8 @@ from .utils import prepare_params, split_head_tail
 
 logger = logging.getLogger("pygcloud")
 
+__all__ = ["CommandLine", "GCloud", "gcloud"]
+
 
 class CommandLine:
 

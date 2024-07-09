@@ -3,9 +3,13 @@
 """
 import logging
 import sys
+from typing import Union
 from .core import CommandLine, GCloud
-from .models import GCPService, Result, Params
 from .constants import ServiceCategory
+from .models import GCPService, Result, Params, \
+    ServiceGroup, service_groups, GroupName, \
+    GroupNameUtility
+
 
 logger = logging.getLogger("pygcloud.deployer")
 
@@ -125,7 +129,7 @@ class Deployer:
         self.after_deploy(service, result)
         return result
 
-    def deploy(self, service: GCPService) -> Result:
+    def _deploy(self, service: GCPService) -> Result:
 
         # The "match" statement is only available from Python 3.10 onwards
         # https://docs.python.org/3/whatsnew/3.10.html#match-statements
@@ -139,6 +143,33 @@ class Deployer:
             return self.deploy_updateable(service)
 
         raise RuntimeError(f"Unknown service category: {service.category}")
+
+    def deploy(self, what: Union[GCPService, ServiceGroup, GroupName]) \
+            -> Result:
+        """
+        Either deploys a single service or a group of them
+
+        Returns the result of the last deploy attempt
+        """
+        if isinstance(what, GCPService):
+            return self._deploy(what)
+
+        result = None
+        services = None
+
+        if isinstance(what, ServiceGroup):
+            services = what
+
+        if GroupNameUtility.is_of_type(what):
+            services = service_groups.get(what, None)
+
+        if services is None:
+            raise Exception("No services could be found")
+
+        for service in services:
+            result = self._deploy(service)
+
+        return result
 
     def create(self, service: GCPService) -> Result:
 

@@ -9,6 +9,25 @@ from .constants import ServiceCategory
 from .helpers import validate_name
 
 
+class EnvValue(str):
+    """
+    Retrieve a value from an environment variable
+    """
+    def __init__(self, name: str, default=None):
+        assert isinstance(name, str)
+        self._name = name
+        self._default = default
+
+    @property
+    def value(self):
+        return os.environ.get(self._name, self._default)
+
+    def __str__(self):
+        return self.value
+
+    __repr__ = __str__
+
+
 @dataclass
 class Param:
     """Description of a gcloud parameter"""
@@ -51,6 +70,26 @@ class EnvParam(Param):
 
 Params = NewType("Param", Union[List[Tuple[str, str]], List[Param]])
 Label = NewType("Label", Tuple[str, str])
+GroupName = NewType("GroupName", Union[str, EnvValue])
+
+
+class GroupNameUtility:
+
+    @staticmethod
+    def is_of_type(what: GroupName):
+        return isinstance(what, str) or \
+            isinstance(what, EnvValue)
+
+    @staticmethod
+    def resolve_group_name(name: GroupName) -> str:
+
+        if isinstance(name, str):
+            return name
+
+        if isinstance(name, EnvValue):
+            return name.value
+
+        raise Exception(f"Expecting a valid name, got: {name}")
 
 
 @dataclass(frozen=True)
@@ -249,3 +288,81 @@ class GCPServiceUpdatable(GCPService):
     but must be created first
     """
     SERVICE_CATEGORY = ServiceCategory.UPDATABLE
+
+
+class ServiceGroup(list):
+    """
+    Utility class for grouping service instances
+
+    Useful for deploying services in group whilst
+    keeping a central view of all services in a workload
+    """
+
+    @property
+    def name(self):
+        return GroupNameUtility.resolve_group_name(self._name)
+
+    def __init__(self, name: Union[str, EnvValue]):
+        self._name = None
+
+        if isinstance(name, str):
+            self._name = name
+
+        if isinstance(name, EnvValue):
+            self._name = name
+
+        if self._name is None:
+            raise Exception(f"Expecting a valid name, got: {name}")
+
+    def append(self, service: GCPService):
+        assert isinstance(service, GCPService)
+        return super().append(service)
+
+
+class ServiceGroups(list):
+    """
+    Container utility class for groups
+
+    The use case is for a Deployer to retrieve
+    a target group of services to deploy
+    """
+    def __init__(self):
+        super().__init__()
+        self._map = dict()
+
+    def clear(self):
+        super().clear()
+        self._map.clear()
+
+    @property
+    def all(self):
+        return self._map
+
+    def __getitem__(self, what: Union[str, GroupName]):
+        str_name = GroupNameUtility.resolve_group_name(what)
+        return self._map[str_name]
+
+    def get(self, what, default):
+        str_name = GroupNameUtility.resolve_group_name(what)
+        return self._map.get(str_name, default)
+
+    def create(self, name: GroupName) -> ServiceGroup:
+        """
+        Create or retrieve a group by name
+        """
+        str_name = GroupNameUtility.resolve_group_name(name)
+
+        if (group := self._map.get(str_name, None)) is not None:
+            return group
+
+        # create a new one and keep track of it
+        group = ServiceGroup(name)
+
+        self._map[str_name] = group
+        self.append(group)
+
+        return group
+
+
+# We only really need one group of groups
+service_groups = ServiceGroups()

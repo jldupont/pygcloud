@@ -1,6 +1,8 @@
 """@author: jldupont"""
 from enum import Enum
 
+__all__ = ["ServiceCategory"]
+
 
 class ServiceCategory(Enum):
     INDETERMINATE = "indeterminate"
