@@ -5,13 +5,13 @@ from pygcloud.gcp.services.firestore import FirestoreDatabase, \
 
 def test_firestore_database_already_exists(deployer):
 
-    d = FirestoreDatabase("default")
+    d = FirestoreDatabase("(default)")
 
     deployer.deploy(d)
 
     assert deployer.cmd.last_command_args == [
         "echo", "firestore", "databases", "describe",
-        "--database", "default"
+        "--database", "(default)"
     ], print(deployer.cmd.last_command_args)
 
 

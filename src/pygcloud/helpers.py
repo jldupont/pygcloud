@@ -14,3 +14,9 @@ def validate_name(name: str) -> bool:
         return False
 
     return REGEX_VALIDATE_NAME.match(name) is not None
+
+
+def remove_parenthesis(name: str) -> str:
+    assert isinstance(name, str)
+
+    return name.replace("(", "").replace(")", "")

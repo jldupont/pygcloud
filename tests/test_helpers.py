@@ -1,6 +1,6 @@
 """@author: jldupont"""
 import pytest
-from pygcloud.helpers import validate_name
+from pygcloud.helpers import validate_name, remove_parenthesis
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -11,3 +11,12 @@ from pygcloud.helpers import validate_name
 ])
 def test_validate_name(input, expected):
     assert validate_name(input) == expected
+
+
+@pytest.mark.parametrize("input,expected", [
+    ("(default)", "default"),
+    ("no replace", "no replace"),
+    ("(many) (replaces)", "many replaces")
+])
+def test_remove_parenthesis(input, expected):
+    assert remove_parenthesis(input)
