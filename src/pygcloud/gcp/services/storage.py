@@ -25,23 +25,24 @@ class StorageBucket(GCPServiceUpdatable):
 
     REQUIRES_UPDATE_AFTER_CREATE = False
 
-    def __init__(self, name: str, *params: Params):
+    def __init__(self, name: str, params_create: Params = [],
+                 params_update: Params = []):
         super().__init__(name=name, ns="gcs")
-        if params is not None:
-            self.params = list(params)
+        self._params_create = params_create
+        self._params_update = params_update
 
     def params_describe(self):
         return [
             "storage", "buckets", "describe", f"gs://{self.name}",
             "--format", "json"
-        ] + self.params
+        ]
 
     def params_create(self):
         return [
             "storage", "buckets", "create", f"gs://{self.name}"
-        ] + self.params
+        ] + self._params_create
 
     def params_update(self):
         return [
             "storage", "buckets", "update", f"gs://{self.name}"
-        ] + self.params
+        ] + self._params_update
