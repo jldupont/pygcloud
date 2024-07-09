@@ -48,12 +48,12 @@ class CommandLine:
         if result.returncode == 0:
             return Result(
                 success=True,
-                message=result.stdout.decode("utf-8").strip(),
+                message=result.stdout.strip(),
                 code=0
             )
         return Result(
             success=False,
-            message=result.stderr.decode("utf-8").strip(),
+            message=result.stderr.strip(),
             code=result.returncode
         )
 
