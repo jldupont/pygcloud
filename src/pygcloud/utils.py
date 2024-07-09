@@ -49,14 +49,16 @@ def prepare_params(params: Union[List[Any], List[Tuple[str, str]]]) \
         -> List[Any]:
     """
     Prepare a list of parameters for a command line invocation
+
+    Must also ensure there are no whitespace separated entries.
     """
     liste = flatten(params)
     new_liste = []
 
     for item in liste:
         if isinstance(item, tuple) or isinstance(item, Param):
-            new_item = f"{item[0]} {item[1]}"
-            new_liste.append(new_item)
+            new_liste.append(item[0])
+            new_liste.append(item[1])
             continue
         new_liste.append(item)
 

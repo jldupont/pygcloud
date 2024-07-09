@@ -50,7 +50,7 @@ class ServiceDoesNotExists(ServiceUpdatable):
 
 def test_deployer_already_exists(deployer):
 
-    s = ServiceAlreadyExists()
+    s = ServiceAlreadyExists("already_exists", "service")
     deployer.deploy(s)
 
     assert s.last_result.success
@@ -60,7 +60,7 @@ def test_deployer_already_exists(deployer):
         assert s.created is None
 
     assert deployer.cmd.last_command_args == \
-        ["echo", "update", "param_update", "--param value"]
+        ["echo", "update", "param_update", "--param", "value"]
 
 
 def test_deployer_needs_creation(deployer):
@@ -75,7 +75,7 @@ def test_deployer_needs_creation(deployer):
         assert s.updated is not None
 
     assert deployer.cmd.last_command_args == \
-        ["echo", "create", "param_create", "--param value"]
+        ["echo", "create", "param_create", "--param", "value"]
 
 
 def test_deployer_with_common_params(deployer, common_params):
@@ -86,7 +86,9 @@ def test_deployer_with_common_params(deployer, common_params):
     deployer.deploy(s)
 
     assert deployer.cmd.last_command_args == \
-        ["echo", "update", "param_update", "--param value", "--common value"]
+        [
+            "echo", "update", "param_update", "--param", "value",
+            "--common", "value"]
 
 # ==============================================================
 
@@ -94,6 +96,7 @@ def test_deployer_with_common_params(deployer, common_params):
 class ServiceSingletonImmutable(GCPServiceSingletonImmutable):
 
     def __init__(self, state_exists: bool = False):
+        super().__init__(name="Singleton", ns="service")
         self.state_exists = state_exists
 
     def params_describe(self):

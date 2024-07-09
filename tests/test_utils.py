@@ -36,9 +36,9 @@ def test_split_head_tail_base(liste, expected):
 
 @pytest.mark.parametrize("inp, expected", [
     (("key", "value"),
-        ["key value"]),
+        ["key", "value"]),
     (["a", [("c", "d")]],
-        ["a", "c d"])
+        ["a", "c", "d"])
 ])
 def test_prepare_params(inp, expected):
     assert prepare_params(inp) == expected

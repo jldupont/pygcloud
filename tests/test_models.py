@@ -2,7 +2,7 @@
 import os
 from dataclasses import dataclass
 
-from pygcloud.models import Param, EnvParam
+from pygcloud.models import Param, EnvParam, Result
 
 
 @dataclass
@@ -57,3 +57,15 @@ def test_sys_env():
 
     assert p[0] == "--key"
     assert p[1] == first_value
+
+
+def test_result_repr():
+
+    r = Result(success=True, message="msg", code=0)
+    expected = """Result(success=True, message='msg', code=0)"""
+
+    assert repr(r) == expected, \
+        print(r)
+
+    assert str(r) == expected, \
+        print(str(r))

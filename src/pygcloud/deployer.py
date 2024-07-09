@@ -7,6 +7,8 @@ from .core import CommandLine, GCloud
 from .models import GCPService, Result, Params
 from .constants import ServiceCategory
 
+logger = logging.getLogger("pygcloud.deployer")
+
 
 class Deployer:
 
@@ -37,7 +39,10 @@ class Deployer:
         return self
 
     def before_describe(self, service: GCPService): pass
-    def before_deploy(self, service: GCPService): pass
+
+    def before_deploy(self, service: GCPService):
+        logger.info(f"Before deploying {service.ns}:{service.name}")
+
     def before_create(self, service: GCPService): pass
     def before_update(self, service: GCPService): pass
     def before_delete(self, service: GCPService): pass
@@ -51,7 +56,7 @@ class Deployer:
 
         if self.exit_on_error and not result.success:
             if self.log_error:
-                logging.error(result.message)
+                logger.error(result.message)
             sys.exit(1)
 
     def after_update(self, service: GCPService, result: Result):
@@ -60,7 +65,7 @@ class Deployer:
 
         if self.exit_on_error and not result.success:
             if self.log_error:
-                logging.error(result.message)
+                logger.error(result.message)
             sys.exit(1)
 
     def after_delete(self, service: GCPService, result: Result): pass

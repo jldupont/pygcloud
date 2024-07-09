@@ -26,8 +26,9 @@ class StorageBucket(GCPServiceUpdatable):
     REQUIRES_UPDATE_AFTER_CREATE = False
 
     def __init__(self, name: str, *params: Params):
-        super().__init__(name, "gcs")
-        self.params = list(params)
+        super().__init__(name=name, ns="gcs")
+        if params is not None:
+            self.params = list(params)
 
     def params_describe(self):
         return [

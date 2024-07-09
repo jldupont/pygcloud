@@ -104,7 +104,7 @@ class GCPService(ServiceNode):
 
     @property
     def ns(self):
-        return self.ns_
+        return self._ns
 
     def __init__(self, name=None, ns=None):
         """

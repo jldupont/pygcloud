@@ -31,7 +31,7 @@ from pygcloud.gcp.labels import LabelGenerator
 class CloudRun(GCPServiceRevisionBased, LabelGenerator):
 
     def __init__(self, name: str, *params: Params):
-        super().__init__(name, "run")
+        super().__init__(name=name, ns="run")
         self.params = list(params)
 
     def params_create(self):

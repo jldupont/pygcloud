@@ -24,8 +24,8 @@ def test_run_deploy(deployer, cr):
     assert deployer.cmd.last_command_args == \
         [
             "echo", "beta", "run", "deploy",
-            "my-service", "--clear-labels", "--p1 v1",
-            "--project my-project"
+            "my-service", "--clear-labels", "--p1", "v1",
+            "--project", "my-project"
         ], print(deployer.cmd.last_command_args)
 
 
@@ -37,6 +37,6 @@ def test_run_with_use(deployer, cr, sn1):
     assert deployer.cmd.last_command_args == \
         [
             "echo", "beta", "run", "deploy",
-            "my-service", "--clear-labels", "--p1 v1",
+            "my-service", "--clear-labels", "--p1", "v1",
             "--labels", "pygcloud-use-0=ns1--name1"
         ], print(deployer.cmd.last_command_args)

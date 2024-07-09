@@ -1,10 +1,13 @@
 """
 @author: jldupont
 """
+import logging
 import subprocess
 from typing import List, Tuple, Any, Union
 from .models import Result, Param, Params
 from .utils import prepare_params, split_head_tail
+
+logger = logging.getLogger("pygcloud")
 
 
 class CommandLine:
@@ -25,6 +28,8 @@ class CommandLine:
             common = []
 
         command_args = prepare_params([self.exec_path] + params + common)
+
+        logger.debug(f"CommandLine.exec: {command_args}")
 
         try:
             result = subprocess.run(
