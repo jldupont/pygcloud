@@ -32,7 +32,8 @@ class StorageBucket(GCPServiceUpdatable):
 
     def params_describe(self):
         return [
-            "storage", "buckets", "describe", f"gs://{self.name}"
+            "storage", "buckets", "describe", f"gs://{self.name}",
+            "--format", "json"
         ] + self.params
 
     def params_create(self):

@@ -46,16 +46,20 @@ class CommandLine:
         self._last_command_args = command_args
 
         if result.returncode == 0:
-            return Result(
+            r = Result(
                 success=True,
                 message=result.stdout.strip(),
                 code=0
             )
-        return Result(
-            success=False,
-            message=result.stderr.strip(),
-            code=result.returncode
-        )
+        else:
+            r = Result(
+                success=False,
+                message=result.stderr.strip(),
+                code=result.returncode
+            )
+
+        logger.debug(f"CommandLine.exec result: {result}")
+        return r
 
 
 class GCloud(CommandLine):
