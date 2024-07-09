@@ -1,5 +1,6 @@
 """@author: jldupont"""
-from pygcloud.gcp.services.firestore import FirestoreDatabase
+from pygcloud.gcp.services.firestore import FirestoreDatabase, \
+    FirestoreIndexComposite
 
 
 def test_firestore_database_already_exists(deployer):
@@ -10,5 +11,17 @@ def test_firestore_database_already_exists(deployer):
 
     assert deployer.cmd.last_command_args == [
         "echo", "firestore", "databases", "describe",
-        "--databases", "default"
+        "--database", "default"
+    ], print(deployer.cmd.last_command_args)
+
+
+def test_firestore_index_composite(deployer):
+
+    i = FirestoreIndexComposite("default")
+
+    deployer.deploy(i)
+
+    assert deployer.cmd.last_command_args == [
+        "echo", "firestore", "indexes", "composite", "create",
+        "--database", "default"
     ], print(deployer.cmd.last_command_args)

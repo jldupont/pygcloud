@@ -219,7 +219,9 @@ class GCPServiceSingletonImmutable(GCPService):
             return result
 
         # Case 2: Check if the service already exists
-        if "ALREADY_EXISTS" in result.message:
+        if "already_exists" in result.message.lower():
+
+            # fake idempotence
             self.already_exists = True
             new_result = Result(success=True, message=result.message, code=0)
             self.last_result = new_result

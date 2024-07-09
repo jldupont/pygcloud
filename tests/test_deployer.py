@@ -100,6 +100,11 @@ class ServiceSingletonImmutable(GCPServiceSingletonImmutable):
         self.state_exists = state_exists
 
     def params_describe(self):
+        """Only called when REQUIRES_DESCRIBE_BEFORE_CREATE is True"""
+
+        if not self.REQUIRES_DESCRIBE_BEFORE_CREATE:
+            raise Exception("Should not be called")
+
         return ["describe", "param_describe"]
 
     def params_create(self):
