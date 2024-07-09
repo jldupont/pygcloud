@@ -10,6 +10,8 @@ def test_gcs(deployer):
 
     deployer.deploy(b)
 
+    # "update" because the "describe" stage will succeed
+
     assert deployer.cmd.last_command_args == [
-        "echo", "storage", "buckets", "create", "gs://bucket"
+        "echo", "storage", "buckets", "update", "gs://bucket"
     ]

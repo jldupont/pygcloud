@@ -76,6 +76,7 @@ class Deployer:
         service.before_describe()
         params = service.params_describe()
         result = self.cmd.exec(params, common=self.common_params)
+        service.after_describe(result)
         self.after_describe(service, result)
         return result
 
