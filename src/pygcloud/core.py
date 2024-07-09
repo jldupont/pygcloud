@@ -34,8 +34,7 @@ class CommandLine:
         try:
             result = subprocess.run(
                 command_args,              # Command to execute
-                stdout=subprocess.PIPE,    # Capture stdout
-                stderr=subprocess.PIPE,    # Capture stderr
+                capture_output=True,
                 text=True                  # Decode output as text
             )
         except FileNotFoundError:
@@ -49,12 +48,12 @@ class CommandLine:
         if result.returncode == 0:
             return Result(
                 success=True,
-                message=result.stdout.strip(),
+                message=result.stdout.decode("utf-8").strip(),
                 code=0
             )
         return Result(
             success=False,
-            message=result.stderr.strip(),
+            message=result.stderr.decode("utf-8").strip(),
             code=result.returncode
         )
 
