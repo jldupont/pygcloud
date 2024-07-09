@@ -80,16 +80,26 @@ class Deployer:
         self.after_describe(service, result)
         return result
 
-    def deploy_singleton_immutable(self, service: GCPService):
+    def deploy_singleton_immutable(self, service: GCPService) -> Result:
         """
         We ignore exceptions arising from the service already being created.
         The service's "after_create" method will need to check for this.
         """
         self.before_deploy(service)
+
+        if service.REQUIRES_DESCRIBE_BEFORE_CREATE:
+            self.describe(service)
+
+            if service.already_exists:
+                self.after_deploy(service, service.last_result)
+                return service.last_result
+
+        self.create(service)
+
         result = self.create(service)
         return self.after_deploy(service, result)
 
-    def deploy_revision_based(self, service: GCPService):
+    def deploy_revision_based(self, service: GCPService) -> Result:
         """
         We skip the "update" step. The "create" parameters will be used.
         The "SingletonImmutable" and "RevisionBased" categories are
@@ -100,7 +110,7 @@ class Deployer:
         result = self.create(service)
         return self.after_deploy(service, result)
 
-    def deploy_updateable(self, service: GCPService):
+    def deploy_updateable(self, service: GCPService) -> Result:
         """
         We do the complete steps i.e. describe, create or update.
         """
@@ -115,7 +125,7 @@ class Deployer:
         self.after_deploy(service, result)
         return result
 
-    def deploy(self, service: GCPService):
+    def deploy(self, service: GCPService) -> Result:
 
         # The "match" statement is only available from Python 3.10 onwards
         # https://docs.python.org/3/whatsnew/3.10.html#match-statements

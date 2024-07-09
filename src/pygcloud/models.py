@@ -90,9 +90,14 @@ class GCPService(ServiceNode):
     REQUIRES_UPDATE_AFTER_CREATE: provides support for services
     which cannot be fully configured during the creation phase.
     For example, Google GCS cannot set labels during creation.
+
+    REQUIRES_DESCRIBE_BEFORE_CREATE: for "create only" services
+    that requires checking for existence before attempting creation.
+    For example: Firestore database.
     """
     SERVICE_CATEGORY = ServiceCategory.INDETERMINATE
     REQUIRES_UPDATE_AFTER_CREATE = False
+    REQUIRES_DESCRIBE_BEFORE_CREATE = False
 
     @property
     def category(self):
