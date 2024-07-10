@@ -3,6 +3,7 @@
 """
 import logging
 import subprocess
+import sys
 from typing import List, Tuple, Any, Union
 from .models import Result, Param, Params
 from .utils import prepare_params, split_head_tail
@@ -14,10 +15,16 @@ __all__ = ["CommandLine", "GCloud", "gcloud"]
 
 class CommandLine:
 
-    def __init__(self, exec_path: str):
+    def __init__(self, exec_path: str, exit_on_error: bool = False):
         assert isinstance(exec_path, str)
         self.exec_path = exec_path
         self._last_command_args = None
+        self._exit_on_error = exit_on_error
+        self._last_result = None
+
+    @property
+    def last_result(self):
+        return self._last_result
 
     @property
     def last_command_args(self) -> List[Any]:
@@ -61,6 +68,12 @@ class CommandLine:
             )
 
         logger.debug(f"CommandLine.exec result: {result}")
+        self._last_result = r
+        
+        if self._exit_on_error:
+            if not r.success:
+                sys.exit(r.code)
+
         return r
 
 

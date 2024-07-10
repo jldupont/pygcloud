@@ -3,7 +3,7 @@
 """
 import logging
 import sys
-from typing import Union
+from typing import Union, Callable
 from .core import CommandLine, GCloud
 from .constants import ServiceCategory
 from .models import GCPService, Result, Params, \
@@ -129,7 +129,23 @@ class Deployer:
         self.after_deploy(service, result)
         return result
 
-    def _deploy(self, service: GCPService) -> Result:
+    def _deploy(self, what: Union[GCPService, Callable]) -> Result:
+
+        if isinstance(what, Callable):
+            function = what
+            maybe_result = function()
+
+            if isinstance(maybe_result, Result):
+                result = maybe_result
+                return result
+
+            # didn't raise an exception ? Assume everything is ok
+            return Result(success=True, message="?", code=0)
+
+        if not isinstance(what, GCPService):
+            raise Exception(f"Expecting a Callable or GCPService, got: {what}")
+
+        service = what
 
         # The "match" statement is only available from Python 3.10 onwards
         # https://docs.python.org/3/whatsnew/3.10.html#match-statements
@@ -167,7 +183,7 @@ class Deployer:
             raise Exception("No services could be found")
 
         for service in services:
-            result = self._deploy(service)
+            result: Result = self._deploy(service)
 
         return result
 

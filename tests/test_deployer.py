@@ -212,3 +212,17 @@ def test_deploy_service_groups_retrieve_by_name(deployer, env_first_key,
     deployer.deploy(group_name)
 
     assert mock_service.last_result.success
+
+
+def test_deploy_with_callable(deployer):
+
+    def task():
+        return Result(success=True, message="task_done", code=0)
+
+    service_groups.clear()
+    sg = service_groups.create("sg")
+    sg.append(task)
+
+    result = deployer.deploy("sg")
+
+    assert result.message == "task_done"

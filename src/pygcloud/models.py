@@ -2,7 +2,7 @@
 @author: jldupont
 """
 import os
-from typing import List, Tuple, NewType, Union
+from typing import List, Tuple, NewType, Union, Callable
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from .constants import ServiceCategory
@@ -305,9 +305,10 @@ class ServiceGroup(list):
         if self._name is None:
             raise Exception(f"Expecting a valid name, got: {name}")
 
-    def append(self, service: GCPService):
-        assert isinstance(service, GCPService)
-        return super().append(service)
+    def append(self, what: Union[GCPService, Callable]):
+        assert isinstance(what, GCPService) or \
+            isinstance(what, Callable)
+        return super().append(what)
 
 
 class ServiceGroups(list):
@@ -316,6 +317,11 @@ class ServiceGroups(list):
 
     The use case is for a Deployer to retrieve
     a target group of services to deploy
+
+    Since it's base class is a list, just
+    'append' to it but the more typical use
+    case would be to use the `create` method
+    so that the groups are properly tracked.
     """
     def __init__(self):
         super().__init__()
