@@ -30,9 +30,18 @@ from pygcloud.gcp.labels import LabelGenerator
 
 class CloudRun(GCPServiceRevisionBased, LabelGenerator):
 
-    def __init__(self, name: str, *params: Params):
+    def __init__(self, name: str, *params: Params, region: str = None):
         super().__init__(name=name, ns="run")
+        assert isinstance(region, str)
         self.params = list(params)
+        self.region = region
+
+    def params_describe(self):
+        return [
+            "run", "services", "describe", self.name,
+            "--region", self.region,
+            "--format", "json"
+        ]
 
     def params_create(self):
         """
@@ -41,5 +50,6 @@ class CloudRun(GCPServiceRevisionBased, LabelGenerator):
         """
         return [
             "beta", "run", "deploy", self.name,
-            "--clear-labels"
+            "--clear-labels",
+            "--region", self.region,
         ] + self.params + self.generate_use_labels()
