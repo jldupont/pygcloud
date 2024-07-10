@@ -3,7 +3,51 @@ import pytest
 from dataclasses import dataclass
 
 from pygcloud.models import Param, EnvParam, Result, EnvValue, \
-    ServiceGroup, service_groups
+    ServiceGroup, service_groups, LazyEnvValue
+
+
+def test_env_can_be_modified():
+    import os
+    os.environ["$$__$$"] = "test"
+    assert os.environ["$$__$$"] == "test"
+
+
+def test_lazy_env_value():
+    import os
+
+    lv = None
+
+    with pytest.raises(ValueError):
+        lv = LazyEnvValue("$$_$$")
+        # need to do something with 'lv' or else
+        # it gets compiled-out
+        print(lv)
+
+    assert isinstance(lv, LazyEnvValue)
+
+    os.environ["$$_$$"] = "test"
+
+    # __eq__ operator
+    assert lv == 'test', print(lv)
+
+    # __ne__ operator
+    assert (lv != "test") == False, print(lv)  # NOQA
+
+
+def test_lazy_env_value2():
+
+    ll = [LazyEnvValue("$??"), "abc"]
+
+    # use repr in order to bypass element wise comparison
+    # which would have used LazyEnvValue.__eq__ and thus
+    # triggered attempt to get from os.environ
+    assert repr(ll) == "[LazyEnvValue($??) = None, 'abc']"
+
+    l2 = list(ll)
+    first = l2[0]
+
+    # should not raise
+    print(repr(first))
 
 
 @dataclass

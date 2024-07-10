@@ -19,6 +19,39 @@ class EnvValue(str):
         return instance
 
 
+class LazyEnvValue(str):
+    """
+    Retrieve a value from an environment variable
+
+    Other operators aside from __eq__ and __neq__
+    might be required in the future
+    """
+    def __init__(self, name):
+        super().__init__()
+        self._name = name
+
+    @property
+    def value(self):
+        v = os.environ.get(self._name, None)
+        if v is None:
+            raise ValueError(f"Environment var '{self._name}' does not exist")
+
+        return v
+
+    def __str__(self):
+        return self.value
+
+    def __eq__(self, other):
+        return self.value == other
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __repr__(self):
+        v = os.environ.get(self._name, None)
+        return f"LazyEnvValue({self._name}) = {v}"
+
+
 @dataclass
 class Param:
     """Description of a gcloud parameter"""
@@ -45,7 +78,7 @@ class EnvParam(Param):
     """
     For parameters coming from environment variables
     """
-    def __init__(self, key: str, env_var_name: str):
+    def __init__(self, key: str, env_var_name: str, default: str = None):
         """
         key: parameter name
         env_var_name: environment variable name
@@ -53,7 +86,7 @@ class EnvParam(Param):
         assert isinstance(key, str)
         assert isinstance(env_var_name, str)
 
-        value = os.environ.get(env_var_name, None)
+        value = os.environ.get(env_var_name, default)
         if value is None:
             raise ValueError(f"Environment variable {env_var_name} not found")
         super().__init__(key, value)

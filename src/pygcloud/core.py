@@ -69,7 +69,7 @@ class CommandLine:
 
         logger.debug(f"CommandLine.exec result: {result}")
         self._last_result = r
-        
+
         if self._exit_on_error:
             if not r.success:
                 sys.exit(r.code)
