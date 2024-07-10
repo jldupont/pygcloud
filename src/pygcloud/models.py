@@ -13,19 +13,10 @@ class EnvValue(str):
     """
     Retrieve a value from an environment variable
     """
-    def __init__(self, name: str, default=None):
-        assert isinstance(name, str)
-        self._name = name
-        self._default = default
-
-    @property
-    def value(self):
-        return os.environ.get(self._name, self._default)
-
-    def __str__(self):
-        return self.value
-
-    __repr__ = __str__
+    def __new__(cls, name):
+        value = os.environ.get(name)
+        instance = super().__new__(cls, value)
+        return instance
 
 
 @dataclass

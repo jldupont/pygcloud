@@ -60,7 +60,9 @@ def test_sys_env(env_first_key, env_first_value):
 def test_env_value(env_first_key, env_first_value):
 
     v = EnvValue(env_first_key)
-    assert v.value == env_first_value
+
+    assert v == env_first_value, \
+        print(f"key={env_first_key} , value={env_first_value}")
 
 
 def test_result_repr():
@@ -87,6 +89,8 @@ def test_service_group_1(env_first_key, env_first_value, mock_service):
 
     with pytest.raises(AssertionError):
         sg.append(...)
+
+    assert sg.name == env_first_value
 
 
 def test_service_groups():

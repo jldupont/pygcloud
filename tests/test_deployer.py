@@ -197,6 +197,7 @@ def test_deploy_service_groups_retrieve_by_name(deployer, env_first_key,
                                                 mock_service):
 
     service_groups.clear()
+    mock_service.last_result = None
 
     # Pretend the deployment group name comes from an environment variable
     group_name = EnvValue(env_first_key)
