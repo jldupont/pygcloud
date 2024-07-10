@@ -51,15 +51,18 @@ def prepare_params(params: Union[List[Any], List[Tuple[str, str]]]) \
     Prepare a list of parameters for a command line invocation
 
     Must also ensure there are no whitespace separated entries.
+
+    We use 'str' on all items because of potential special instances
+    such as LazyEnvValue.
     """
     liste = flatten(params)
     new_liste = []
 
     for item in liste:
         if isinstance(item, tuple) or isinstance(item, Param):
-            new_liste.append(item[0])
-            new_liste.append(item[1])
+            new_liste.append(str(item[0]))
+            new_liste.append(str(item[1]))
             continue
-        new_liste.append(item)
+        new_liste.append(str(item))
 
     return new_liste
