@@ -13,14 +13,16 @@ class BackendService(GCPServiceSingletonImmutable):
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
 
-    def __init__(self, name: str, *params: Params):
+    def __init__(self, name: str, params_describe: Params,
+                 params_create: Params):
         super().__init__(name=name, ns="be")
-        self._params = params
+        self._params_describe = params_describe
+        self._params_create = params_create
 
     def params_describe(self):
         return [
             "compute", "backend-services", "describe", self.name,
-        ] + self._params
+        ] + self._params_describe
 
     def after_describe(self, result: Result) -> Result:
         self.already_exists = result.success
@@ -29,4 +31,4 @@ class BackendService(GCPServiceSingletonImmutable):
     def params_create(self):
         return [
             "compute", "backend-services", "create", self.name
-        ] + self._params
+        ] + self._params_create
