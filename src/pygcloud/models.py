@@ -260,6 +260,7 @@ class GCPService(ServiceNode):
     def before_deploy(self):
         """Called by Deployer"""
         for task in self._callables_before_deploy:
+            logging.debug(f"before_deply: executing {task.__name__}")
             task(self)
 
     def before_describe(self):

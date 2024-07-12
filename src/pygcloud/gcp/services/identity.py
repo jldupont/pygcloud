@@ -3,6 +3,7 @@ Services Identity
 
 @author: jldupont
 """
+import logging
 from pygcloud.models import GCPServiceSingletonImmutable, Result
 
 
@@ -43,5 +44,8 @@ class ServicesIdentityIAP(GCPServiceSingletonImmutable):
         except Exception:
             raise Exception("Could not find service account email in:"
                             f" {result.message}")
+
+        logging.debug("ServiceAccount for IAP successfully created"
+                      " (if not already)")
 
         return result

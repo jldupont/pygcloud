@@ -62,6 +62,14 @@ class ServiceAccountIAM(GCPServiceSingletonImmutable):
 
         self.already_exists = binding_existence
 
+        if self.already_exists:
+            ns = self._target_binding.ns
+            email = self._target_binding.email
+            role = self._target_binding.role
+
+            logging.debug("ServiceAccountIAM binding already exists: "
+                          f"{ns}:{email} for role '{role}'")
+
         return result
 
     def params_create(self):
