@@ -92,6 +92,9 @@ class EnvParam(Param):
             raise ValueError(f"Environment variable {env_var_name} not found")
         super().__init__(key, value)
 
+    def __str__(self):
+        return self.value
+
 
 Params = NewType("Param", Union[List[Tuple[str, str]], List[Param]])
 Label = NewType("Label", Tuple[str, str])
