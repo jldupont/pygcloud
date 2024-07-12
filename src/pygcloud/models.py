@@ -2,11 +2,12 @@
 @author: jldupont
 """
 import os
+import logging
+from functools import cache
 from typing import List, Tuple, NewType, Union, Callable
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from .constants import ServiceCategory
-from .helpers import validate_name
 
 
 class EnvValue(str):
@@ -179,23 +180,11 @@ class GCPService(ServiceNode):
         name: string (optional)
         ns: string (optional)
         """
-        if name is not None:
-            if not validate_name(name):
-                raise Exception(f"Invalid name: {name}")
-
         self.already_exists = None  # indeterminated
         self.last_result = None
         self._name = name
         self._ns = ns
         self._uses: List[ServiceNode] = []
-
-    def use(self, service: ServiceNode):
-        self._uses.append(service)
-        return self
-
-    @property
-    def uses(self) -> List[ServiceNode]:
-        return self._uses
 
     def __repr__(self):
         return f"""
@@ -204,6 +193,52 @@ class GCPService(ServiceNode):
         last_result={self.last_result}
         )
         """.strip()
+
+    @classmethod
+    @cache
+    def generate_label(cls, target: ServiceNode) -> str:
+        """
+        Needs to be implemented in a derived class
+        """
+        return None
+
+    def validate_label(self, target: ServiceNode) -> bool:
+        try:
+            self.generate_label(target)
+
+        except Exception:
+            return False
+
+        return True
+
+    def before_use(self, target_service: ServiceNode):
+        """
+        Raises exception if a valid label cannot be derived
+        """
+        if self.validate_label(self) is None:
+            logging.warning("Label validation is not available for:"
+                            f" {self.__class__.name}")
+        else:
+            self.validate_label(self)
+
+        if not self.validate_label(target_service):
+            logging.warning("Label validation is not available for:"
+                            f" {target_service.__class__.name}")
+        else:
+            self.validate_label(target_service)
+
+    def use(self, service: ServiceNode):
+        self.before_use(service)
+        self._uses.append(service)
+        self.after_use(service)
+        return self
+
+    def after_use(self, service: ServiceNode):
+        pass
+
+    @property
+    def uses(self) -> List[ServiceNode]:
+        return self._uses
 
     def before_describe(self):
         """This is service specific"""

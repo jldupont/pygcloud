@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+import json
 from typing import List, Any, Tuple, Union
 from .models import Param
 
@@ -66,3 +67,17 @@ def prepare_params(params: Union[List[Any], List[Tuple[str, str]]]) \
         new_liste.append(str(item))
 
     return new_liste
+
+
+class JsonObject(dict):
+    """
+    Utility class for handling JSON objects
+    """
+
+    @classmethod
+    def from_string(cls, json_str: str):
+        """
+        Build an instance from a JSON string
+        """
+        json_obj = json.loads(json_str)
+        return cls(json_obj)

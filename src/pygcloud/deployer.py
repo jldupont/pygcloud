@@ -51,8 +51,11 @@ class Deployer:
     def before_update(self, service: GCPService): pass
     def before_delete(self, service: GCPService): pass
 
-    def after_describe(self, service: GCPService, result: Result): pass
-    def after_deploy(self, service: GCPService, result: Result): pass
+    def after_describe(self, service: GCPService, result: Result):
+        return result
+
+    def after_deploy(self, service: GCPService, result: Result):
+        return result
 
     def after_create(self, service: GCPService, result: Result):
         if result is None:
@@ -81,7 +84,7 @@ class Deployer:
         params = service.params_describe()
         result = self.cmd.exec(params, common=self.common_params)
         service.after_describe(result)
-        self.after_describe(service, result)
+        result = self.after_describe(service, result)
         return result
 
     def deploy_singleton_immutable(self, service: GCPService) -> Result:
@@ -94,9 +97,9 @@ class Deployer:
         if service.REQUIRES_DESCRIBE_BEFORE_CREATE:
             self.describe(service)
 
-            if service.already_exists:
-                self.after_deploy(service, service.last_result)
-                return service.last_result
+        if service.already_exists:
+            self.after_deploy(service, service.last_result)
+            return service.last_result
 
         self.create(service)
 
@@ -133,7 +136,7 @@ class Deployer:
 
         if isinstance(what, Callable):
             function = what
-            maybe_result = function()
+            maybe_result = function(self)
 
             if isinstance(maybe_result, Result):
                 result = maybe_result

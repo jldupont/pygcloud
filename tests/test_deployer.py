@@ -216,7 +216,7 @@ def test_deploy_service_groups_retrieve_by_name(deployer, env_first_key,
 
 def test_deploy_with_callable(deployer):
 
-    def task():
+    def task(_deployer):
         return Result(success=True, message="task_done", code=0)
 
     service_groups.clear()

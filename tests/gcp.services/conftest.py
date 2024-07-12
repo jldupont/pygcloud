@@ -2,9 +2,36 @@
 @author: jldupont
 """
 import pytest
-from pygcloud.models import ServiceNode
 from pygcloud.gcp.labels import LabelGenerator
-from pygcloud.models import GCPService
+from pygcloud.models import GCPService, Result
+from pygcloud.gcp.parsers import ProjectIAMBindings, IAMBinding
+from samples import PROJECT_BINDINGS
+from pygcloud.gcp.services.iam import ServiceAccountIAM
+
+
+@pytest.fixture
+def project_bindings():
+    return ProjectIAMBindings(PROJECT_BINDINGS)
+
+
+@pytest.fixture
+def sample_binding():
+    """Exists in the samples"""
+    return IAMBinding(
+        email="280761648870@cloudbuild.gserviceaccount.com",
+        role="roles/editor",
+        ns="serviceAccount"
+    )
+
+
+@pytest.fixture
+def sample_fake_binding():
+    """Does not exist in the samples"""
+    return IAMBinding(
+        email="some_email",
+        role="roles/editor",
+        ns="user"
+    )
 
 
 class MockServiceNode(GCPService, LabelGenerator):
@@ -16,8 +43,9 @@ def mock_sn():
     return MockServiceNode("name", "ns")
 
 
-class MockSn(ServiceNode):
+class MockSn(MockServiceNode):
     def __init__(self, name, ns):
+        print(f"MockSn({ns}, {name})")
         self._name = name
         self._ns = ns
 
@@ -28,6 +56,11 @@ class MockSn(ServiceNode):
     @property
     def ns(self):
         return self._ns
+
+
+@pytest.fixture
+def mock_sn_class():
+    return MockSn
 
 
 @pytest.fixture
@@ -43,3 +76,27 @@ def sn2():
 @pytest.fixture
 def sn3():
     return MockSn("name3", "ns3")
+
+
+@pytest.fixture
+def mock_service_account_iam_class():
+    class MockServiceAccountIAM(ServiceAccountIAM):
+
+        def before_describe(self):
+            self.before_describe_called = True
+            self.after_created_called = False
+
+        def after_describe(self, result: Result) -> Result:
+            result = Result(success=True, message=PROJECT_BINDINGS, code=0)
+            super().after_describe(result)
+            return result
+
+        def before_create(self):
+            super().before_create()
+            print(self.already_exists)
+
+        def after_create(self, result: Result) -> Result:
+            self.after_created_called = True
+            return result
+
+    return MockServiceAccountIAM

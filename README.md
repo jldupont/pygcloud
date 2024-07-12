@@ -80,6 +80,8 @@ We work with the limitations (i.e. 64 entries, unique key names, value length li
 2. Each label key is composed like so:  *`pygcloud-use-$index`*
 3. The corresponding label value:  *`$ns--$name`*
 
+The field `$name` is sometimes encoded since the value contains characters not supported by GCP. Encoding strategy in these cases is always the same (bas64 with custom alphabet, padding `=` removed).
+
 
 # About Python 3.9
 

@@ -10,9 +10,6 @@ def validate_name(name: str) -> bool:
     if not isinstance(name, str):
         return False
 
-    if "--" in name:
-        return False
-
     return REGEX_VALIDATE_NAME.match(name) is not None
 
 
