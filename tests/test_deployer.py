@@ -3,7 +3,7 @@ import pytest
 from pygcloud.models import Result, Param, EnvValue, \
     GCPServiceSingletonImmutable, GCPServiceRevisionBased, \
     GCPServiceUpdatable, \
-    service_groups
+    service_groups, GCPService
 
 
 @pytest.fixture
@@ -226,3 +226,23 @@ def test_deploy_with_callable(deployer):
     result = deployer.deploy("sg")
 
     assert result.message == "task_done"
+
+
+def test_deploy_with_before_deploy_in_service(deployer, mock_service):
+
+    called = False
+
+    def task(service):
+        assert isinstance(service, GCPService)
+        nonlocal called
+        called = True
+
+    mock_service.add_task_before_deploy(task)
+
+    service_groups.clear()
+    sg = service_groups.create("sg")
+    sg.append(mock_service)
+
+    deployer.deploy("sg")
+
+    assert called

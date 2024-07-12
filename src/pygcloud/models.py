@@ -185,6 +185,7 @@ class GCPService(ServiceNode):
         self._name = name
         self._ns = ns
         self._uses: List[ServiceNode] = []
+        self._callables_before_deploy: List[Callable] = []
 
     def __repr__(self):
         return f"""
@@ -193,6 +194,19 @@ class GCPService(ServiceNode):
         last_result={self.last_result}
         )
         """.strip()
+
+    def add_task_before_deploy(self, task: Union[Callable, List[Callable]]):
+
+        if isinstance(task, Callable):
+            self._callables_before_deploy.append(task)
+            return self
+
+        if isinstance(task, List):
+            self._callables_before_deploy.extend(task)
+            return self
+
+        raise Exception("Expecting task or task list, "
+                        f"got: {type(task)}")
 
     @classmethod
     @cache
@@ -242,6 +256,8 @@ class GCPService(ServiceNode):
 
     def before_deploy(self):
         """Called by Deployer"""
+        for task in self._callables_before_deploy:
+            task(self)
 
     def before_describe(self):
         """This is service specific"""
