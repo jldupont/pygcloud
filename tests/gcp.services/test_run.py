@@ -2,7 +2,7 @@
 @author: jldupont
 """
 import pytest
-from pygcloud.gcp.services.run import CloudRun
+from pygcloud.gcp.services.run import CloudRun, CloudRunNeg
 from pygcloud.models import Param
 
 
@@ -43,4 +43,19 @@ def test_run_with_use(deployer, cr, sn1):
             "--region", "region",
             "--p1", "v1",
             "--labels", "pygcloud-use-0=ns1--name1"
+        ], print(deployer.cmd.last_command_args)
+
+
+def test_cloud_run_neg(deployer):
+
+    neg = CloudRunNeg("neg", [
+        "--param", "value"
+    ], region="region")
+
+    deployer.deploy(neg)
+    assert deployer.cmd.last_command_args == \
+        [
+            "echo", "beta", "compute", "network-endpoint-groups",
+            "describe", "neg",
+            "--region", "region",
         ], print(deployer.cmd.last_command_args)

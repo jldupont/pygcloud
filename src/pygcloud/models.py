@@ -335,11 +335,7 @@ class GCPServiceSingletonImmutable(GCPService):
     def after_describe(self, result: Result) -> Result:
         """Generic"""
 
-        if not result.success:
-            self.already_exists = False
-            return result
-
-        self.already_exists = True
+        self.already_exists = result.success
         return result
 
     def before_create(self):

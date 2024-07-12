@@ -62,16 +62,17 @@ class CloudRunNeg(GCPServiceSingletonImmutable):
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/network-endpoint-groups
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
+    PREFIX = ["beta", "compute", "network-endpoint-groups"]
 
     def __init__(self, name: str, *params: Params, region: str = None):
         assert isinstance(region, str)
         super().__init__(name, ns="crneg")
         self._region = region
-        self._params = list(params)
+        self._params = list(params) + ["--region", region]
 
     def params_describe(self):
-        return [
-            "beta", "compute", "network-endpoint-groups", "describe",
+        return self.PREFIX + [
+            "describe",
             self.name,
             "--region", self._region
         ]
@@ -82,9 +83,8 @@ class CloudRunNeg(GCPServiceSingletonImmutable):
         --cloud-run-url-mask=${URL_MASK}
         --cloud-run-service=${CLOUD_RUN_NAME}
         """
-        return [
-            "beta", "compute", "network-endpoint-groups", "create",
+        return self.PREFIX + [
+            "create",
             self.name,
-            "--region", self._region,
             "network-endpoint-type", "serverless",
         ] + self._params
