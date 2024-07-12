@@ -5,7 +5,7 @@ import pytest
 from pygcloud.gcp.labels import LabelGenerator
 from pygcloud.models import GCPService, Result
 from pygcloud.gcp.parsers import ProjectIAMBindings, IAMBinding
-from samples import PROJECT_BINDINGS
+from samples import PROJECT_BINDINGS, IP_ADDRESS
 from pygcloud.gcp.services.iam import ServiceAccountIAM
 
 
@@ -100,3 +100,13 @@ def mock_service_account_iam_class():
             return result
 
     return MockServiceAccountIAM
+
+
+@pytest.fixture
+def sample_ip_json():
+    return IP_ADDRESS
+
+
+@pytest.fixture
+def result_success():
+    return Result(success=True, message="success", code=0)

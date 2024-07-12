@@ -105,3 +105,23 @@ PROJECT_BINDINGS = """
   "version": 1
 }
 """
+
+IP_ADDRESS = """
+{
+  "address": "34.144.203.24",
+  "addressType": "EXTERNAL",
+  "creationTimestamp": "2024-05-08T08:41:32.180-07:00",
+  "description": "",
+  "id": "7020168853507679171",
+  "ipVersion": "IPV4",
+  "kind": "compute#address",
+  "labelFingerprint": "42WmSpB8rSM=",
+  "name": "ingress-proxy-ip",
+  "networkTier": "PREMIUM",
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/PROJECT/global/addresses/ingress-proxy-ip",
+  "status": "IN_USE",
+  "users": [
+    "https://www.googleapis.com/compute/v1/projects/PROJECT/global/forwardingRules/fwd-proxy-service"
+  ]
+}
+"""   # NOQA
