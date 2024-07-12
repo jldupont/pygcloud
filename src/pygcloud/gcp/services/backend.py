@@ -1,7 +1,6 @@
 """
 @author: jldupont
 """
-import logging
 from pygcloud.models import GCPServiceSingletonImmutable, Result, Params
 
 

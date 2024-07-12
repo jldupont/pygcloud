@@ -24,7 +24,7 @@ gcloud beta run deploy ${_COMPONENT}  \
 
 * [Cloud Run](https://cloud.google.com/run/docs/deploying)
 """
-from pygcloud.models import GCPServiceRevisionBased, Params
+from pygcloud.models import GCPServiceRevisionBased, Params, GCPServiceSingletonImmutable
 from pygcloud.gcp.labels import LabelGenerator
 
 
@@ -53,3 +53,38 @@ class CloudRun(GCPServiceRevisionBased, LabelGenerator):
             "--clear-labels",
             "--region", self.region,
         ] + self.params + self.generate_use_labels()
+
+
+class CloudRunNeg(GCPServiceSingletonImmutable):
+    """
+    Cloud Run NEG
+
+    https://cloud.google.com/sdk/gcloud/reference/beta/compute/network-endpoint-groups
+    """
+    REQUIRES_DESCRIBE_BEFORE_CREATE = True
+
+    def __init__(self, name: str, *params: Params, region: str = None):
+        assert isinstance(region, str)
+        super().__init__(name, ns="crneg")
+        self._region = region
+        self._params = list(params)
+
+    def params_describe(self):
+        return [
+            "beta", "compute", "network-endpoint-groups", "describe",
+            self.name,
+            "--region", self._region
+        ]
+
+    def params_create(self):
+        """
+        In the params, typically:
+        --cloud-run-url-mask=${URL_MASK}
+        --cloud-run-service=${CLOUD_RUN_NAME}
+        """
+        return [
+            "beta", "compute", "network-endpoint-groups", "create",
+            self.name,
+            "--region", self._region,
+            "network-endpoint-type", "serverless",
+        ] + self._params

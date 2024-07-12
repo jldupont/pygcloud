@@ -332,6 +332,16 @@ class GCPServiceSingletonImmutable(GCPService):
     """
     SERVICE_CATEGORY = ServiceCategory.SINGLETON_IMMUTABLE
 
+    def after_describe(self, result: Result) -> Result:
+        """Generic"""
+
+        if not result.success:
+            self.already_exists = False
+            return result
+
+        self.already_exists = True
+        return result
+
     def before_create(self):
 
         # We do not know if the service already exists
