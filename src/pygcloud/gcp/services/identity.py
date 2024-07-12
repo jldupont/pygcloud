@@ -23,7 +23,7 @@ class ServicesIdentityIAP(GCPServiceSingletonImmutable):
     def params_create(self):
         return [
             "beta", "services", "identity", "create",
-            "--service", "iap,googleapis.com",
+            "--service", "iap.googleapis.com",
             "--format", "json"
         ]
 
