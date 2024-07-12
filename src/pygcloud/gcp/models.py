@@ -4,7 +4,6 @@ Data models related to GCP services
 @author: jldupont
 """
 from typing import List
-import dataclasses
 from dataclasses import dataclass
 
 

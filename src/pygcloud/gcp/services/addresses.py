@@ -41,6 +41,7 @@ class ServicesAddress(GCPServiceSingletonImmutable):
             self.already_exists = False
             return result
 
+        self.already_exists = True
         self._init_with_json(result.message)
 
         return result
