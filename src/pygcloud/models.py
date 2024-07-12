@@ -14,8 +14,8 @@ class EnvValue(str):
     """
     Retrieve a value from an environment variable
     """
-    def __new__(cls, name):
-        value = os.environ.get(name)
+    def __new__(cls, name, default=None):
+        value = os.environ.get(name, default)
         instance = super().__new__(cls, value)
         return instance
 
