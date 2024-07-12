@@ -240,6 +240,9 @@ class GCPService(ServiceNode):
     def uses(self) -> List[ServiceNode]:
         return self._uses
 
+    def before_deploy(self):
+        """Called by Deployer"""
+
     def before_describe(self):
         """This is service specific"""
 
@@ -286,6 +289,9 @@ class GCPService(ServiceNode):
     def after_delete(self, result: Result) -> Result:
         self.last_result = result
         return result
+
+    def after_deploy(self):
+        """Called by Deployer"""
 
 
 class GCPServiceSingletonImmutable(GCPService):

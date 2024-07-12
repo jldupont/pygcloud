@@ -46,6 +46,7 @@ class Deployer:
 
     def before_deploy(self, service: GCPService):
         logger.info(f"Before deploying {service.ns}:{service.name}")
+        service.before_deploy()
 
     def before_create(self, service: GCPService): pass
     def before_update(self, service: GCPService): pass
@@ -55,6 +56,7 @@ class Deployer:
         return result
 
     def after_deploy(self, service: GCPService, result: Result):
+        service.after_deploy()
         return result
 
     def after_create(self, service: GCPService, result: Result):
