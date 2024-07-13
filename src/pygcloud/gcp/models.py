@@ -106,23 +106,39 @@ class CloudRunRevisionSpec:
 
 
 @dataclass
+class BackendGroup:
+    balancingMode: str
+    group: str
+    capacityScaler: int
+
+
+@dataclass
 class BackendServiceSpec:
 
     name: str
     port: int
     portName: str
     protocol: str
+    backend_groups: List[BackendGroup]
 
     @classmethod
     def from_string(cls, json_str: str):
 
         obj = JsonObject.from_string(json_str)
 
+        raw_groups = obj["backends"]
+        groups = []
+
+        for group in raw_groups:
+            group = BackendGroup(**group)
+            groups.append(group)
+
         d = {
             "name": obj["name"],
             "port": obj["port"],
             "portName": obj["portName"],
-            "protocol": obj["protocol"]
+            "protocol": obj["protocol"],
+            "backend_groups": groups
         }
 
         return cls(**d)

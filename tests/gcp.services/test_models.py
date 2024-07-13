@@ -2,7 +2,7 @@
 @author: jldupont
 """
 from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec, \
-    BackendServiceSpec
+    BackendServiceSpec, BackendGroup
 
 
 def test_service_address(sample_ip_json):
@@ -27,3 +27,12 @@ def test_backend_service(sample_backend_service):
 
     assert bes.name == "backend-service"
     assert bes.protocol == "HTTPS"
+
+    groups = bes.backend_groups
+
+    assert len(groups) == 1
+
+    group = groups[0]
+    assert isinstance(group, BackendGroup)
+
+    assert group.capacityScaler == 1.0
