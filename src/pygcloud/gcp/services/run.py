@@ -1,19 +1,6 @@
 """
 @author: jldupont
 
-gcloud beta run deploy ${_COMPONENT}  \
---source .  \
---no-allow-unauthenticated \
---region $_REGION     \
---project ${_PROJECT_ID}  \
---ingress internal-and-cloud-load-balancing \
---memory ${_MEMORY}   \
---execution-environment gen2 \
---add-volume name="blobs",type=cloud-storage,bucket="${_BLOBS_BUCKET}" \
---add-volume-mount volume="blobs",mount-path="${BLOB_MOUNT_PATH}" \
---set-env-vars "BLOB_MOUNT_PATH=${BLOB_MOUNT_PATH}" \
---command "/app/run.sh"
-
 # Labels
 
 * The parameter `--labels` is an alias for `--update-labels`.
@@ -24,8 +11,10 @@ gcloud beta run deploy ${_COMPONENT}  \
 
 * [Cloud Run](https://cloud.google.com/run/docs/deploying)
 """
-from pygcloud.models import GCPServiceRevisionBased, Params, GCPServiceSingletonImmutable
+from pygcloud.models import GCPServiceRevisionBased, Params, \
+    GCPServiceSingletonImmutable, Result
 from pygcloud.gcp.labels import LabelGenerator
+from pygcloud.gcp.models import CloudRunRevisionSpec
 
 
 class CloudRun(GCPServiceRevisionBased, LabelGenerator):
@@ -35,6 +24,7 @@ class CloudRun(GCPServiceRevisionBased, LabelGenerator):
         assert isinstance(region, str)
         self.params = list(params)
         self.region = region
+        self.spec = None
 
     def params_describe(self):
         return [
@@ -42,6 +32,13 @@ class CloudRun(GCPServiceRevisionBased, LabelGenerator):
             "--region", self.region,
             "--format", "json"
         ]
+
+    def after_describe(self, result: Result) -> Result:
+
+        if result.success:
+            self.spec = CloudRunRevisionSpec.from_string(result.message)
+
+        return super().after_describe(result)
 
     def params_create(self):
         """

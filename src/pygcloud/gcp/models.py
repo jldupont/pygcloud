@@ -3,8 +3,9 @@ Data models related to GCP services
 
 @author: jldupont
 """
-from typing import List
+from typing import List, Dict
 from dataclasses import dataclass
+from pygcloud.utils import JsonObject
 
 
 class _base:
@@ -79,3 +80,27 @@ class IPAddress(_base):
     address: str
     addressType: str
     ipVersion: str
+
+
+@dataclass
+class CloudRunRevisionSpec:
+    """
+    Cloud Run Revision Specification (flattened)
+    """
+    name: str
+    url: str
+    labels: Dict
+
+    @classmethod
+    def from_string(cls, json_str: str):
+
+        obj = JsonObject.from_string(json_str)
+
+        d = {
+            "url": obj["status.url"],
+            "labels": obj["spec.template.metadata.labels"],
+            "name": obj["metadata.name"],
+        }
+
+        return cls(**d)
+

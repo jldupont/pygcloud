@@ -1,7 +1,8 @@
 """@author: jldupont"""
 
 import pytest
-from pygcloud.utils import flatten, split_head_tail, prepare_params
+from pygcloud.utils import flatten, split_head_tail, prepare_params, \
+    JsonObject
 
 
 @pytest.mark.parametrize("liste,expected", [
@@ -42,3 +43,14 @@ def test_split_head_tail_base(liste, expected):
 ])
 def test_prepare_params(inp, expected):
     assert prepare_params(inp) == expected
+
+
+@pytest.mark.parametrize("obj, path,expected", [
+    ({"l1": "v1"},         "l1",   "v1"),
+    ({"l1": {"l2": "v2"}}, "l1.l2", "v2"),
+    ({"l1": {"l2": ["v2"]}}, "l1.l2", ["v2"])
+])
+def test_json_obj(obj, path, expected):
+
+    obj = JsonObject(**obj)
+    assert obj[path] == expected

@@ -69,7 +69,36 @@ def prepare_params(params: Union[List[Any], List[Tuple[str, str]]]) \
     return new_liste
 
 
-class JsonObject(dict):
+class DotDict(dict):
+    """
+    A dictionary like object where values
+    can be accessed through nested dot paths
+
+    e.g.
+        d = DoctAccessibleDict({"l1": {"l2": "v2"}})
+        value = d["l1.l2"]
+        assert value == "v2"
+    """
+    def __getitem__(self, path):
+        if "." not in path:
+            return super().__getitem__(path)
+
+        result = None
+        parts = path.split(".")
+        current = self
+
+        for part in parts:
+            result = current.get(part, None)
+            if result is None:
+                break
+            if not isinstance(result, dict):
+                break
+            current = result
+
+        return result
+
+
+class JsonObject(DotDict):
     """
     Utility class for handling JSON objects
     """

@@ -125,3 +125,144 @@ IP_ADDRESS = """
   ]
 }
 """   # NOQA
+
+CLOUD_RUN_REVISION_SPEC = """
+{
+  "apiVersion": "serving.knative.dev/v1",
+  "kind": "Service",
+  "metadata": {
+    "annotations": {
+      "run.googleapis.com/client-name": "gcloud",
+      "run.googleapis.com/client-version": "483.0.0",
+      "run.googleapis.com/ingress": "internal-and-cloud-load-balancing",
+      "run.googleapis.com/ingress-status": "internal-and-cloud-load-balancing",
+      "run.googleapis.com/launch-stage": "BETA",
+      "run.googleapis.com/operation-id": "6e52862c-84a1-4805-a5ee-57bf3473555a",
+      "serving.knative.dev/creator": "280761648870@cloudbuild.gserviceaccount.com",
+      "serving.knative.dev/lastModifier": "280761648870@cloudbuild.gserviceaccount.com"
+    },
+    "creationTimestamp": "2024-05-08T13:19:53.805059Z",
+    "generation": 71,
+    "labels": {
+      "cloud.googleapis.com/location": "northamerica-northeast1"
+    },
+    "name": "SERVICE",
+    "namespace": "215695389495",
+    "resourceVersion": "AAYc54GvVGU",
+    "selfLink": "/apis/serving.knative.dev/v1/namespaces/215695389495/services/SERVICE",
+    "uid": "165ad2e2-0c5d-475d-af49-6b45b4a5a007"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "annotations": {
+          "autoscaling.knative.dev/maxScale": "100",
+          "run.googleapis.com/client-name": "gcloud",
+          "run.googleapis.com/client-version": "483.0.0",
+          "run.googleapis.com/execution-environment": "gen2",
+          "run.googleapis.com/startup-cpu-boost": "true"
+        },
+        "labels": {
+          "client.knative.dev/nonce": "cotyygbwzm",
+          "run.googleapis.com/startupProbeType": "Default"
+        }
+      },
+      "spec": {
+        "containerConcurrency": 80,
+        "containers": [
+          {
+            "command": [
+              "/app/run.sh"
+            ],
+            "env": [
+              {
+                "name": "BLOB_MOUNT_PATH",
+                "value": "/tmp/_blobs"
+              }
+            ],
+            "image": "northamerica-northeast1-docker.pkg.dev/sys-playground-dev/cloud-run-source-deploy/SERVICE@sha256:10236cf86a0cdae06a147e72056ef5a0940edf53ebf5026d23bd840d016685c8",
+            "ports": [
+              {
+                "containerPort": 8080,
+                "name": "http1"
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "1000m",
+                "memory": "512Mi"
+              }
+            },
+            "startupProbe": {
+              "failureThreshold": 1,
+              "periodSeconds": 240,
+              "tcpSocket": {
+                "port": 8080
+              },
+              "timeoutSeconds": 240
+            },
+            "volumeMounts": [
+              {
+                "mountPath": "/tmp/_blobs",
+                "name": "blobs"
+              }
+            ]
+          }
+        ],
+        "serviceAccountName": "215695389495-compute@developer.gserviceaccount.com",
+        "timeoutSeconds": 300,
+        "volumes": [
+          {
+            "csi": {
+              "driver": "gcsfuse.run.googleapis.com",
+              "volumeAttributes": {
+                "bucketName": "systemical-SERVICE-files-dev"
+              }
+            },
+            "name": "blobs"
+          }
+        ]
+      }
+    },
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100
+      }
+    ]
+  },
+  "status": {
+    "address": {
+      "url": "https://SERVICE-4ro7a33l3a-nn.a.run.app"
+    },
+    "conditions": [
+      {
+        "lastTransitionTime": "2024-07-10T16:54:59.038309Z",
+        "status": "True",
+        "type": "Ready"
+      },
+      {
+        "lastTransitionTime": "2024-05-08T13:19:54.492116Z",
+        "status": "True",
+        "type": "ConfigurationsReady"
+      },
+      {
+        "lastTransitionTime": "2024-07-10T16:54:59.014028Z",
+        "status": "True",
+        "type": "RoutesReady"
+      }
+    ],
+    "latestCreatedRevisionName": "SERVICE-00071-q56",
+    "latestReadyRevisionName": "SERVICE-00071-q56",
+    "observedGeneration": 71,
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100,
+        "revisionName": "SERVICE-00071-q56"
+      }
+    ],
+    "url": "https://SERVICE-4ro7a33l3a-nn.a.run.app"
+  }
+}
+"""  # NOQA

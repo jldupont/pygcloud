@@ -5,7 +5,7 @@ import pytest
 from pygcloud.gcp.labels import LabelGenerator
 from pygcloud.models import GCPService, Result
 from pygcloud.gcp.parsers import ProjectIAMBindings, IAMBinding
-from samples import PROJECT_BINDINGS, IP_ADDRESS
+from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC
 from pygcloud.gcp.services.iam import ServiceAccountIAM
 
 
@@ -110,3 +110,8 @@ def sample_ip_json():
 @pytest.fixture
 def result_success():
     return Result(success=True, message="success", code=0)
+
+
+@pytest.fixture
+def sample_cloud_run_revision_spec():
+    return CLOUD_RUN_REVISION_SPEC
