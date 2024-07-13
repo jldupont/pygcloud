@@ -1,8 +1,8 @@
 """
 @author: jldupont
 """
-from pygcloud.models import GCPServiceSingletonImmutable, Result, Params, \
-    BackendServiceSpec
+from pygcloud.models import GCPServiceSingletonImmutable, Result, Params
+from pygcloud.gcp.models import BackendServiceSpec
 
 
 class BackendService(GCPServiceSingletonImmutable):
