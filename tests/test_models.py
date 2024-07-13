@@ -3,7 +3,7 @@ import pytest
 from dataclasses import dataclass
 
 from pygcloud.models import Param, EnvParam, Result, EnvValue, \
-    ServiceGroup, service_groups, LazyEnvValue
+    ServiceGroup, service_groups, LazyEnvValue, LazyAttrValue
 
 
 def test_env_can_be_modified():
@@ -154,3 +154,27 @@ def test_service_groups():
 
     assert sg1.name == "sg1"
     assert sg2.name == "sg2"
+
+
+@dataclass
+class Data:
+    d: dict
+    e: str
+    f: int
+
+
+data = Data(d={"k": "v", "k2": {"k3": "v3"}}, e="666", f=666)
+
+
+@pytest.mark.parametrize("obj, path, expected", [
+    (data, "d.k",  "v"),
+    (data, "e",    "666"),
+    (data, "f",    666),
+    (data, "d.k2", {"k3": "v3"})
+])
+def test_lazy_attr_value(obj, path, expected):
+
+    lv = LazyAttrValue(obj, path)
+
+    assert lv == expected, print(lv)
+    assert str(lv) == str(expected), print(lv)

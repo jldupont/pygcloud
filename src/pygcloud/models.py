@@ -4,7 +4,7 @@
 import os
 import logging
 from functools import cache
-from typing import List, Tuple, NewType, Union, Callable
+from typing import List, Tuple, NewType, Union, Callable, Any
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from .constants import ServiceCategory
@@ -51,6 +51,46 @@ class LazyEnvValue(str):
     def __repr__(self):
         v = os.environ.get(self._name, None)
         return f"LazyEnvValue({self._name}) = {v}"
+
+
+class LazyAttrValue:
+    """
+    Retrieve a value from an object
+
+    The attribute name can be nested
+    using "dot" notation
+
+    See example in the unit-test
+    """
+
+    def __init__(self, obj: Any, path: str):
+        self._obj = obj
+        self._path = path
+
+    @property
+    def value(self):
+        parts = self._path.split(".")
+        result = self._obj
+
+        while parts:
+            key = parts.pop(0)
+            if isinstance(result, dict):
+                result = result[key]
+            else:
+                result = getattr(result, key)
+
+        return result
+
+    def __eq__(self, other):
+        return self.value == other
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __str__(self):
+        return str(self.value)
+
+    __repr__ = __str__
 
 
 @dataclass
