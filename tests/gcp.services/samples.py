@@ -180,7 +180,7 @@ CLOUD_RUN_REVISION_SPEC = """
                 "value": "/tmp/_blobs"
               }
             ],
-            "image": "northamerica-northeast1-docker.pkg.dev/sys-playground-dev/cloud-run-source-deploy/SERVICE@sha256:10236cf86a0cdae06a147e72056ef5a0940edf53ebf5026d23bd840d016685c8",
+            "image": "northamerica-northeast1-docker.pkg.dev/SERVICE/cloud-run-source-deploy/SERVICE@sha256:10236cf86a0cdae06a147e72056ef5a0940edf53ebf5026d23bd840d016685c8",
             "ports": [
               {
                 "containerPort": 8080,
@@ -264,5 +264,50 @@ CLOUD_RUN_REVISION_SPEC = """
     ],
     "url": "https://SERVICE-4ro7a33l3a-nn.a.run.app"
   }
+}
+"""  # NOQA
+
+BACKEND_SERVICE = """
+{
+  "affinityCookieTtlSec": 0,
+  "backends": [
+    {
+      "balancingMode": "UTILIZATION",
+      "capacityScaler": 1.0,
+      "group": "https://www.googleapis.com/compute/v1/projects/SERVICE/regions/northamerica-northeast1/networkEndpointGroups/backend-neg"
+    }
+  ],
+  "connectionDraining": {
+    "drainingTimeoutSec": 0
+  },
+  "creationTimestamp": "2024-05-08T17:28:46.445-07:00",
+  "description": "",
+  "enableCDN": false,
+  "fingerprint": "HDHonjhFZmg=",
+  "iap": {
+    "enabled": true,
+    "oauth2ClientId": "215695389495-kv6g4u53mdkmc5s9olhr3r9nusahnvbl.apps.googleusercontent.com",
+    "oauth2ClientSecretSha256": "3a949ba4ab5c8124e553d89853ea38441d33e92830b64a88637e1bef8aef2974"
+  },
+  "id": "6598618698168247889",
+  "kind": "compute#backendService",
+  "loadBalancingScheme": "EXTERNAL",
+  "logConfig": {
+    "enable": true,
+    "optionalMode": "EXCLUDE_ALL_OPTIONAL",
+    "sampleRate": 1.0
+  },
+  "name": "backend-service",
+  "port": 80,
+  "portName": "http",
+  "protocol": "HTTPS",
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/SERVICE/global/backendServices/backend-service",
+  "sessionAffinity": "NONE",
+  "timeoutSec": 30,
+  "usedBy": [
+    {
+      "reference": "https://www.googleapis.com/compute/v1/projects/SERVICE/global/urlMaps/urlmap-backend-service"
+    }
+  ]
 }
 """  # NOQA

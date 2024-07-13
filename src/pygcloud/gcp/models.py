@@ -104,3 +104,25 @@ class CloudRunRevisionSpec:
 
         return cls(**d)
 
+
+@dataclass
+class BackendServiceSpec:
+
+    name: str
+    port: int
+    portName: str
+    protocol: str
+
+    @classmethod
+    def from_string(cls, json_str: str):
+
+        obj = JsonObject.from_string(json_str)
+
+        d = {
+            "name": obj["name"],
+            "port": obj["port"],
+            "portName": obj["portName"],
+            "protocol": obj["protocol"]
+        }
+
+        return cls(**d)

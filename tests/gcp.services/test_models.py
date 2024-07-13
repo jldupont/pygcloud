@@ -1,7 +1,8 @@
 """
 @author: jldupont
 """
-from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec
+from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec, \
+    BackendServiceSpec
 
 
 def test_service_address(sample_ip_json):
@@ -18,3 +19,11 @@ def test_cloud_run_revision_spec(sample_cloud_run_revision_spec):
 
     assert crr.name == "SERVICE"
     assert crr.url == "https://SERVICE-4ro7a33l3a-nn.a.run.app"
+
+
+def test_backend_service(sample_backend_service):
+
+    bes = BackendServiceSpec.from_string(sample_backend_service)
+
+    assert bes.name == "backend-service"
+    assert bes.protocol == "HTTPS"

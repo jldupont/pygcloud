@@ -1,7 +1,8 @@
 """
 @author: jldupont
 """
-from pygcloud.models import GCPServiceSingletonImmutable, Result, Params
+from pygcloud.models import GCPServiceSingletonImmutable, Result, Params, \
+    BackendServiceSpec
 
 
 class BackendService(GCPServiceSingletonImmutable):
@@ -17,14 +18,26 @@ class BackendService(GCPServiceSingletonImmutable):
         super().__init__(name=name, ns="be")
         self._params_describe = params_describe
         self._params_create = params_create
+        self._service_spec: BackendServiceSpec = None
+
+    @property
+    def spec(self) -> BackendServiceSpec:
+        return self._service_spec
 
     def params_describe(self):
         return [
             "compute", "backend-services", "describe", self.name,
+            "--format", "json"
         ] + self._params_describe
 
     def after_describe(self, result: Result) -> Result:
-        self.already_exists = result.success
+
+        if not result.success:
+            return super().after_describe(result)
+
+        self.already_exists = True
+        self._service_spec = BackendServiceSpec.from_string(result.message)
+
         return result
 
     def params_create(self):
