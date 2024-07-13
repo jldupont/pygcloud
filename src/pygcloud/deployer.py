@@ -5,7 +5,7 @@ import logging
 import sys
 from typing import Union, Callable
 from .core import CommandLine, GCloud
-from .constants import ServiceCategory
+from .constants import ServiceCategory, Instruction
 from .models import GCPService, Result, Params, \
     ServiceGroup, service_groups, GroupName, \
     GroupNameUtility
@@ -44,9 +44,9 @@ class Deployer:
 
     def before_describe(self, service: GCPService): pass
 
-    def before_deploy(self, service: GCPService):
+    def before_deploy(self, service: GCPService) -> Union[Instruction, None]:
         logger.info(f"Before deploying {service.ns}:{service.name}")
-        service.before_deploy()
+        return service.before_deploy()
 
     def before_create(self, service: GCPService): pass
     def before_update(self, service: GCPService): pass
@@ -89,12 +89,28 @@ class Deployer:
         result = self.after_describe(service, result)
         return result
 
-    def deploy_singleton_immutable(self, service: GCPService) -> Result:
+    def _should_abort(self, service, instruction: Instruction) -> bool:
+
+        if instruction == Instruction.ABORT_DEPLOY:
+            logging.debug(f"Deployment of {service.name} aborted")
+            return True
+
+        if instruction == Instruction.ABORT_DEPLOY_ALL:
+            logging.debug("Aborting further steps in deployment")
+            return True
+
+        return False
+
+    def deploy_singleton_immutable(self, service: GCPService) \
+            -> Union[Result, Instruction]:
         """
         We ignore exceptions arising from the service already being created.
         The service's "after_create" method will need to check for this.
         """
-        self.before_deploy(service)
+        instruction: Instruction = self.before_deploy(service)
+
+        if self._should_abort(service, instruction):
+            return instruction
 
         if service.REQUIRES_DESCRIBE_BEFORE_CREATE:
             self.describe(service)
@@ -112,14 +128,18 @@ class Deployer:
         result = self.create(service)
         return self.after_deploy(service, result)
 
-    def deploy_revision_based(self, service: GCPService) -> Result:
+    def deploy_revision_based(self, service: GCPService) \
+            -> Union[Result, Instruction]:
         """
         We skip the "update" step. The "create" parameters will be used.
         The "SingletonImmutable" and "RevisionBased" categories are
         indistinguishable from the Deployer point of view: the logic to
         handle them is located in the Service class.
         """
-        self.before_deploy(service)
+        instruction: Instruction = self.before_deploy(service)
+
+        if self._should_abort(service, instruction):
+            return instruction
 
         if service.just_describe:
             self.describe(service)
@@ -129,11 +149,16 @@ class Deployer:
         result = self.create(service)
         return self.after_deploy(service, result)
 
-    def deploy_updateable(self, service: GCPService) -> Result:
+    def deploy_updateable(self, service: GCPService) \
+            -> Union[Result, Instruction]:
         """
         We do the complete steps i.e. describe, create or update.
         """
-        self.before_deploy(service)
+        instruction: Instruction = self.before_deploy(service)
+
+        if self._should_abort(service, instruction):
+            return instruction
+
         self.describe(service)
 
         if service.just_describe:
@@ -148,7 +173,8 @@ class Deployer:
         self.after_deploy(service, result)
         return result
 
-    def _deploy(self, what: Union[GCPService, Callable]) -> Result:
+    def _deploy(self, what: Union[GCPService, Callable]) \
+            -> Union[Result, Instruction]:
 
         if isinstance(what, Callable):
             function = what
@@ -180,7 +206,7 @@ class Deployer:
         raise RuntimeError(f"Unknown service category: {service.category}")
 
     def deploy(self, what: Union[GCPService, ServiceGroup, GroupName]) \
-            -> Result:
+            -> Union[Result, Instruction]:
         """
         Either deploys a single service or a group of them
 
@@ -202,7 +228,9 @@ class Deployer:
             raise Exception("No services could be found")
 
         for service in services:
-            result: Result = self._deploy(service)
+            result: Union[Result, Instruction] = self._deploy(service)
+            if result == Instruction.ABORT_DEPLOY_ALL:
+                break
 
         return result
 

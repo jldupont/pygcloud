@@ -7,7 +7,7 @@ from functools import cache
 from typing import List, Tuple, NewType, Union, Callable, Any
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from .constants import ServiceCategory
+from .constants import ServiceCategory, Instruction
 
 
 class EnvValue(str):
@@ -306,8 +306,16 @@ class GCPService(ServiceNode):
     def uses(self) -> List[ServiceNode]:
         return self._uses
 
-    def before_deploy(self):
-        """Called by Deployer"""
+    def before_deploy(self) -> Union[Instruction, None]:
+        """
+        Called by Deployer
+
+        If Instruction.ABORT_DEPLOY is returned by a task,
+        the Deployer will abort the deployment of the
+        current service.
+        """
+
+        instruction = None
         for task in self._callables_before_deploy:
 
             try:
@@ -317,7 +325,13 @@ class GCPService(ServiceNode):
                 tname = str(task)
 
             logging.debug(f"before_deply: executing {tname}")
-            task(self)
+            instruction = task(self)
+            if instruction is not None:
+                if instruction.is_abort():
+                    return instruction
+
+        # returns last instruction ; plan accordingly
+        return instruction
 
     def before_describe(self):
         """This is service specific"""

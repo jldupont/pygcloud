@@ -1,5 +1,6 @@
 """@author: jldupont"""
 import pytest
+from pygcloud.constants import Instruction
 from pygcloud.models import Result, Param, EnvValue, \
     GCPServiceSingletonImmutable, GCPServiceRevisionBased, \
     GCPServiceUpdatable, \
@@ -246,3 +247,45 @@ def test_deploy_with_before_deploy_in_service(deployer, mock_service):
     deployer.deploy("sg")
 
     assert called
+
+
+def test_deploy_abort(deployer, mock_service):
+
+    def task(_srv):
+        return Instruction.ABORT_DEPLOY
+
+    mock_service.add_task_before_deploy(task)
+
+    service_groups.clear()
+    sg = service_groups.create("sg")
+    sg.append(mock_service)
+
+    result = deployer.deploy("sg")
+
+    assert isinstance(result, Instruction)
+    assert result == Instruction.ABORT_DEPLOY
+
+
+def test_deploy_abort_all(deployer, mock_service):
+
+    def task(_srv):
+        return Instruction.ABORT_DEPLOY_ALL
+
+    called = False
+
+    def task_should_not_be_executed(_srv):
+        nonlocal called
+        called = True
+
+    mock_service.add_task_before_deploy(task)
+    mock_service.add_task_before_deploy(task_should_not_be_executed)
+
+    service_groups.clear()
+    sg = service_groups.create("sg")
+    sg.append(mock_service)
+
+    result = deployer.deploy("sg")
+
+    assert isinstance(result, Instruction)
+    assert result == Instruction.ABORT_DEPLOY_ALL
+    assert not called
