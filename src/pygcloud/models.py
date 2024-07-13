@@ -189,6 +189,15 @@ class GCPService(ServiceNode):
         self._ns = ns
         self._uses: List[ServiceNode] = []
         self._callables_before_deploy: List[Callable] = []
+        self._just_describe = False
+
+    @property
+    def just_describe(self):
+        return self._just_describe
+
+    def set_just_describe(self):
+        self._just_describe = True
+        return self
 
     def __repr__(self):
         return f"""

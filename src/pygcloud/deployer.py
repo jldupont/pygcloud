@@ -99,6 +99,10 @@ class Deployer:
         if service.REQUIRES_DESCRIBE_BEFORE_CREATE:
             self.describe(service)
 
+        if service.just_describe:
+            self.after_deploy(service, service.last_result)
+            return service.last_result
+
         if service.already_exists:
             self.after_deploy(service, service.last_result)
             return service.last_result
@@ -116,6 +120,12 @@ class Deployer:
         handle them is located in the Service class.
         """
         self.before_deploy(service)
+
+        if service.just_describe:
+            self.describe(service)
+            self.after_deploy(service, service.last_result)
+            return service.last_result
+
         result = self.create(service)
         return self.after_deploy(service, result)
 
@@ -125,6 +135,10 @@ class Deployer:
         """
         self.before_deploy(service)
         self.describe(service)
+
+        if service.just_describe:
+            self.after_deploy(service, service.last_result)
+            return service.last_result
 
         if service.already_exists:
             result = self.update(service)
