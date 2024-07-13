@@ -325,7 +325,7 @@ class GCPService(ServiceNode):
                 tname = str(task)
 
             logging.debug(f"before_deply: executing {tname}")
-            instruction = task(self)
+            instruction = task()
             if instruction is not None:
                 if instruction.is_abort():
                     return instruction

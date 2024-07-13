@@ -217,7 +217,7 @@ def test_deploy_service_groups_retrieve_by_name(deployer, env_first_key,
 
 def test_deploy_with_callable(deployer):
 
-    def task(_deployer):
+    def task():
         return Result(success=True, message="task_done", code=0)
 
     service_groups.clear()
@@ -233,8 +233,7 @@ def test_deploy_with_before_deploy_in_service(deployer, mock_service):
 
     called = False
 
-    def task(service):
-        assert isinstance(service, GCPService)
+    def task():
         nonlocal called
         called = True
 
@@ -251,7 +250,7 @@ def test_deploy_with_before_deploy_in_service(deployer, mock_service):
 
 def test_deploy_abort(deployer, mock_service):
 
-    def task(_srv):
+    def task():
         return Instruction.ABORT_DEPLOY
 
     mock_service.add_task_before_deploy(task)
@@ -268,12 +267,12 @@ def test_deploy_abort(deployer, mock_service):
 
 def test_deploy_abort_all(deployer, mock_service):
 
-    def task(_srv):
+    def task():
         return Instruction.ABORT_DEPLOY_ALL
 
     called = False
 
-    def task_should_not_be_executed(_srv):
+    def task_should_not_be_executed():
         nonlocal called
         called = True
 
