@@ -26,11 +26,6 @@ class FwdRuleHTTPSProxyService(GCPServiceSingletonImmutable):
         super().__init__(name=name, ns="fwd-rule")
         self._proxy_name = proxy_name
         self._ip_address_name = ip_address_name
-        self._rule = None
-
-    @property
-    def spec(self):
-        return self._rule
 
     def params_describe(self):
         return self.PREFIX + [
