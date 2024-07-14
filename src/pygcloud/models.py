@@ -205,6 +205,7 @@ class GCPService(ServiceNode):
     SERVICE_CATEGORY = ServiceCategory.INDETERMINATE
     REQUIRES_UPDATE_AFTER_CREATE = False
     REQUIRES_DESCRIBE_BEFORE_CREATE = False
+    SPEC_CLASS = None
 
     @property
     def category(self):
@@ -230,6 +231,11 @@ class GCPService(ServiceNode):
         self._uses: List[ServiceNode] = []
         self._callables_before_deploy: List[Callable] = []
         self._just_describe = False
+        self._spec = None
+
+    @property
+    def spec(self):
+        return self._spec
 
     @property
     def just_describe(self):
@@ -364,12 +370,28 @@ class GCPService(ServiceNode):
     def after_describe(self, result: Result) -> Result:
         """This is service specific"""
         self.last_result = result
+
+        if not result.success:
+            return result
+
         if result.success:
             self.already_exists = True
+            if self.SPEC_CLASS:
+                self._spec = self.SPEC_CLASS.from_string(result.message)
+
         return result
 
     def after_create(self, result: Result) -> Result:
         self.last_result = result
+
+        if not result.success:
+            return result
+
+        if result.success:
+            self.already_exists = False
+            if self.SPEC_CLASS:
+                self._spec = self.SPEC_CLASS.from_string(result.message)
+
         return result
 
     def after_update(self, result: Result) -> Result:
@@ -395,12 +417,6 @@ class GCPServiceSingletonImmutable(GCPService):
     """
     SERVICE_CATEGORY = ServiceCategory.SINGLETON_IMMUTABLE
 
-    def after_describe(self, result: Result) -> Result:
-        """Generic"""
-
-        self.already_exists = result.success
-        return result
-
     def before_create(self):
 
         # We do not know if the service already exists
@@ -415,8 +431,7 @@ class GCPServiceSingletonImmutable(GCPService):
 
         # Case 1: the service was just created
         if result.code == 0:
-            self.already_exists = False
-            return result
+            return super().after_create(result)
 
         # Case 2: Check if the service already exists
         if "already_exists" in result.message.lower():

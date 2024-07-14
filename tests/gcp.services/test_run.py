@@ -19,6 +19,13 @@ class MockCloudRun(CloudRun):
 
         return super().after_describe(new_result)
 
+    def after_create(self, _):
+        new_result = Result(success=True,
+                            message=CLOUD_RUN_REVISION_SPEC,
+                            code=0
+                            )
+        return super().after_create(new_result)
+
     def params_create(self):
         if self.just_describe:
             raise Exception("Should only describe...")

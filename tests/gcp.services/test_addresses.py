@@ -10,7 +10,9 @@ from samples import IP_ADDRESS
 class MockServicesAddress(ServicesAddress):
 
     def after_describe(self, result):
-        return Result(success=False, message="failure", code=1)
+        result = Result(success=False, message="failure", code=1)
+        self.last_result = result
+        return result
 
     def after_create(self, result):
         result = Result(success=True, message=IP_ADDRESS, code=0)
@@ -23,4 +25,4 @@ def test_services_address_create(deployer):
 
     deployer.deploy(srv)
 
-    assert isinstance(srv.address, IPAddress), print(srv.address)
+    assert isinstance(srv.spec, IPAddress), print(srv.spec)

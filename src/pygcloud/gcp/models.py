@@ -21,7 +21,7 @@ class _base:
         return json_obj
 
     @classmethod
-    def from_json_string(cls, json_str: str):
+    def from_string(cls, json_str: str):
         """
         Create a dataclass from a JSON string
         Make sure to only include fields declare
@@ -142,3 +142,16 @@ class BackendServiceSpec:
         }
 
         return cls(**d)
+
+
+@dataclass
+class FwdRule(_base):
+    """Attribute names come directly from gcloud describe"""
+
+    name: str
+    IPAddress: str
+    IPProtocol: str
+    loadBalancingScheme: str
+    networkTier: str
+    portRange: str
+    target: str

@@ -12,19 +12,20 @@
 * [Cloud Run](https://cloud.google.com/run/docs/deploying)
 """
 from pygcloud.models import GCPServiceRevisionBased, Params, \
-    GCPServiceSingletonImmutable, Result
+    GCPServiceSingletonImmutable
 from pygcloud.gcp.labels import LabelGenerator
 from pygcloud.gcp.models import CloudRunRevisionSpec
 
 
 class CloudRun(GCPServiceRevisionBased, LabelGenerator):
 
+    SPEC_CLASS = CloudRunRevisionSpec
+
     def __init__(self, name: str, *params: Params, region: str = None):
         super().__init__(name=name, ns="run")
         assert isinstance(region, str)
         self.params = list(params)
         self.region = region
-        self.spec = None
 
     def params_describe(self):
         return [
@@ -32,13 +33,6 @@ class CloudRun(GCPServiceRevisionBased, LabelGenerator):
             "--region", self.region,
             "--format", "json"
         ]
-
-    def after_describe(self, result: Result) -> Result:
-
-        if result.success:
-            self.spec = CloudRunRevisionSpec.from_string(result.message)
-
-        return super().after_describe(result)
 
     def params_create(self):
         """

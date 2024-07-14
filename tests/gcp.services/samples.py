@@ -336,3 +336,22 @@ SSL_CERTIFICATE = """
   "type": "MANAGED"
 }
 """  # NOQA
+
+FWD_RULE = """
+{
+  "IPAddress": "34.144.203.24",
+  "IPProtocol": "TCP",
+  "creationTimestamp": "2024-05-08T17:29:46.798-07:00",
+  "description": "",
+  "fingerprint": "ltpTu3jOepo=",
+  "id": "432872022940427797",
+  "kind": "compute#forwardingRule",
+  "labelFingerprint": "42WmSpB8rSM=",
+  "loadBalancingScheme": "EXTERNAL",
+  "name": "fwd-proxy-service",
+  "networkTier": "PREMIUM",
+  "portRange": "443-443",
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/PROJECT/global/forwardingRules/fwd-proxy-service",
+  "target": "https://www.googleapis.com/compute/v1/projects/PROJECT/global/targetHttpsProxies/proxy-service"
+}
+"""  # NOQA
