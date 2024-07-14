@@ -1,4 +1,6 @@
 """
+Compute Engine IP addresses
+
 @author: jldupont
 """
 from pygcloud.models import GCPServiceSingletonImmutable

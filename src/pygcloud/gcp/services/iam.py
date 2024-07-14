@@ -29,6 +29,10 @@ class ServiceAccountIAM(GCPServiceSingletonImmutable):
         self._bindings_obj = None
 
     @property
+    def spec(self) -> ProjectIAMBindings:
+        return self._bindings_obj
+
+    @property
     def bindings(self) -> Union[ProjectIAMBindings, None]:
         return self._bindings_obj
 

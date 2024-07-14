@@ -314,7 +314,7 @@ BACKEND_SERVICE = """
 
 SSL_CERTIFICATE = """
 {
-  "certificate": "-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----\n",
+  "certificate": "-----BEGIN CERTIFICATE----------END CERTIFICATE-----",
   "creationTimestamp": "2024-05-08T17:29:37.626-07:00",
   "expireTime": "2024-10-02T14:06:37.000-07:00",
   "id": "626735018341934622",
@@ -334,8 +334,7 @@ SSL_CERTIFICATE = """
     "DOMAIN"
   ],
   "type": "MANAGED"
-}
-"""  # NOQA
+}"""  # NOQA
 
 FWD_RULE = """
 {
@@ -353,5 +352,94 @@ FWD_RULE = """
   "portRange": "443-443",
   "selfLink": "https://www.googleapis.com/compute/v1/projects/PROJECT/global/forwardingRules/fwd-proxy-service",
   "target": "https://www.googleapis.com/compute/v1/projects/PROJECT/global/targetHttpsProxies/proxy-service"
+}
+"""  # NOQA
+
+STORAGE_BUCKET = """
+{
+  "acl": [
+    {
+      "entity": "project-owners-215695389495",
+      "projectTeam": {
+        "projectNumber": "215695389495",
+        "team": "owners"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-editors-215695389495",
+      "projectTeam": {
+        "projectNumber": "215695389495",
+        "team": "editors"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-viewers-215695389495",
+      "projectTeam": {
+        "projectNumber": "215695389495",
+        "team": "viewers"
+      },
+      "role": "READER"
+    }
+  ],
+  "creation_time": "2024-06-04T00:58:08+0000",
+  "default_acl": [
+    {
+      "entity": "project-owners-215695389495",
+      "projectTeam": {
+        "projectNumber": "215695389495",
+        "team": "owners"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-editors-215695389495",
+      "projectTeam": {
+        "projectNumber": "215695389495",
+        "team": "editors"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-viewers-215695389495",
+      "projectTeam": {
+        "projectNumber": "215695389495",
+        "team": "viewers"
+      },
+      "role": "READER"
+    }
+  ],
+  "default_storage_class": "STANDARD",
+  "location": "US",
+  "location_type": "multi-region",
+  "metageneration": 14,
+  "name": "bucket",
+  "public_access_prevention": "enforced",
+  "rpo": "DEFAULT",
+  "soft_delete_policy": {
+    "effectiveTime": "2024-06-04T00:58:08.161000+00:00",
+    "retentionDurationSeconds": "604800"
+  },
+  "storage_url": "gs://bucket/",
+  "uniform_bucket_level_access": false,
+  "update_time": "2024-07-10T17:01:30+0000"
+}
+"""  # NOQA
+
+HTTPS_PROXY = """
+{
+  "creationTimestamp": "2024-05-08T17:29:42.215-07:00",
+  "fingerprint": "0dY8ZxQRKOk=",
+  "id": "1964828312724416025",
+  "kind": "compute#targetHttpsProxy",
+  "name": "proxy-service",
+  "quicOverride": "NONE",
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/PROJECT/global/targetHttpsProxies/proxy-service",
+  "sslCertificates": [
+    "https://www.googleapis.com/compute/v1/projects/PROJECT/global/sslCertificates/proxy-certificate"
+  ],
+  "tlsEarlyData": "DISABLED",
+  "urlMap": "https://www.googleapis.com/compute/v1/projects/PROJECT/global/urlMaps/urlmap-backend-service"
 }
 """  # NOQA

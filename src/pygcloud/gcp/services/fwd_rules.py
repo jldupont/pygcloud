@@ -1,10 +1,5 @@
 """
-gcloud compute forwarding-rules create fwd-${NAME} \
-    --project=${PROJECT_ID} \
-    --target-https-proxy=${NAME} \
-    --global \
-    --ports=443 \
-    --address=${NAME_IP}
+Compute Engine Forwarding Rules
 
 @author: jldupont
 """

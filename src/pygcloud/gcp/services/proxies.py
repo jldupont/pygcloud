@@ -1,24 +1,10 @@
 """
-echo "INFO: Checking status of HTTPS Proxy '${NAME}'"
-gcloud compute target-https-proxies describe ${NAME} \
-      --project=${PROJECT_ID} 2>/dev/null 1>/dev/null
-
-if [ $? -eq 0 ]; then
-    echo "NOTICE: ${NAME} already exists"
-    _ACTION="update"
-fi
-
-_ACTION="${_ACTION:-create}"
-
-echo "INFO: HTTPS Proxy $_ACTION '${NAME}'..."
-gcloud compute target-https-proxies ${_ACTION} ${NAME} \
-      --ssl-certificates=${NAME_CERTIFICATE} \
-      --url-map=${NAME_URL_MAP} \
-      --project=${PROJECT_ID} 2>/dev/null
+HTTPS Proxy
 
 @author: jldupont
 """
 from pygcloud.models import GCPServiceUpdatable
+from pygcloud.gcp.models import HTTPSProxy
 
 
 class HTTPSProxyService(GCPServiceUpdatable):
@@ -26,6 +12,7 @@ class HTTPSProxyService(GCPServiceUpdatable):
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/target-https-proxies
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
+    SPEC_CLASS = HTTPSProxy
     PREFIX = ["compute", "target-https-proxies"]
 
     def __init__(self, name: str, ssl_certificate_name: str,
@@ -39,6 +26,7 @@ class HTTPSProxyService(GCPServiceUpdatable):
     def params_describe(self):
         return self.PREFIX + [
             "describe", self.name,
+            "--format", "json"
         ]
 
     def params_create(self):

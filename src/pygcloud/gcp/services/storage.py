@@ -19,11 +19,13 @@ Google Cloud Storage
 @author: jldupont
 """
 from pygcloud.models import Params, GCPServiceUpdatable
+from pygcloud.gcp.models import GCSBucket
 
 
 class StorageBucket(GCPServiceUpdatable):
 
     REQUIRES_UPDATE_AFTER_CREATE = False
+    SPEC_CLASS = GCSBucket
 
     def __init__(self, name: str, params_create: Params = [],
                  params_update: Params = []):

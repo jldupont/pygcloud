@@ -3,7 +3,8 @@
 """
 import pytest
 from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec, \
-    BackendServiceSpec, BackendGroup, FwdRule
+    BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
+    HTTPSProxy
 
 
 def test_service_address(sample_ip_json):
@@ -64,3 +65,17 @@ def test_fwd_rule_compare(sample_fwd_rule, fwd_rule):
     # A little bit of paranoia...
     assert f2.target is None
     assert fwd_rule.target is None
+
+
+def test_ssl_certificate(sample_ssl_certificate):
+
+    c = SSLCertificate.from_string(sample_ssl_certificate)
+    assert c.type == "MANAGED"
+    assert c.managed["domains"] == ["DOMAIN"], print(c.managed)
+
+
+def test_https_proxy(sample_https_proxy):
+
+    p = HTTPSProxy.from_string(sample_https_proxy)
+    assert len(p.sslCertificates) == 1
+    assert p.name == "proxy-service"

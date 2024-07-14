@@ -3,7 +3,7 @@ Data models related to GCP services
 
 @author: jldupont
 """
-from typing import List, Dict
+from typing import List, Dict, Optional
 from dataclasses import dataclass
 from pygcloud.utils import JsonObject
 
@@ -155,3 +155,28 @@ class FwdRule(_base):
     networkTier: str
     portRange: str
     target: str
+
+
+@dataclass
+class GCSBucket(_base):
+    name: str
+    location: str
+    default_storage_class: str
+    location_type: str
+    metageneration: int
+    public_access_prevention: str
+    uniform_bucket_level_access: str
+
+
+@dataclass
+class SSLCertificate(_base):
+    name: str
+    type: str
+    managed: Optional[dict]
+
+
+@dataclass
+class HTTPSProxy(_base):
+    name: str
+    sslCertificates: Optional[list]
+    urlMap: Optional[str]

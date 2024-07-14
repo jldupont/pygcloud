@@ -7,6 +7,7 @@ gcloud compute ssl-certificates create ${NAME} \
 @author: jldupont
 """
 from pygcloud.models import GCPServiceSingletonImmutable
+from pygcloud.gcp.models import SSLCertificate
 
 
 class SSLCertificateService(GCPServiceSingletonImmutable):
@@ -14,6 +15,7 @@ class SSLCertificateService(GCPServiceSingletonImmutable):
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/ssl-certificates
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
+    SPEC_CLASS = SSLCertificate
     PREFIX = ["compute", "ssl-certificates"]
 
     def __init__(self, name: str, domain: str):

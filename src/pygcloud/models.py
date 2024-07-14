@@ -241,8 +241,8 @@ class GCPService(ServiceNode):
     def just_describe(self):
         return self._just_describe
 
-    def set_just_describe(self):
-        self._just_describe = True
+    def set_just_describe(self, enable: bool = True):
+        self._just_describe = enable
         return self
 
     def __repr__(self):
@@ -330,7 +330,7 @@ class GCPService(ServiceNode):
                 # partial functions do not have __name__
                 tname = str(task)
 
-            logging.debug(f"before_deply: executing {tname}")
+            logging.debug(f"before_deploy: executing {tname}")
             instruction = task()
             if instruction is not None:
                 if instruction.is_abort():

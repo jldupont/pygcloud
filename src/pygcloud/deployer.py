@@ -18,7 +18,8 @@ class Deployer:
 
     def __init__(self, cmd: CommandLine = None, exit_on_error=True,
                  log_error=True,
-                 common_params: Params = None):
+                 common_params: Params = None,
+                 just_describe: bool = False):
         """
         exit_on_error (bool): by default, applies to create
         and update operations
@@ -27,6 +28,11 @@ class Deployer:
         self.exit_on_error = exit_on_error
         self.log_error = log_error
         self.common_params = common_params or []
+        self._just_describe = just_describe
+
+    def set_just_describe(self, enable: bool = True):
+        self._just_describe = enable
+        return self
 
     @property
     def command(self):
@@ -115,7 +121,7 @@ class Deployer:
         if service.REQUIRES_DESCRIBE_BEFORE_CREATE:
             self.describe(service)
 
-        if service.just_describe:
+        if service.just_describe or self._just_describe:
             self.after_deploy(service, service.last_result)
             return service.last_result
 
@@ -141,7 +147,7 @@ class Deployer:
         if self._should_abort(service, instruction):
             return instruction
 
-        if service.just_describe:
+        if service.just_describe or self._just_describe:
             self.describe(service)
             self.after_deploy(service, service.last_result)
             return service.last_result
@@ -161,7 +167,7 @@ class Deployer:
 
         self.describe(service)
 
-        if service.just_describe:
+        if service.just_describe or self._just_describe:
             self.after_deploy(service, service.last_result)
             return service.last_result
 
@@ -178,6 +184,14 @@ class Deployer:
 
         if isinstance(what, Callable):
             function = what
+
+            try:
+                fname = function.__name__
+            except Exception:
+                # partial functions do not have __name__
+                fname = str(function)
+
+            logging.debug(f"Before callable: {fname}")
             maybe_result = function()
 
             if isinstance(maybe_result, Result):
@@ -194,6 +208,7 @@ class Deployer:
 
         # The "match" statement is only available from Python 3.10 onwards
         # https://docs.python.org/3/whatsnew/3.10.html#match-statements
+
         if service.category == ServiceCategory.SINGLETON_IMMUTABLE:
             return self.deploy_singleton_immutable(service)
 
