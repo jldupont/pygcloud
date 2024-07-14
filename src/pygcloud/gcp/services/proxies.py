@@ -43,14 +43,14 @@ class HTTPSProxyService(GCPServiceUpdatable):
 
     def params_create(self):
         return self.PREFIX + [
-            "create",
+            "create", self.name,
             "--ssl-certificates", self._ssl_certificate_name,
             "--url-map", self._url_map_name
         ]
 
     def params_update(self):
         return self.PREFIX + [
-            "update",
+            "update", self.name,
             "--ssl-certificates", self._ssl_certificate_name,
             "--url-map", self._url_map_name
         ]
