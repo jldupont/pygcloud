@@ -1,10 +1,4 @@
 """
-echo "INFO: Checking status of forwarding rules on proxy '${NAME}'"
-gcloud compute forwarding-rules describe fwd-${NAME} \
-    --global \
-    --project=${PROJECT_ID} 2>/dev/null 1>/dev/null
-
-
 gcloud compute forwarding-rules create fwd-${NAME} \
     --project=${PROJECT_ID} \
     --target-https-proxy=${NAME} \
@@ -14,10 +8,10 @@ gcloud compute forwarding-rules create fwd-${NAME} \
 
 @author: jldupont
 """
-from pygcloud.models import GCPServiceUpdatable
+from pygcloud.models import GCPServiceSingletonImmutable
 
 
-class FwdRuleHTTPSProxyService(GCPServiceUpdatable):
+class FwdRuleHTTPSProxyService(GCPServiceSingletonImmutable):
     """
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/forwarding-rules
     """
@@ -41,15 +35,6 @@ class FwdRuleHTTPSProxyService(GCPServiceUpdatable):
     def params_create(self):
         return self.PREFIX + [
             "create", self.name,
-            "--global",
-            "--target-https-proxy", self._proxy_name,
-            "--address", self._ip_address_name,
-            "--ports", "443"
-        ]
-
-    def params_update(self):
-        return self.PREFIX + [
-            "update", self.name,
             "--global",
             "--target-https-proxy", self._proxy_name,
             "--address", self._ip_address_name,
