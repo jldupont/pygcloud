@@ -178,7 +178,7 @@ class Deployer:
 
         if isinstance(what, Callable):
             function = what
-            maybe_result = function(self)
+            maybe_result = function()
 
             if isinstance(maybe_result, Result):
                 result = maybe_result

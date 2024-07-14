@@ -4,7 +4,7 @@ from pygcloud.constants import Instruction
 from pygcloud.models import Result, Param, EnvValue, \
     GCPServiceSingletonImmutable, GCPServiceRevisionBased, \
     GCPServiceUpdatable, \
-    service_groups, GCPService
+    service_groups
 
 
 @pytest.fixture

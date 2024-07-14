@@ -311,3 +311,28 @@ BACKEND_SERVICE = """
   ]
 }
 """  # NOQA
+
+SSL_CERTIFICATE = """
+{
+  "certificate": "-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----\n",
+  "creationTimestamp": "2024-05-08T17:29:37.626-07:00",
+  "expireTime": "2024-10-02T14:06:37.000-07:00",
+  "id": "626735018341934622",
+  "kind": "compute#sslCertificate",
+  "managed": {
+    "domainStatus": {
+      "DOMAIN": "ACTIVE"
+    },
+    "domains": [
+      "DOMAIN"
+    ],
+    "status": "ACTIVE"
+  },
+  "name": "proxy-certificate",
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/PROJECT/global/sslCertificates/proxy-certificate",
+  "subjectAlternativeNames": [
+    "DOMAIN"
+  ],
+  "type": "MANAGED"
+}
+"""  # NOQA
