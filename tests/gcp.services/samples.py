@@ -446,7 +446,7 @@ HTTPS_PROXY = """
 
 SCHEDULER_JOB = """
 {
-  "name": "projects/PROJECT/locations/northamerica-northeast1/jobs/test",
+  "name": "projects/PROJECT/locations/northamerica-northeast1/jobs/test-job",
   "pubsubTarget": {
     "data": "dGVzdA==",
     "topicName": "projects/PROJECT/topics/test"
@@ -461,5 +461,11 @@ SCHEDULER_JOB = """
   "state": "ENABLED",
   "timeZone": "Etc/UTC",
   "userUpdateTime": "2024-07-15T11:41:07Z"
+}
+"""  # NOQA
+
+PUBSUB_TOPIC = """
+{
+  "name": "projects/PROJECT/topics/test"
 }
 """  # NOQA

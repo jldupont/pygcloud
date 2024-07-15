@@ -1,26 +1,21 @@
 """
-Cloud Scheduler
-
-NOTE: Job can be created with pubsub publication without the topic
-being created first.
-
 @author: jldupont
 """
 from pygcloud.models import GCPServiceUpdatable, Params
-from pygcloud.gcp.models import SchedulerJob
+from pygcloud.gcp.models import PubsubTopic
 
 
-class CloudScheduler(GCPServiceUpdatable):
+class PubsubTopic(GCPServiceUpdatable):
     """
-    https://cloud.google.com/sdk/gcloud/reference/scheduler
+    https://cloud.google.com/sdk/gcloud/reference/pubsub/
     """
-    SPEC_CLASS = SchedulerJob
-    PREFIX = ["scheduler", "jobs"]
+    SPEC_CLASS = PubsubTopic
+    PREFIX = ["pubsub", "topics"]
 
     def __init__(self, name: str, params_create: Params,
                  params_update: Params):
         assert isinstance(name, str)
-        super().__init__(name, ns="scheduler")
+        super().__init__(name, ns="pubsub-topic")
         self.params_create = list(params_create)
         self.params_update = list(params_update)
 
@@ -31,9 +26,6 @@ class CloudScheduler(GCPServiceUpdatable):
         ]
 
     def params_create(self):
-        """
-        https://cloud.google.com/sdk/gcloud/reference/scheduler/jobs/create
-        """
         return self.PREFIX + [
             "create", self.name
         ] + self.params_create

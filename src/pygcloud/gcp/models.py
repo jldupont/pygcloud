@@ -4,7 +4,7 @@ Data models related to GCP services
 @author: jldupont
 """
 from typing import List, Dict, Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pygcloud.utils import JsonObject
 
 
@@ -172,21 +172,37 @@ class GCSBucket(_base):
 class SSLCertificate(_base):
     name: str
     type: str
-    managed: Optional[dict]
+    managed: Optional[dict] = field(default_factory=dict)
 
 
 @dataclass
 class HTTPSProxy(_base):
     name: str
-    sslCertificates: Optional[list]
-    urlMap: Optional[str]
+    sslCertificates: Optional[list] = field(default_factory=list)
+    urlMap: Optional[str] = field(default_factory="")
 
 
 @dataclass
 class SchedulerJob(_base):
     name: str
-    pubsubTarget: Optional[dict]
     retryConfig: dict
     schedule: str
     state: str
     timeZone: str
+    location: str = "???"
+    pubsubTarget: Optional[dict] = field(default_factory=dict)
+
+    def __post_init__(self):
+        parts = self.name.split("/")
+
+        self.location = parts[3]
+        self.name = parts[-1]
+
+
+@dataclass
+class PubsubTopic(_base):
+    name: str
+
+    def __post_init__(self):
+        parts = self.name.split("/")
+        self.name = parts[-1]

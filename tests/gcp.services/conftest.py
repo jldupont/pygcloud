@@ -7,7 +7,7 @@ from pygcloud.models import GCPService, Result
 from pygcloud.gcp.parsers import ProjectIAMBindings, IAMBinding
 from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC, \
     BACKEND_SERVICE, FWD_RULE, STORAGE_BUCKET, SSL_CERTIFICATE, HTTPS_PROXY, \
-    SCHEDULER_JOB
+    SCHEDULER_JOB, PUBSUB_TOPIC
 from pygcloud.gcp.services.iam import ServiceAccountIAM
 
 
@@ -147,3 +147,8 @@ def sample_https_proxy():
 @pytest.fixture
 def sample_scheduler_job():
     return SCHEDULER_JOB
+
+
+@pytest.fixture
+def sample_pubsub_topic():
+    return PUBSUB_TOPIC
