@@ -6,7 +6,8 @@ from pygcloud.gcp.labels import LabelGenerator
 from pygcloud.models import GCPService, Result
 from pygcloud.gcp.parsers import ProjectIAMBindings, IAMBinding
 from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC, \
-    BACKEND_SERVICE, FWD_RULE, STORAGE_BUCKET, SSL_CERTIFICATE, HTTPS_PROXY
+    BACKEND_SERVICE, FWD_RULE, STORAGE_BUCKET, SSL_CERTIFICATE, HTTPS_PROXY, \
+    SCHEDULER_JOB
 from pygcloud.gcp.services.iam import ServiceAccountIAM
 
 
@@ -141,3 +142,8 @@ def sample_ssl_certificate():
 @pytest.fixture
 def sample_https_proxy():
     return HTTPS_PROXY
+
+
+@pytest.fixture
+def sample_scheduler_job():
+    return SCHEDULER_JOB

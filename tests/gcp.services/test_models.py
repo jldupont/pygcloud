@@ -4,7 +4,7 @@
 import pytest
 from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
-    HTTPSProxy
+    HTTPSProxy, SchedulerJob
 
 
 def test_service_address(sample_ip_json):
@@ -79,3 +79,10 @@ def test_https_proxy(sample_https_proxy):
     p = HTTPSProxy.from_string(sample_https_proxy)
     assert len(p.sslCertificates) == 1
     assert p.name == "proxy-service"
+
+
+def test_scheduler_job(sample_scheduler_job):
+
+    j = SchedulerJob.from_string(sample_scheduler_job)
+
+    assert 'topics/test' in j.pubsubTarget["topicName"]

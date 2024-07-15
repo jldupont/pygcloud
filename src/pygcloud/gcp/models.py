@@ -180,3 +180,13 @@ class HTTPSProxy(_base):
     name: str
     sslCertificates: Optional[list]
     urlMap: Optional[str]
+
+
+@dataclass
+class SchedulerJob(_base):
+    name: str
+    pubsubTarget: Optional[dict]
+    retryConfig: dict
+    schedule: str
+    state: str
+    timeZone: str

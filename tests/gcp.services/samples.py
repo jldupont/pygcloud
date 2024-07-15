@@ -443,3 +443,23 @@ HTTPS_PROXY = """
   "urlMap": "https://www.googleapis.com/compute/v1/projects/PROJECT/global/urlMaps/urlmap-backend-service"
 }
 """  # NOQA
+
+SCHEDULER_JOB = """
+{
+  "name": "projects/PROJECT/locations/northamerica-northeast1/jobs/test",
+  "pubsubTarget": {
+    "data": "dGVzdA==",
+    "topicName": "projects/PROJECT/topics/test"
+  },
+  "retryConfig": {
+    "maxBackoffDuration": "3600s",
+    "maxDoublings": 16,
+    "maxRetryDuration": "0s",
+    "minBackoffDuration": "5s"
+  },
+  "schedule": "0 */3 * * *",
+  "state": "ENABLED",
+  "timeZone": "Etc/UTC",
+  "userUpdateTime": "2024-07-15T11:41:07Z"
+}
+"""  # NOQA
