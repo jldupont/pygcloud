@@ -24,6 +24,7 @@ from pygcloud.gcp.models import GCSBucket
 
 class StorageBucket(GCPServiceUpdatable):
 
+    DEPENDS_ON_API = ["storage.googleapis.com",]
     REQUIRES_UPDATE_AFTER_CREATE = False
     SPEC_CLASS = GCSBucket
     GROUP = ["storage", "buckets"]

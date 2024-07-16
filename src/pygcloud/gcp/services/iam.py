@@ -13,6 +13,7 @@ class ServiceAccountIAM(GCPServiceSingletonImmutable):
     """
     Add role to Service Account
     """
+    DEPENDS_ON_API = ["cloudresourcemanager.googleapis.com",]
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
 
     def __init__(self, target_binding: IAMBinding, project_id: str):

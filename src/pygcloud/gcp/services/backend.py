@@ -11,6 +11,7 @@ class BackendService(GCPServiceSingletonImmutable):
 
     https://cloud.google.com/sdk/gcloud/reference/compute/backend-services
     """
+    DEPENDS_ON_API = ["compute.googleapis.com",]
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = BackendServiceSpec
     GROUP = ["compute", "backend-services"]
@@ -37,6 +38,7 @@ class BackendServiceAddNeg(GCPServiceSingletonImmutable):
     """
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/backend-services/add-backend
     """
+    DEPENDS_ON_API = ["compute.googleapis.com",]
     REQUIRES_DESCRIBE_BEFORE_CREATE = False
     GROUP = ["compute", "backend-services"]
 

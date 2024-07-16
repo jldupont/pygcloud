@@ -19,6 +19,7 @@ from pygcloud.gcp.models import CloudRunRevisionSpec
 
 class CloudRun(GCPServiceRevisionBased, LabelGenerator):
 
+    DEPENDS_ON_API = ["run.googleapis.com",]
     SPEC_CLASS = CloudRunRevisionSpec
     GROUP = ["beta", "run"]
     GROUP_SUB_DESCRIBE = ["services", ]
@@ -54,6 +55,7 @@ class CloudRunNeg(GCPServiceSingletonImmutable):
 
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/network-endpoint-groups
     """
+    DEPENDS_ON_API = ["run.googleapis.com", "compute.googleapis.com"]
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     GROUP = ["beta", "compute", "network-endpoint-groups"]
 

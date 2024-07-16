@@ -14,6 +14,7 @@ class SSLCertificateService(GCPServiceSingletonImmutable):
     """
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/ssl-certificates
     """
+    DEPENDS_ON_API = ["compute.googleapis.com",]
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = SSLCertificate
     GROUP = ["compute", "ssl-certificates"]

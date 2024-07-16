@@ -14,6 +14,7 @@ class CloudScheduler(GCPServiceUpdatable):
     """
     https://cloud.google.com/sdk/gcloud/reference/scheduler
     """
+    DEPENDS_ON_API = ["cloudscheduler.googleapis.com",]
     SPEC_CLASS = SchedulerJob
     GROUP = ["scheduler", "jobs"]
 

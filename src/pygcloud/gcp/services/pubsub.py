@@ -9,6 +9,7 @@ class PubsubTopic(GCPServiceUpdatable):
     """
     https://cloud.google.com/sdk/gcloud/reference/pubsub/
     """
+    DEPENDS_ON_API = ["pubsub.googleapis.com",]
     SPEC_CLASS = PubsubTopic
     GROUP = ["pubsub", "topics"]
 

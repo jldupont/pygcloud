@@ -11,6 +11,7 @@ from pygcloud.helpers import remove_parenthesis
 
 
 class FirestoreDbBase(GCPServiceSingletonImmutable):
+    DEPENDS_ON_API = ["firestore.googleapis.com", "datastore.googleapis.com"]
 
     def __init__(self, db_name: str):
         name = remove_parenthesis(db_name)
@@ -49,6 +50,7 @@ class FirestoreIndexComposite(GCPServiceSingletonImmutable):
     """
     Cannot describe an index unfortunately
     """
+    DEPENDS_ON_API = ["firestore.googleapis.com", "datastore.googleapis.com"]
     GROUP = ["firestore", "indexes", "composite"]
 
     def __init__(self, db_name: str, params_create: Params = []):

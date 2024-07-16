@@ -232,6 +232,7 @@ class GCPService(ServiceNode):
     SERVICE_CATEGORY = ServiceCategory.INDETERMINATE
     REQUIRES_UPDATE_AFTER_CREATE = False
     REQUIRES_DESCRIBE_BEFORE_CREATE = False
+    DEPENDS_ON_API = []
     SPEC_CLASS = None
     GROUP = []
     GROUP_SUB_DESCRIBE = []
