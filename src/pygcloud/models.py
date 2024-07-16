@@ -206,6 +206,8 @@ class GCPService(ServiceNode):
     REQUIRES_UPDATE_AFTER_CREATE = False
     REQUIRES_DESCRIBE_BEFORE_CREATE = False
     SPEC_CLASS = None
+    GROUP = []
+    GROUP_SUB_DESCRIBE = []
 
     @property
     def category(self):

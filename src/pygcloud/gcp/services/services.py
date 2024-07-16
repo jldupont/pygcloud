@@ -13,6 +13,7 @@ class ServiceEnable(GCPServiceSingletonImmutable):
     For enabling a service in a project
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = False
+    GROUP = "services"
 
     def __init__(self, name: str):
         assert isinstance(name, str)
@@ -20,5 +21,5 @@ class ServiceEnable(GCPServiceSingletonImmutable):
 
     def params_create(self):
         return [
-            "services", "enable", self.name
+            "enable", self.name
         ]

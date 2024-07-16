@@ -13,7 +13,7 @@ class HTTPSProxyService(GCPServiceUpdatable):
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = HTTPSProxy
-    PREFIX = ["compute", "target-https-proxies"]
+    GROUP = ["compute", "target-https-proxies"]
 
     def __init__(self, name: str, ssl_certificate_name: str,
                  url_map_name: str):
@@ -24,20 +24,20 @@ class HTTPSProxyService(GCPServiceUpdatable):
         self._url_map_name = url_map_name
 
     def params_describe(self):
-        return self.PREFIX + [
+        return [
             "describe", self.name,
             "--format", "json"
         ]
 
     def params_create(self):
-        return self.PREFIX + [
+        return [
             "create", self.name,
             "--ssl-certificates", self._ssl_certificate_name,
             "--url-map", self._url_map_name
         ]
 
     def params_update(self):
-        return self.PREFIX + [
+        return [
             "update", self.name,
             "--ssl-certificates", self._ssl_certificate_name,
             "--url-map", self._url_map_name

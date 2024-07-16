@@ -16,7 +16,7 @@ class SSLCertificateService(GCPServiceSingletonImmutable):
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = SSLCertificate
-    PREFIX = ["compute", "ssl-certificates"]
+    GROUP = ["compute", "ssl-certificates"]
 
     def __init__(self, name: str, domain: str):
         assert isinstance(domain, str)
@@ -24,13 +24,13 @@ class SSLCertificateService(GCPServiceSingletonImmutable):
         self._domain = domain
 
     def params_describe(self):
-        return self.PREFIX + [
+        return [
             "describe", self.name,
             "--format", "json"
         ]
 
     def params_create(self):
-        return self.PREFIX + [
+        return [
             "create", self.name,
             "--domains", self.domain
         ]

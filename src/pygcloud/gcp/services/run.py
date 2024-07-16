@@ -20,6 +20,8 @@ from pygcloud.gcp.models import CloudRunRevisionSpec
 class CloudRun(GCPServiceRevisionBased, LabelGenerator):
 
     SPEC_CLASS = CloudRunRevisionSpec
+    GROUP = ["beta", "run"]
+    GROUP_SUB_DESCRIBE = ["services", ]
 
     def __init__(self, name: str, *params: Params, region: str = None):
         super().__init__(name=name, ns="run")
@@ -29,7 +31,7 @@ class CloudRun(GCPServiceRevisionBased, LabelGenerator):
 
     def params_describe(self):
         return [
-            "run", "services", "describe", self.name,
+            "describe", self.name,
             "--region", self.region,
             "--format", "json"
         ]
@@ -40,7 +42,7 @@ class CloudRun(GCPServiceRevisionBased, LabelGenerator):
         be injected through the Deployer.
         """
         return [
-            "beta", "run", "deploy", self.name,
+            "deploy", self.name,
             "--clear-labels",
             "--region", self.region,
         ] + self.params + self.generate_use_labels()
@@ -53,7 +55,7 @@ class CloudRunNeg(GCPServiceSingletonImmutable):
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/network-endpoint-groups
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
-    PREFIX = ["beta", "compute", "network-endpoint-groups"]
+    GROUP = ["beta", "compute", "network-endpoint-groups"]
 
     def __init__(self, name: str, *params: Params, region: str = None):
         assert isinstance(region, str)
@@ -62,7 +64,7 @@ class CloudRunNeg(GCPServiceSingletonImmutable):
         self._params = list(params) + ["--region", region]
 
     def params_describe(self):
-        return self.PREFIX + [
+        return [
             "describe",
             self.name,
             "--region", self._region
@@ -74,7 +76,7 @@ class CloudRunNeg(GCPServiceSingletonImmutable):
         --cloud-run-url-mask=${URL_MASK}
         --cloud-run-service=${CLOUD_RUN_NAME}
         """
-        return self.PREFIX + [
+        return [
             "create",
             self.name,
             "network-endpoint-type", "serverless",

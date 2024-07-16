@@ -21,20 +21,20 @@ class UrlMapDefaultService(GCPServiceSingletonImmutable):
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/url-maps
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
-    PREFIX = ["compute", "url-maps"]
+    GROUP = ["compute", "url-maps"]
 
     def __init__(self, name: str, default_service_name: str):
         super().__init__(name=name, ns="urlmap")
         self._default_service_name = default_service_name
 
     def params_describe(self):
-        return self.PREFIX + [
+        return [
             "describe", self.name,
             "--format", "json"
         ]
 
     def params_create(self):
-        return self.PREFIX + [
+        return [
             "create", self.name,
             "--global",
             "--default-service", self._default_service_name

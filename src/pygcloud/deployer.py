@@ -89,7 +89,8 @@ class Deployer:
 
         self.before_describe(service)
         service.before_describe()
-        params = service.params_describe()
+        params = service.GROUP + service.GROUP_SUB_DESCRIBE + \
+            service.params_describe()
         result = self.cmd.exec(params, common=self.common_params)
         service.after_describe(result)
         result = self.after_describe(service, result)
@@ -253,7 +254,7 @@ class Deployer:
 
         self.before_create(service)
         service.before_create()
-        params = service.params_create()
+        params = service.GROUP + service.params_create()
         result = self.cmd.exec(params, common=self.common_params)
         result = service.after_create(result)
         self.after_create(service, result)
@@ -267,7 +268,7 @@ class Deployer:
 
         self.before_update(service)
         service.before_update()
-        params = service.params_update()
+        params = service.GROUP + service.params_update()
         result = self.cmd.exec(params, common=self.common_params)
         result = service.after_update(result)
         self.after_update(service, result)
@@ -277,7 +278,7 @@ class Deployer:
 
         self.before_delete(service)
         service.before_delete()
-        params = service.params_delete()
+        params = service.GROUP + service.params_delete()
         result = self.cmd.exec(params, common=self.common_params)
         result = service.after_delete(result)
         self.after_delete(service, result)

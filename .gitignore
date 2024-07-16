@@ -1,3 +1,6 @@
+_assets.json
+_services.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

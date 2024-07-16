@@ -26,6 +26,7 @@ class FirestoreDbBase(GCPServiceSingletonImmutable):
 class FirestoreDatabase(FirestoreDbBase):
 
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
+    GROUP = ["firestore", "databases"]
 
     def __init__(self, name: str, params_create: Params = []):
         super().__init__(name)
@@ -33,13 +34,13 @@ class FirestoreDatabase(FirestoreDbBase):
 
     def params_describe(self):
         return [
-            "firestore", "databases", "describe",
+            "describe",
             "--database", self.db_name
         ]
 
     def params_create(self):
         return [
-            "firestore", "databases", "create",
+            "create",
             "--database", self.db_name
         ] + self._params_create
 
@@ -48,6 +49,7 @@ class FirestoreIndexComposite(GCPServiceSingletonImmutable):
     """
     Cannot describe an index unfortunately
     """
+    GROUP = ["firestore", "indexes", "composite"]
 
     def __init__(self, db_name: str, params_create: Params = []):
         super().__init__(name=None, ns="fs-index")
@@ -56,6 +58,6 @@ class FirestoreIndexComposite(GCPServiceSingletonImmutable):
 
     def params_create(self):
         return [
-            "firestore", "indexes", "composite", "create",
+            "create",
             "--database", self.db_name
         ] + self._params_create

@@ -12,7 +12,7 @@ class FwdRuleHTTPSProxyService(GCPServiceSingletonImmutable):
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/forwarding-rules
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
-    PREFIX = ["compute", "forwarding-rules"]
+    GROUP = ["compute", "forwarding-rules"]
     SPEC_CLASS = FwdRule
 
     def __init__(self, name: str, proxy_name: str, ip_address_name: str):
@@ -23,14 +23,14 @@ class FwdRuleHTTPSProxyService(GCPServiceSingletonImmutable):
         self._ip_address_name = ip_address_name
 
     def params_describe(self):
-        return self.PREFIX + [
+        return [
             "describe", self.name,
             "--global",
             "--format", "json"
         ]
 
     def params_create(self):
-        return self.PREFIX + [
+        return [
             "create", self.name,
             "--global",
             "--target-https-proxy", self._proxy_name,

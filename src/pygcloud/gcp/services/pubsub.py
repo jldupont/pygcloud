@@ -10,7 +10,7 @@ class PubsubTopic(GCPServiceUpdatable):
     https://cloud.google.com/sdk/gcloud/reference/pubsub/
     """
     SPEC_CLASS = PubsubTopic
-    PREFIX = ["pubsub", "topics"]
+    GROUP = ["pubsub", "topics"]
 
     def __init__(self, name: str, params_create: Params,
                  params_update: Params):
@@ -20,17 +20,17 @@ class PubsubTopic(GCPServiceUpdatable):
         self.params_update = list(params_update)
 
     def params_describe(self):
-        return self.PREFIX + [
+        return [
             "describe", self.name,
             "--format", "json"
         ]
 
     def params_create(self):
-        return self.PREFIX + [
+        return [
             "create", self.name
         ] + self.params_create
 
     def params_update(self):
-        return self.PREFIX + [
+        return [
             "update", self.name
         ] + self.params_update

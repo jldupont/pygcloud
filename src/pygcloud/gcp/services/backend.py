@@ -13,6 +13,7 @@ class BackendService(GCPServiceSingletonImmutable):
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = BackendServiceSpec
+    GROUP = ["compute", "backend-services"]
 
     def __init__(self, name: str, params_describe: Params,
                  params_create: Params):
@@ -22,13 +23,13 @@ class BackendService(GCPServiceSingletonImmutable):
 
     def params_describe(self):
         return [
-            "compute", "backend-services", "describe", self.name,
+            "describe", self.name,
             "--format", "json"
         ] + self._params_describe
 
     def params_create(self):
         return [
-            "compute", "backend-services", "create", self.name
+            "create", self.name
         ] + self._params_create
 
 
@@ -37,6 +38,7 @@ class BackendServiceAddNeg(GCPServiceSingletonImmutable):
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/backend-services/add-backend
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = False
+    GROUP = ["compute", "backend-services"]
 
     def __init__(self, name: str, neg_name: str, region: str = None):
         super().__init__(name, "be")
@@ -47,7 +49,7 @@ class BackendServiceAddNeg(GCPServiceSingletonImmutable):
 
     def params_create(self):
         return [
-            "compute", "backend-services", "add-backend", self.name,
+            "add-backend", self.name,
             "--global",
             "--network-endpoint-group", self._neg_name,
             "--network-endpoint-group-region", self._region

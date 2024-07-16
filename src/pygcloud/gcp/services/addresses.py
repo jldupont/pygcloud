@@ -15,19 +15,20 @@ class ServicesAddress(GCPServiceSingletonImmutable):
     """
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = IPAddress
+    GROUP = ["compute", "addresses"]
 
     def __init__(self, name: str):
         super().__init__(name=name, ns="ip")
 
     def params_describe(self):
         return [
-            "compute", "addresses", "describe", self.name,
+            "describe", self.name,
             "--global", "--format", "json"
         ]
 
     def params_create(self):
         return [
-            "compute", "addresses", "create", self.name,
+            "create", self.name,
             "--ip-version=IPv4", "--global",
             "--network-tier", "PREMIUM",
             "--format", "json"
