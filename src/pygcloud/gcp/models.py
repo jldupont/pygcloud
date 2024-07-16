@@ -21,13 +21,7 @@ class _base:
         return json_obj
 
     @classmethod
-    def from_string(cls, json_str: str):
-        """
-        Create a dataclass from a JSON string
-        Make sure to only include fields declare
-        in the dataclass
-        """
-        obj = cls.parse_json(json_str)
+    def from_obj(cls, obj):
 
         fields = cls.__annotations__
 
@@ -36,6 +30,51 @@ class _base:
             if fields.get(key, None) is not None
         }
         return cls(**sobj)
+
+    @classmethod
+    def from_string(cls, json_str: str):
+        """
+        Create a dataclass from a JSON string
+        Make sure to only include fields declare
+        in the dataclass
+        """
+        obj = cls.parse_json(json_str)
+        return cls.from_obj(obj)
+
+    @classmethod
+    def from_json_list(cls, json_str: str):
+        assert isinstance(json_str, str)
+
+        import json
+
+        try:
+            json_list = json.loads(json_str)
+        except Exception as e:
+            raise Exception(f"Error trying to load list from JSON string: {e}")
+
+        assert isinstance(json_list, list)
+
+        return [
+            cls.from_obj(obj) for obj in json_list
+        ]
+
+
+@dataclass
+class ServiceDescription(_base):
+    """
+    A service description as retrieved through
+    `gcloud services list --enabled`
+    """
+    name: str
+    state: str
+    parent: str
+    project_number: int = 0
+    api: str = "???"
+
+    def __post_init__(self):
+        parts = self.name.split("/")
+        self.project_number = parts[1]
+        self.api = parts[-1]
 
 
 @dataclass

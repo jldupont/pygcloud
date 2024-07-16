@@ -4,7 +4,7 @@
 import pytest
 from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
-    HTTPSProxy, SchedulerJob, PubsubTopic
+    HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription
 
 
 def test_service_address(sample_ip_json):
@@ -93,3 +93,13 @@ def test_pubsub_topic(sample_pubsub_topic):
 
     t = PubsubTopic.from_string(sample_pubsub_topic)
     assert t.name == "test"
+
+
+def test_services_list(sample_services_list):
+
+    liste = ServiceDescription.from_json_list(sample_services_list)
+
+    first = liste[0]
+
+    assert first.api == "aiplatform.googleapis.com"
+    assert first.project_number == "215695389495"

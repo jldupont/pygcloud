@@ -471,7 +471,7 @@ PUBSUB_TOPIC = """
 """  # NOQA
 
 
-SERVICES_LIST = """
+SERVICES_LIST = r'''
 [
   {
     "config": {
@@ -3593,4 +3593,4 @@ SERVICES_LIST = """
     "state": "ENABLED"
   }
 ]
-"""  # NOQA
+'''  # NOQA

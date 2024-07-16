@@ -1,5 +1,5 @@
 _assets.json
-_services.json
+_services*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

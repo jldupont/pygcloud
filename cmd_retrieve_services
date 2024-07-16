@@ -1,0 +1,5 @@
+#!/bin/bash
+# @author: jldupont
+#
+export PYTHONPATH=$PYTHONPATH:$(pwd)/src
+python -c 'from pygcloud.cmds import cmd_retrieve_enabled_services; cmd_retrieve_enabled_services()'

@@ -6,7 +6,7 @@ from pygcloud.models import Result
 from samples import STORAGE_BUCKET
 
 
-class _StorageBucket(StorageBucket):
+class MockStorageBucket(StorageBucket):
 
     def after_describe(self, result):
         result = Result(success=True, message=STORAGE_BUCKET, code=0)
@@ -15,7 +15,7 @@ class _StorageBucket(StorageBucket):
 
 def test_gcs(deployer, sample_gcs_bucket):
 
-    b = _StorageBucket("bucket")
+    b = MockStorageBucket("bucket")
 
     deployer.deploy(b)
 

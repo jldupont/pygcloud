@@ -5,7 +5,7 @@ import os
 import logging
 from functools import cache
 from typing import List, Tuple, NewType, Union, Callable, Any
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from dataclasses import dataclass
 from .constants import ServiceCategory, Instruction
 
@@ -167,7 +167,34 @@ class Result:
     code: int
 
 
-class ServiceNode(ABC):
+class ServiceMeta(type):
+
+    @classmethod
+    def only_add_real_service_class(cls, classe):
+        new_class_name = classe.__name__.lower()
+
+        if 'mock' in new_class_name:
+            return
+
+        if new_class_name == 'servicenode':
+            return
+
+        if 'gcpservice' in new_class_name:
+            return
+
+        cls.__all_classes__.append(classe)
+
+    def __new__(cls, name, bases, attrs):
+
+        if not getattr(cls, "__all_classes__", False):
+            setattr(cls, "__all_classes__", [])
+
+        new_class = super().__new__(cls, name, bases, attrs)
+        cls.only_add_real_service_class(new_class)
+        return new_class
+
+
+class ServiceNode(metaclass=ServiceMeta):
     """
     Protocol to establish "use" relationships
     between services

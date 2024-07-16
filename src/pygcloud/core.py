@@ -15,12 +15,14 @@ __all__ = ["CommandLine", "GCloud", "gcloud"]
 
 class CommandLine:
 
-    def __init__(self, exec_path: str, exit_on_error: bool = False):
-        assert isinstance(exec_path, str)
-        self.exec_path = exec_path
+    def __init__(self, _exec_path: str, exit_on_error: bool = False,
+                 log_error: bool = False):
+        assert isinstance(_exec_path, str)
+        self._exec_path = _exec_path
         self._last_command_args = None
         self._exit_on_error = exit_on_error
         self._last_result = None
+        self._log_error = log_error
 
     @property
     def last_result(self):
@@ -36,7 +38,7 @@ class CommandLine:
         if common is None:
             common = []
 
-        command_args = prepare_params([self.exec_path] + params + common)
+        command_args = prepare_params([self._exec_path] + params + common)
 
         logger.debug(f"CommandLine.exec: {command_args}")
 
@@ -47,10 +49,10 @@ class CommandLine:
                 text=True                  # Decode output as text
             )
         except FileNotFoundError:
-            raise FileNotFoundError(f"Command not found: {self.exec_path}")
+            raise FileNotFoundError(f"Command not found: {self._exec_path}")
         except PermissionError:
             raise PermissionError("Permission denied (or possibly "
-                                  f"invalid exec path): {self.exec_path}")
+                                  f"invalid exec path): {self._exec_path}")
 
         self._last_command_args = command_args
 
@@ -67,12 +69,21 @@ class CommandLine:
                 code=result.returncode
             )
 
-        logger.debug(f"CommandLine.exec result: {result}")
-        self._last_result = r
+        already_logged = False
+
+        if not r.success:
+            if self._log_error:
+                logging.error(f"Error executing command: {result}")
+                already_logged = True
 
         if self._exit_on_error:
             if not r.success:
                 sys.exit(r.code)
+
+        if not already_logged:
+            logger.debug(f"CommandLine.exec result: {result}")
+
+        self._last_result = r
 
         return r
 
@@ -93,11 +104,11 @@ class GCloud(CommandLine):
     """
 
     def __init__(self, *head_tail: Union[List[Union[str, Tuple[str, str]]],
-                                         Param], cmd="gcloud"):
+                                         Param], cmd="gcloud", **kw):
         """
         head_tail: [head_parameters ...] tail_parameters
         """
-        super().__init__(cmd)
+        super().__init__(cmd, **kw)
         self.head_tail = head_tail
 
     def __call__(self, *head_after: List[Union[str, Tuple[str, str], Param]]) \
