@@ -13,7 +13,10 @@ from pygcloud.gcp.models import SSLCertificate
 class SSLCertificateService(GCPServiceSingletonImmutable):
     """
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/ssl-certificates
+
+    CAUTION: sensitive information in the 'certificate' field
     """
+    LISTING_CAPABLE = True
     DEPENDS_ON_API = ["compute.googleapis.com",]
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = SSLCertificate

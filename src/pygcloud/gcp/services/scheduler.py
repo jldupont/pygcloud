@@ -13,7 +13,11 @@ from pygcloud.gcp.models import SchedulerJob
 class CloudScheduler(GCPServiceUpdatable):
     """
     https://cloud.google.com/sdk/gcloud/reference/scheduler
+
+    NOTE: requires --location for listing
     """
+    LISTING_CAPABLE = True
+    LISTING_REQUIRES_LOCATION = True
     DEPENDS_ON_API = ["cloudscheduler.googleapis.com",]
     SPEC_CLASS = SchedulerJob
     GROUP = ["scheduler", "jobs"]

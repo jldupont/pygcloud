@@ -7,7 +7,7 @@ from pygcloud.models import GCPService, Result
 from pygcloud.gcp.parsers import ProjectIAMBindings, IAMBinding
 from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC, \
     BACKEND_SERVICE, FWD_RULE, STORAGE_BUCKET, SSL_CERTIFICATE, HTTPS_PROXY, \
-    SCHEDULER_JOB, PUBSUB_TOPIC, SERVICES_LIST
+    SCHEDULER_JOB, PUBSUB_TOPIC, SERVICES_LIST, FIRESTORE_DB, CLOUDRUN_NEG_SPEC
 from pygcloud.gcp.services.iam import ServiceAccountIAM
 
 
@@ -157,3 +157,13 @@ def sample_pubsub_topic():
 @pytest.fixture
 def sample_services_list():
     return SERVICES_LIST
+
+
+@pytest.fixture
+def sample_firestore_db():
+    return FIRESTORE_DB
+
+
+@pytest.fixture
+def sample_cloudrun_neg():
+    return CLOUDRUN_NEG_SPEC

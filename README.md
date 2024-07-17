@@ -90,7 +90,7 @@ The gcloud command line is currently built for Python 3.9. The accompanied Docke
 # TODO
 
 * File bug report about GCS not supporting --clear-labels along with --update-labels (as in Cloud Run as example)
-
+* File bug report about Cloud Scheduler listing requiring --location (whilst most other services do not)
 
 # Links
 

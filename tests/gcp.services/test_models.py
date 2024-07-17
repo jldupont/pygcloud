@@ -4,7 +4,8 @@
 import pytest
 from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
-    HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription
+    HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
+    FirestoreDb
 
 
 def test_service_address(sample_ip_json):
@@ -103,3 +104,9 @@ def test_services_list(sample_services_list):
 
     assert first.api == "aiplatform.googleapis.com"
     assert first.project_number == "215695389495"
+
+
+def test_firestore_db(sample_firestore_db):
+
+    d = FirestoreDb.from_string(sample_firestore_db)
+    assert d.name == "(default)"

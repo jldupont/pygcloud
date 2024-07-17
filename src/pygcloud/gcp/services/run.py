@@ -14,11 +14,17 @@
 from pygcloud.models import GCPServiceRevisionBased, Params, \
     GCPServiceSingletonImmutable
 from pygcloud.gcp.labels import LabelGenerator
-from pygcloud.gcp.models import CloudRunRevisionSpec
+from pygcloud.gcp.models import CloudRunRevisionSpec, CloudRunNegSpec
 
 
 class CloudRun(GCPServiceRevisionBased, LabelGenerator):
+    """
+    https://cloud.google.com/sdk/gcloud/reference/run
 
+    CAUTION: sensitive information can be contained in the spec
+             e.g. in the environment variables
+    """
+    LISTING_CAPABLE = True
     DEPENDS_ON_API = ["run.googleapis.com",]
     SPEC_CLASS = CloudRunRevisionSpec
     GROUP = ["beta", "run"]
@@ -55,8 +61,10 @@ class CloudRunNeg(GCPServiceSingletonImmutable):
 
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/network-endpoint-groups
     """
+    LISTING_CAPABLE = True
     DEPENDS_ON_API = ["run.googleapis.com", "compute.googleapis.com"]
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
+    SPEC_CLASS = CloudRunNegSpec
     GROUP = ["beta", "compute", "network-endpoint-groups"]
 
     def __init__(self, name: str, *params: Params, region: str = None):

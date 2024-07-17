@@ -1,28 +1,24 @@
 """
-{
-  "creationTimestamp": "2024-05-08T17:29:33.834-07:00",
-  "defaultService": "https://www.googleapis.com/compute/v1/projects/PROJECT/
-                        global/backendServices/backend-service",
-  "fingerprint": "rUH-NY9dEXs=",
-  "id": "922127737791030786",
-  "kind": "compute#urlMap",
-  "name": "urlmap-backend-service",
-  "selfLink": "https://www.googleapis.com/compute/v1/projects/PROJECT/
-                    global/urlMaps/urlmap-backend-service"
-}
+URL Maps
 
 @author: jldupont
 """
 from pygcloud.models import GCPServiceSingletonImmutable
 
 
-class UrlMapDefaultService(GCPServiceSingletonImmutable):
+class UrlMap(GCPServiceSingletonImmutable):
     """
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/url-maps
     """
+    LISTING_CAPABLE = True
     DEPENDS_ON_API = ["compute.googleapis.com",]
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     GROUP = ["compute", "url-maps"]
+
+
+class UrlMapDefaultService(UrlMap):
+
+    LISTING_CAPABLE = False
 
     def __init__(self, name: str, default_service_name: str):
         super().__init__(name=name, ns="urlmap")

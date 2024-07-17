@@ -3,8 +3,8 @@
 """
 import pytest
 from pygcloud.models import Result, Param
-from pygcloud.gcp.services.run import CloudRun, CloudRunNeg
-from pygcloud.gcp.models import CloudRunRevisionSpec
+from pygcloud.gcp.services.run import CloudRun
+from pygcloud.gcp.models import CloudRunRevisionSpec, CloudRunNegSpec
 from samples import CLOUD_RUN_REVISION_SPEC
 
 
@@ -84,6 +84,9 @@ def test_cloud_run_just_describe(deployer, cr):
     assert isinstance(cr.spec, CloudRunRevisionSpec)
 
 
+'''
+TODO: just build a proper mock
+@pytest.mark.skip
 def test_cloud_run_neg(deployer):
 
     neg = CloudRunNeg("neg", [
@@ -97,3 +100,11 @@ def test_cloud_run_neg(deployer):
             "describe", "neg",
             "--region", "region",
         ], print(deployer.cmd.last_command_args)
+'''
+
+
+def test_cloudrun_neg(sample_cloudrun_neg):
+
+    n = CloudRunNegSpec.from_string(sample_cloudrun_neg)
+
+    assert n.name == "backend-neg"

@@ -209,6 +209,9 @@ class GCSBucket(_base):
 
 @dataclass
 class SSLCertificate(_base):
+    """
+    CAUTION: sensitive information in the 'certificate' field
+    """
     name: str
     type: str
     managed: Optional[dict] = field(default_factory=dict)
@@ -245,3 +248,25 @@ class PubsubTopic(_base):
     def __post_init__(self):
         parts = self.name.split("/")
         self.name = parts[-1]
+
+
+@dataclass
+class FirestoreDb(_base):
+    name: str
+    type: str
+    locationId: str
+    concurrencyMode: str
+    pointInTimeRecoveryEnablement: str
+
+    def __post_init__(self):
+        parts = self.name.split("/")
+        self.name = parts[-1]
+
+
+@dataclass
+class CloudRunNegSpec(_base):
+
+    name: str
+    networkEndpointType: str
+    region: str = field(default_factory=str)
+    cloudRun: dict = field(default_factory=dict)

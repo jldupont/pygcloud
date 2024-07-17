@@ -13,6 +13,7 @@ class ServiceAccountIAM(GCPServiceSingletonImmutable):
     """
     Add role to Service Account
     """
+    LISTING_CAPABLE = False
     DEPENDS_ON_API = ["cloudresourcemanager.googleapis.com",]
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
 

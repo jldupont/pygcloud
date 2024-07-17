@@ -11,6 +11,7 @@ class FwdRuleHTTPSProxyService(GCPServiceSingletonImmutable):
     """
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/forwarding-rules
     """
+    LISTING_CAPABLE = True
     DEPENDS_ON_API = ["compute.googleapis.com",]
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     GROUP = ["compute", "forwarding-rules"]

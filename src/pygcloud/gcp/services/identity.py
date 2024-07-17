@@ -14,6 +14,7 @@ class ServicesIdentityIAP(GCPServiceSingletonImmutable):
     https://cloud.google.com/sdk/gcloud/reference/beta/identity
     """
     DEPENDS_ON_API = ["iap.googleapis.com",]
+    LISTING_CAPABLE = False
 
     @property
     def sa_email(self) -> str:

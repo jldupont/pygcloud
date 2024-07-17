@@ -11,6 +11,7 @@ class BackendService(GCPServiceSingletonImmutable):
 
     https://cloud.google.com/sdk/gcloud/reference/compute/backend-services
     """
+    LISTING_CAPABLE = True
     DEPENDS_ON_API = ["compute.googleapis.com",]
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = BackendServiceSpec

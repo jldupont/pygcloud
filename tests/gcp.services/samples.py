@@ -2,6 +2,25 @@
 @author: jldupont
 """
 
+FIRESTORE_DB = """
+{
+  "appEngineIntegrationMode": "DISABLED",
+  "concurrencyMode": "PESSIMISTIC",
+  "createTime": "2024-06-16T12:11:22.315328Z",
+  "deleteProtectionState": "DELETE_PROTECTION_DISABLED",
+  "earliestVersionTime": "2024-07-16T23:42:01.544005Z",
+  "etag": "INGlhNjrrIcDMJjoof+L4IYD",
+  "keyPrefix": "s",
+  "locationId": "nam5",
+  "name": "projects/PROJECT/databases/(default)",
+  "pointInTimeRecoveryEnablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+  "type": "FIRESTORE_NATIVE",
+  "uid": "a55e6c7f-24e6-41dd-9de5-4b0cd12e4812",
+  "updateTime": "2024-06-16T12:11:22.315328Z",
+  "versionRetentionPeriod": "3600s"
+}
+"""  # NOQA
+
 # gcloud projects get-iam-policy $PROJECT_ID
 #
 PROJECT_BINDINGS = """
@@ -3594,3 +3613,19 @@ SERVICES_LIST = r'''
   }
 ]
 '''  # NOQA
+
+CLOUDRUN_NEG_SPEC = """
+{
+    "cloudRun": {
+      "service": "jeeves"
+    },
+    "creationTimestamp": "2024-05-08T11:58:51.036-07:00",
+    "id": "2371160243587937668",
+    "kind": "compute#networkEndpointGroup",
+    "name": "backend-neg",
+    "networkEndpointType": "SERVERLESS",
+    "region": "https://www.googleapis.com/compute/beta/projects/PROJECT/regions/northamerica-northeast1",
+    "selfLink": "https://www.googleapis.com/compute/beta/projects/PROJECT/regions/northamerica-northeast1/networkEndpointGroups/backend-neg",
+    "size": 0
+}
+"""  # NOQA
