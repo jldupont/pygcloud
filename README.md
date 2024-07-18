@@ -82,6 +82,9 @@ We work with the limitations (i.e. 64 entries, unique key names, value length li
 
 The field `$name` is sometimes encoded since the value contains characters not supported by GCP. Encoding strategy in these cases is always the same (bas64 with custom alphabet, padding `=` removed).
 
+# About Regions
+
+Some services are more difficult to inventory than others. This is the case for Cloud Scheduler for example: `gloud scheduler jobs list` command requires specifying the `--location` where to perform the listing.
 
 # About Python 3.9
 
