@@ -7,8 +7,14 @@ from pygcloud.models import GCPService, Result
 from pygcloud.gcp.parsers import ProjectIAMBindings, IAMBinding
 from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC, \
     BACKEND_SERVICE, FWD_RULE, STORAGE_BUCKET, SSL_CERTIFICATE, HTTPS_PROXY, \
-    SCHEDULER_JOB, PUBSUB_TOPIC, SERVICES_LIST, FIRESTORE_DB, CLOUDRUN_NEG_SPEC
+    SCHEDULER_JOB, PUBSUB_TOPIC, SERVICES_LIST, FIRESTORE_DB, \
+    CLOUDRUN_NEG_SPEC, PROJECT_DESC
 from pygcloud.gcp.services.iam import ServiceAccountIAM
+
+
+@pytest.fixture
+def sample_project_desc():
+    return PROJECT_DESC
 
 
 @pytest.fixture

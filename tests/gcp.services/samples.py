@@ -2,6 +2,20 @@
 @author: jldupont
 """
 
+PROJECT_DESC = """
+{
+  "createTime": "2024-05-05T11:59:25.640705Z",
+  "lifecycleState": "ACTIVE",
+  "name": "PROJECT",
+  "parent": {
+    "id": "116975272573",
+    "type": "organization"
+  },
+  "projectId": "PROJECT_ID",
+  "projectNumber": "215695389495"
+}
+"""  # NOQA
+
 FIRESTORE_DB = """
 {
   "appEngineIntegrationMode": "DISABLED",

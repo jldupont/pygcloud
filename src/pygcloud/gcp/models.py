@@ -60,6 +60,15 @@ class _base:
 
 
 @dataclass
+class ProjectDescription(_base):
+    name: str
+    projectId: str
+    projectNumber: str
+    lifecycleState: str
+    parent: dict
+
+
+@dataclass
 class ServiceDescription(_base):
     """
     A service description as retrieved through

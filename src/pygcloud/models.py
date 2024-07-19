@@ -4,10 +4,25 @@
 import os
 import logging
 from functools import cache
+from collections import UserList
 from typing import List, Tuple, NewType, Union, Callable, Any
 from abc import abstractmethod
 from dataclasses import dataclass
 from .constants import ServiceCategory, Instruction
+
+
+class OptionalParam(UserList):
+    """
+    If the value resolves to None, the list resolves to empty.
+
+    If the value resolves to something other than None,
+    then the list resolves to [param, value]
+    """
+    def __init__(self, param, value):
+        if value is None:
+            super().__init__()
+        else:
+            super().__init__([param, value])
 
 
 class EnvValue(str):

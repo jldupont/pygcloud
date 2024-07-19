@@ -5,7 +5,13 @@ import pytest
 from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
     HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
-    FirestoreDb
+    FirestoreDb, ProjectDescription
+
+
+def test_project_desc(sample_project_desc):
+    p = ProjectDescription.from_string(sample_project_desc)
+    assert p.projectNumber == "215695389495"
+    assert p.parent["id"] == "116975272573"
 
 
 def test_service_address(sample_ip_json):
