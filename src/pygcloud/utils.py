@@ -2,6 +2,7 @@
 @author: jldupont
 """
 import json
+from collections.abc import Iterable
 from typing import List, Any, Tuple, Union
 from .models import Param
 
@@ -60,10 +61,16 @@ def prepare_params(params: Union[List[Any], List[Tuple[str, str]]]) \
     new_liste = []
 
     for item in liste:
-        if isinstance(item, tuple) or isinstance(item, Param):
-            new_liste.append(str(item[0]))
-            new_liste.append(str(item[1]))
+
+        if isinstance(item, str):
+            new_liste.append(item)
             continue
+
+        if isinstance(item, Iterable) or isinstance(item, Param):
+            for subitem in item:
+                new_liste.append(str(subitem))
+            continue
+
         new_liste.append(str(item))
 
     return new_liste

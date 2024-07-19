@@ -1,6 +1,7 @@
 """@author: jldupont"""
 
 import pytest
+from pygcloud.models import OptionalParam
 from pygcloud.utils import flatten, split_head_tail, prepare_params, \
     JsonObject
 
@@ -39,7 +40,11 @@ def test_split_head_tail_base(liste, expected):
     (("key", "value"),
         ["key", "value"]),
     (["a", [("c", "d")]],
-        ["a", "c", "d"])
+        ["a", "c", "d"]),
+    ([OptionalParam("whatever", None)],
+        []),
+    (["head", OptionalParam("whatever", True), "tail"],
+        ["head", "whatever", "True", "tail"])
 ])
 def test_prepare_params(inp, expected):
     assert prepare_params(inp) == expected
