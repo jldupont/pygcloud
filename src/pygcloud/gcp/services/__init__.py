@@ -12,5 +12,6 @@ __all__ = [
     "scheduler",
     "services",
     "storage",
+    "tasks",
     "urlmap"
 ]

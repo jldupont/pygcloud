@@ -5,7 +5,7 @@ import pytest
 from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
     HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
-    FirestoreDb, ProjectDescription
+    FirestoreDb, ProjectDescription, TaskQueue
 
 
 def test_project_desc(sample_project_desc):
@@ -116,3 +116,10 @@ def test_firestore_db(sample_firestore_db):
 
     d = FirestoreDb.from_string(sample_firestore_db)
     assert d.name == "(default)"
+
+
+def test_task_queue(sample_task_queue):
+
+    q = TaskQueue.from_string(sample_task_queue)
+    assert q.name == "test"
+    assert q.location == "northamerica-northeast1"

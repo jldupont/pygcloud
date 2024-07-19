@@ -8,7 +8,7 @@ from pygcloud.gcp.parsers import ProjectIAMBindings, IAMBinding
 from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC, \
     BACKEND_SERVICE, FWD_RULE, STORAGE_BUCKET, SSL_CERTIFICATE, HTTPS_PROXY, \
     SCHEDULER_JOB, PUBSUB_TOPIC, SERVICES_LIST, FIRESTORE_DB, \
-    CLOUDRUN_NEG_SPEC, PROJECT_DESC
+    CLOUDRUN_NEG_SPEC, PROJECT_DESC, TASK_QUEUE
 from pygcloud.gcp.services.iam import ServiceAccountIAM
 
 
@@ -173,3 +173,8 @@ def sample_firestore_db():
 @pytest.fixture
 def sample_cloudrun_neg():
     return CLOUDRUN_NEG_SPEC
+
+
+@pytest.fixture
+def sample_task_queue():
+    return TASK_QUEUE

@@ -3643,3 +3643,21 @@ CLOUDRUN_NEG_SPEC = """
     "size": 0
 }
 """  # NOQA
+
+TASK_QUEUE = """
+{
+  "name": "projects/PROJECT/locations/northamerica-northeast1/queues/test",
+  "rateLimits": {
+    "maxBurstSize": 10,
+    "maxConcurrentDispatches": 1,
+    "maxDispatchesPerSecond": 1.0
+  },
+  "retryConfig": {
+    "maxAttempts": 1,
+    "maxBackoff": "3600s",
+    "maxDoublings": 16,
+    "minBackoff": "0.100s"
+  },
+  "state": "RUNNING"
+}
+"""  # NOQA

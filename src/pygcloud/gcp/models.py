@@ -10,6 +10,19 @@ from pygcloud.utils import JsonObject
 
 class _base:
 
+    def __post_init__(self):
+        """
+        Helper for typical URI type name i.e.
+
+        projects/PROJECT/locations/LOCATION/RESOURCE/id",
+        """
+        parts = self.name.split("/")
+        if len(parts) != 6:
+            return
+
+        self.location = parts[3]
+        self.name = parts[-1]
+
     @classmethod
     def parse_json(cls, json_str: str) -> dict:
         import json
@@ -243,12 +256,6 @@ class SchedulerJob(_base):
     location: str = "???"
     pubsubTarget: Optional[dict] = field(default_factory=dict)
 
-    def __post_init__(self):
-        parts = self.name.split("/")
-
-        self.location = parts[3]
-        self.name = parts[-1]
-
 
 @dataclass
 class PubsubTopic(_base):
@@ -279,3 +286,13 @@ class CloudRunNegSpec(_base):
     networkEndpointType: str
     region: str = field(default_factory=str)
     cloudRun: dict = field(default_factory=dict)
+
+
+@dataclass
+class TaskQueue(_base):
+
+    name: str
+    state: str
+    location: str = field(default_factory=str)
+    rateLimits: dict = field(default_factory=dict)
+    retryConfig: dict = field(default_factory=dict)
