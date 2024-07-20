@@ -423,7 +423,7 @@ class GCPService(ServiceNode):
 
         if result.success:
             self.already_exists = True
-            if self.SPEC_CLASS:
+            if self.SPEC_CLASS is not None:
                 self._spec = self.SPEC_CLASS.from_string(result.message)
 
         return result
@@ -436,7 +436,7 @@ class GCPService(ServiceNode):
 
         if result.success:
             self.already_exists = False
-            if self.SPEC_CLASS:
+            if self.SPEC_CLASS is not None:
                 self._spec = self.SPEC_CLASS.from_string(result.message)
 
         return result

@@ -103,8 +103,9 @@ class GCloud(CommandLine):
     gcloud run services list
     """
 
-    def __init__(self, *head_tail: Union[List[Union[str, Tuple[str, str]]],
-                                         Param], cmd="gcloud", **kw):
+    def __init__(self,
+                 *head_tail: Union[str, List[Union[str, Tuple[str, str]]],
+                                   Param], cmd="gcloud", **kw):
         """
         head_tail: [head_parameters ...] tail_parameters
         """

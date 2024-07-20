@@ -8,6 +8,7 @@ correctly, we strip the parenthesis from the name.
 """
 from pygcloud.models import Params, GCPServiceSingletonImmutable
 from pygcloud.helpers import remove_parenthesis
+from pygcloud.gcp.models import FirestoreDb
 
 
 class FirestoreDbBase(GCPServiceSingletonImmutable):
@@ -33,6 +34,7 @@ class FirestoreDatabase(FirestoreDbBase):
     DEPENDS_ON_API = ["firestore.googleapis.com", "datastore.googleapis.com"]
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     GROUP = ["firestore", "databases"]
+    SPEC_CLASS = FirestoreDb
 
     def __init__(self, name: str, params_create: Params = []):
         super().__init__(name)
@@ -41,13 +43,15 @@ class FirestoreDatabase(FirestoreDbBase):
     def params_describe(self):
         return [
             "describe",
-            "--database", self.db_name
+            "--database", self.db_name,
+            "--format", "json"
         ]
 
     def params_create(self):
         return [
             "create",
-            "--database", self.db_name
+            "--database", self.db_name,
+            "--format", "json"
         ] + self._params_create
 
 
