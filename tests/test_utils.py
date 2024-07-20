@@ -1,7 +1,7 @@
 """@author: jldupont"""
 
 import pytest
-from pygcloud.models import OptionalParam
+from pygcloud.models import OptionalParam, LazyEnvValue
 from pygcloud.utils import flatten, split_head_tail, prepare_params, \
     JsonObject
 
@@ -44,10 +44,21 @@ def test_split_head_tail_base(liste, expected):
     ([OptionalParam("whatever", None)],
         []),
     (["head", OptionalParam("whatever", True), "tail"],
-        ["head", "whatever", "True", "tail"])
+        ["head", "whatever", "True", "tail"]),
 ])
-def test_prepare_params(inp, expected):
+def test_prepare_params(inp, expected, env_first_key, env_first_value):
     assert prepare_params(inp) == expected
+
+
+def test_prepare_params_lazy(env_first_key, env_first_value):
+    lv = LazyEnvValue(env_first_key)
+
+    liste = [lv, "tail"]
+    result = prepare_params(liste)
+
+    assert result == [
+        "bash", "tail"
+    ], print(result)
 
 
 @pytest.mark.parametrize("obj, path,expected", [

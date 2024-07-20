@@ -63,7 +63,10 @@ def prepare_params(params: Union[List[Any], List[Tuple[str, str]]]) \
     for item in liste:
 
         if isinstance(item, str):
-            new_liste.append(item)
+
+            # We need to have str() on top
+            # because of types such as LazyEnvValue
+            new_liste.append(str(item))
             continue
 
         if isinstance(item, Iterable) or isinstance(item, Param):

@@ -2,7 +2,7 @@ import pytest
 import os
 from pygcloud.deployer import Deployer
 from pygcloud.core import CommandLine
-from pygcloud.models import GCPService
+from pygcloud.models import GCPService, LazyEnvValue
 from pygcloud.constants import ServiceCategory
 
 
@@ -14,6 +14,11 @@ def env_first_key():
 @pytest.fixture
 def env_first_value(env_first_key):
     return os.environ[env_first_key]
+
+
+@pytest.fixture
+def lazy_env_value(env_first_key):
+    return LazyEnvValue(env_first_key)
 
 
 class MockGCPService(GCPService):
