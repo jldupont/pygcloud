@@ -4,11 +4,11 @@ Data models related to GCP services
 @author: jldupont
 """
 from typing import List, Dict, Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, is_dataclass
 from pygcloud.utils import JsonObject
 
 
-class _base:
+class Spec:
 
     def __post_init__(self):
         """
@@ -71,9 +71,27 @@ class _base:
             cls.from_obj(obj) for obj in json_list
         ]
 
+    def to_dict(self):
+        result = {}
+
+        fields = self.__annotations__
+
+        for _field in fields:
+            value = getattr(self, _field)
+            if is_dataclass(value):
+                value = value.to_dict()
+
+            result[_field] = value
+
+        return result
+
+    def to_json_string(self):
+        import json
+        return json.dumps(self.to_dict())
+
 
 @dataclass
-class ProjectDescription(_base):
+class ProjectDescription(Spec):
     name: str
     projectId: str
     projectNumber: str
@@ -82,7 +100,7 @@ class ProjectDescription(_base):
 
 
 @dataclass
-class ServiceDescription(_base):
+class ServiceDescription(Spec):
     """
     A service description as retrieved through
     `gcloud services list --enabled`
@@ -133,7 +151,7 @@ class IAMBinding:
 
 
 @dataclass
-class IPAddress(_base):
+class IPAddress(Spec):
     """
     Compute Engine IP address
     """
@@ -206,7 +224,7 @@ class BackendServiceSpec:
 
 
 @dataclass
-class FwdRule(_base):
+class FwdRule(Spec):
     """Attribute names come directly from gcloud describe"""
 
     name: str
@@ -219,7 +237,7 @@ class FwdRule(_base):
 
 
 @dataclass
-class GCSBucket(_base):
+class GCSBucket(Spec):
     name: str
     location: str
     default_storage_class: str
@@ -230,7 +248,7 @@ class GCSBucket(_base):
 
 
 @dataclass
-class SSLCertificate(_base):
+class SSLCertificate(Spec):
     """
     CAUTION: sensitive information in the 'certificate' field
     """
@@ -240,14 +258,14 @@ class SSLCertificate(_base):
 
 
 @dataclass
-class HTTPSProxy(_base):
+class HTTPSProxy(Spec):
     name: str
     sslCertificates: Optional[list] = field(default_factory=list)
     urlMap: Optional[str] = field(default_factory="")
 
 
 @dataclass
-class SchedulerJob(_base):
+class SchedulerJob(Spec):
     name: str
     retryConfig: dict
     schedule: str
@@ -258,7 +276,7 @@ class SchedulerJob(_base):
 
 
 @dataclass
-class PubsubTopic(_base):
+class PubsubTopic(Spec):
     name: str
 
     def __post_init__(self):
@@ -267,7 +285,7 @@ class PubsubTopic(_base):
 
 
 @dataclass
-class FirestoreDb(_base):
+class FirestoreDb(Spec):
     name: str
     type: str
     locationId: str
@@ -280,7 +298,7 @@ class FirestoreDb(_base):
 
 
 @dataclass
-class CloudRunNegSpec(_base):
+class CloudRunNegSpec(Spec):
 
     name: str
     networkEndpointType: str
@@ -289,7 +307,7 @@ class CloudRunNegSpec(_base):
 
 
 @dataclass
-class TaskQueue(_base):
+class TaskQueue(Spec):
 
     name: str
     state: str

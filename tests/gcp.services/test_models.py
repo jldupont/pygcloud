@@ -123,3 +123,17 @@ def test_task_queue(sample_task_queue):
     q = TaskQueue.from_string(sample_task_queue)
     assert q.name == "test"
     assert q.location == "northamerica-northeast1"
+
+
+def test_to_dict(sample_task_queue):
+
+    q = TaskQueue.from_string(sample_task_queue)
+    d = q.to_dict()
+
+    assert d['retryConfig']['maxAttempts'] == 1
+
+    import json
+
+    j = json.dumps(d)
+
+    assert 'RUNNING' in j
