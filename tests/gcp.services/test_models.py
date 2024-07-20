@@ -30,6 +30,21 @@ def test_cloud_run_revision_spec(sample_cloud_run_revision_spec):
     assert crr.url == "https://SERVICE-4ro7a33l3a-nn.a.run.app"
 
 
+def test_cloud_run_revision_spec_list(sample_cloud_run_revision_spec):
+
+    liste = f"[{sample_cloud_run_revision_spec}]"
+
+    liste = \
+        CloudRunRevisionSpec.from_json_list(liste)
+
+    assert len(liste) == 1
+
+    crr = liste[0]
+
+    assert crr.name == "SERVICE"
+    assert crr.url == "https://SERVICE-4ro7a33l3a-nn.a.run.app"
+
+
 def test_backend_service(sample_backend_service):
 
     bes = BackendServiceSpec.from_string(sample_backend_service)
@@ -37,7 +52,21 @@ def test_backend_service(sample_backend_service):
     assert bes.name == "backend-service"
     assert bes.protocol == "HTTPS"
 
-    groups = bes.backend_groups
+    groups = bes.backends
+
+    """
+    import typing
+
+    t = bes.__annotations__["backends"]
+
+    origin = typing.get_origin(t)
+    assert origin == list
+
+    args = typing.get_args(t)
+    arg0 = args[0]
+    print(args)
+    assert arg0 == BackendGroup
+    """
 
     assert len(groups) == 1
 

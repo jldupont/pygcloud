@@ -16,6 +16,9 @@ class Spec:
 
         projects/PROJECT/locations/LOCATION/RESOURCE/id",
         """
+        if not getattr(self, "name", False):
+            return
+
         parts = self.name.split("/")
         if len(parts) != 6:
             return
@@ -35,14 +38,44 @@ class Spec:
 
     @classmethod
     def from_obj(cls, obj):
+        """
+        This recursively builds a class instance
+        based on the annotations
+        """
+        if isinstance(obj, list):
+            return [
+                cls(**item) for item in obj
+            ]
+
+        import typing
 
         fields = cls.__annotations__
 
-        sobj = {
-            key: value for key, value in obj.items()
-            if fields.get(key, None) is not None
-        }
-        return cls(**sobj)
+        result: dict = {}
+
+        for key, value in obj.items():
+            _field = fields.get(key, None)
+            if _field is None:
+                continue
+
+            origin = typing.get_origin(_field)
+
+            if origin != list:
+                result[key] = value
+                continue
+
+            # we are just dealing with the simplest case
+            # ... at least for now e.g.
+            # List[BackendGroup]
+            #
+            # and not something like:
+            # List[Union[...]]
+            classe = typing.get_args(_field)[0]
+            entries = classe.from_obj(value)
+
+            result[key] = entries
+
+        return cls(**result)
 
     @classmethod
     def from_string(cls, json_str: str):
@@ -118,14 +151,14 @@ class ServiceDescription(Spec):
 
 
 @dataclass
-class IAMBindings:
+class IAMBindings(Spec):
 
     members: List[str]
     role: str
 
 
 @dataclass
-class IAMBinding:
+class IAMBinding(Spec):
     """
     By default, if the 'email' does not
     contain a namespace prefix, it will be
@@ -162,7 +195,7 @@ class IPAddress(Spec):
 
 
 @dataclass
-class CloudRunRevisionSpec:
+class CloudRunRevisionSpec(Spec):
     """
     Cloud Run Revision Specification (flattened)
     """
@@ -171,10 +204,7 @@ class CloudRunRevisionSpec:
     labels: Dict
 
     @classmethod
-    def from_string(cls, json_str: str):
-
-        obj = JsonObject.from_string(json_str)
-
+    def from_obj(cls, obj):
         d = {
             "url": obj["status.url"],
             "labels": obj["spec.template.metadata.labels"],
@@ -183,44 +213,39 @@ class CloudRunRevisionSpec:
 
         return cls(**d)
 
+    @classmethod
+    def from_string(cls, json_str: str):
+        obj = JsonObject.from_string(json_str)
+        return cls.from_obj(obj)
+
+    @classmethod
+    def from_json_list(cls, json_list):
+        liste: List = cls.parse_json(json_list)
+
+        entries = []
+        for obj_dict in liste:
+            jso = JsonObject(obj_dict)
+            obj = cls.from_obj(jso)
+            entries.append(obj)
+
+        return entries
+
 
 @dataclass
-class BackendGroup:
+class BackendGroup(Spec):
     balancingMode: str
     group: str
     capacityScaler: int
 
 
 @dataclass
-class BackendServiceSpec:
+class BackendServiceSpec(Spec):
 
     name: str
     port: int
     portName: str
     protocol: str
-    backend_groups: List[BackendGroup]
-
-    @classmethod
-    def from_string(cls, json_str: str):
-
-        obj = JsonObject.from_string(json_str)
-
-        raw_groups = obj["backends"]
-        groups = []
-
-        for group in raw_groups:
-            group = BackendGroup(**group)
-            groups.append(group)
-
-        d = {
-            "name": obj["name"],
-            "port": obj["port"],
-            "portName": obj["portName"],
-            "protocol": obj["protocol"],
-            "backend_groups": groups
-        }
-
-        return cls(**d)
+    backends: List[BackendGroup]
 
 
 @dataclass
