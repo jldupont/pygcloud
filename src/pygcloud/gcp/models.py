@@ -3,7 +3,7 @@ Data models related to GCP services
 
 @author: jldupont
 """
-from typing import List, Dict, Optional
+from typing import List, Dict
 from dataclasses import dataclass, field, is_dataclass
 from pygcloud.utils import JsonObject
 
@@ -279,14 +279,14 @@ class SSLCertificate(Spec):
     """
     name: str
     type: str
-    managed: Optional[dict] = field(default_factory=dict)
+    managed: dict = field(default_factory=dict)
 
 
 @dataclass
 class HTTPSProxy(Spec):
     name: str
-    sslCertificates: Optional[list] = field(default_factory=list)
-    urlMap: Optional[str] = field(default_factory="")
+    sslCertificates: list = field(default_factory=list)
+    urlMap: str = field(default_factory=str)
 
 
 @dataclass
@@ -297,7 +297,7 @@ class SchedulerJob(Spec):
     state: str
     timeZone: str
     location: str = "???"
-    pubsubTarget: Optional[dict] = field(default_factory=dict)
+    pubsubTarget: dict = field(default_factory=dict)
 
 
 @dataclass
