@@ -26,8 +26,8 @@ class CloudScheduler(GCPServiceUpdatable):
                  params_update: Params):
         assert isinstance(name, str)
         super().__init__(name, ns="scheduler")
-        self.params_create = list(params_create)
-        self.params_update = list(params_update)
+        self._params_create = list(params_create)
+        self._params_update = list(params_update)
 
     def params_describe(self):
         return [
@@ -41,9 +41,9 @@ class CloudScheduler(GCPServiceUpdatable):
         """
         return [
             "create", self.name
-        ] + self.params_create
+        ] + self._params_create
 
     def params_update(self):
         return [
             "update", self.name
-        ] + self.params_update
+        ] + self._params_update

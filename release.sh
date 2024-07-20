@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 VERSION=`./extract_version.py`
 
 git add .
