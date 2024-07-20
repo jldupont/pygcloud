@@ -57,7 +57,7 @@ def test_prepare_params_lazy(env_first_key, env_first_value):
     result = prepare_params(liste)
 
     assert result == [
-        "bash", "tail"
+        env_first_value, "tail"
     ], print(result)
 
 
