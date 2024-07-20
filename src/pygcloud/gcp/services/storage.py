@@ -46,10 +46,12 @@ class StorageBucket(GCPServiceUpdatable):
 
     def params_create(self):
         return [
-            "create", f"gs://{self.name}"
+            "create", f"gs://{self.name}",
+            "--format", "json"
         ] + self._params_create
 
     def params_update(self):
         return [
-            "update", f"gs://{self.name}"
+            "update", f"gs://{self.name}",
+            "--format", "json"
         ] + self._params_update

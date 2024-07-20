@@ -52,6 +52,7 @@ class CloudRun(GCPServiceRevisionBased, LabelGenerator):
             "deploy", self.name,
             "--clear-labels",
             "--region", self.region,
+            "--format", "json"
         ] + self.params + self.generate_use_labels()
 
 
@@ -77,7 +78,8 @@ class CloudRunNeg(GCPServiceSingletonImmutable):
         return [
             "describe",
             self.name,
-            "--region", self._region
+            "--region", self._region,
+            "--format", "json"
         ]
 
     def params_create(self):
@@ -90,4 +92,5 @@ class CloudRunNeg(GCPServiceSingletonImmutable):
             "create",
             self.name,
             "network-endpoint-type", "serverless",
+            "--format", "json"
         ] + self._params

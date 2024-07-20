@@ -90,5 +90,6 @@ class ServiceAccountIAM(GCPServiceSingletonImmutable):
         return [
             "projects", "add-iam-policy-binding", self._project_id,
             "--member", f"{ns}:{email}",
-            "--role", role
+            "--role", role,
+            "--format", "json"
         ]

@@ -22,7 +22,8 @@ def test_gcs(deployer, sample_gcs_bucket):
     # "update" because the "describe" stage will succeed
 
     assert deployer.cmd.last_command_args == [
-        "echo", "storage", "buckets", "update", "gs://bucket"
+        "echo", "storage", "buckets", "update", "gs://bucket",
+        "--format", "json"
     ]
 
     assert b.spec.name == "bucket"

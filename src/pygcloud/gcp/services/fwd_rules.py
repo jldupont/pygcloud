@@ -37,5 +37,6 @@ class FwdRuleHTTPSProxyService(GCPServiceSingletonImmutable):
             "--global",
             "--target-https-proxy", self._proxy_name,
             "--address", self._ip_address_name,
-            "--ports", "443"
+            "--ports", "443",
+            "--format", "json"
         ]

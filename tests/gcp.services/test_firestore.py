@@ -48,5 +48,5 @@ def test_firestore_index_composite(deployer):
 
     assert deployer.cmd.last_command_args == [
         "echo", "firestore", "indexes", "composite", "create",
-        "--database", "default"
+        "--database", "default", "--format", "json"
     ], print(deployer.cmd.last_command_args)

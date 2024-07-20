@@ -72,5 +72,6 @@ class FirestoreIndexComposite(GCPServiceSingletonImmutable):
     def params_create(self):
         return [
             "create",
-            "--database", self.db_name
+            "--database", self.db_name,
+            "--format", "json"
         ] + self._params_create

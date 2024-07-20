@@ -52,8 +52,9 @@ def test_run_deploy(deployer, cr):
             "echo", "beta", "run", "deploy",
             "my-service", "--clear-labels",
             "--region", "region",
+            "--format", "json",
             "--p1", "v1",
-            "--project", "my-project"
+            "--project", "my-project",
         ], print(deployer.cmd.last_command_args)
 
 
@@ -67,8 +68,9 @@ def test_run_with_use(deployer, cr, sn1):
             "echo", "beta", "run", "deploy",
             "my-service", "--clear-labels",
             "--region", "region",
+            "--format", "json",
             "--p1", "v1",
-            "--labels", "pygcloud-use-0=ns1--name1"
+            "--labels", "pygcloud-use-0=ns1--name1",
         ], print(deployer.cmd.last_command_args)
 
 

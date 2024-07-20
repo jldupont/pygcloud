@@ -36,5 +36,6 @@ class SSLCertificateService(GCPServiceSingletonImmutable):
     def params_create(self):
         return [
             "create", self.name,
-            "--domains", self.domain
+            "--domains", self.domain,
+            "--format", "json"
         ]

@@ -34,5 +34,6 @@ class UrlMapDefaultService(UrlMap):
         return [
             "create", self.name,
             "--global",
-            "--default-service", self._default_service_name
+            "--default-service", self._default_service_name,
+            "--format", "json"
         ]

@@ -27,5 +27,6 @@ class ServiceEnable(GCPServiceSingletonImmutable):
 
     def params_create(self):
         return [
-            "enable", self.name
+            "enable", self.name,
+            "--format", "json"
         ]

@@ -40,10 +40,12 @@ class CloudScheduler(GCPServiceUpdatable):
         https://cloud.google.com/sdk/gcloud/reference/scheduler/jobs/create
         """
         return [
-            "create", self.name
+            "create", self.name,
+            "--format", "json"
         ] + self._params_create
 
     def params_update(self):
         return [
-            "update", self.name
+            "update", self.name,
+            "--format", "json"
         ] + self._params_update

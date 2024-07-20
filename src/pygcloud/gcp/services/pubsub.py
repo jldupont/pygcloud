@@ -29,10 +29,12 @@ class PubsubTopic(GCPServiceUpdatable):
 
     def params_create(self):
         return [
-            "create", self.name
+            "create", self.name,
+            "--format", "json"
         ] + self.params_create
 
     def params_update(self):
         return [
-            "update", self.name
+            "update", self.name,
+            "--format", "json"
         ] + self.params_update

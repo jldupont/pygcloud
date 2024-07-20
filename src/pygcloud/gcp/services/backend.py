@@ -31,7 +31,8 @@ class BackendService(GCPServiceSingletonImmutable):
 
     def params_create(self):
         return [
-            "create", self.name
+            "create", self.name,
+            "--format", "json"
         ] + self._params_create
 
 
@@ -55,5 +56,6 @@ class BackendServiceAddNeg(GCPServiceSingletonImmutable):
             "add-backend", self.name,
             "--global",
             "--network-endpoint-group", self._neg_name,
-            "--network-endpoint-group-region", self._region
+            "--network-endpoint-group-region", self._region,
+            "--format", "json"
         ]
