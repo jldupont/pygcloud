@@ -19,7 +19,7 @@ class ServiceEnable(GCPServiceSingletonImmutable):
     LISTING_CAPABLE = False
     DEPENDS_ON_API = ["serviceusage.googleapis.com",]
     REQUIRES_DESCRIBE_BEFORE_CREATE = False
-    GROUP = "services"
+    GROUP = ["services", ]
 
     def __init__(self, name: str):
         assert isinstance(name, str)
