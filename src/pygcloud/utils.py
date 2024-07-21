@@ -123,13 +123,13 @@ class JsonObject(DotDict):
 
 
 class FlexJSONEncoder(json.JSONEncoder):
-    def __init__(self, *args, **kwargs):
-        json.JSONEncoder.__init__(self, *args, **kwargs)
-        self._replacement_map = {}
 
     def default(self, o):
+        """
+        The purpose is to return an object
+        that can be JSON serializable
+        """
         if not getattr(o, "to_dict", False):
             return json.JSONEncoder.default(self, o)
 
-        dic = o.to_dict()
-        return json.dumps(dic)
+        return o.to_dict()

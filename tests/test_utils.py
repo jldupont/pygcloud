@@ -1,9 +1,10 @@
 """@author: jldupont"""
 
 import pytest
+import json
 from pygcloud.models import OptionalParam, LazyEnvValue
 from pygcloud.utils import flatten, split_head_tail, prepare_params, \
-    JsonObject
+    JsonObject, FlexJSONEncoder
 
 
 @pytest.mark.parametrize("liste,expected", [
@@ -70,3 +71,19 @@ def test_json_obj(obj, path, expected):
 
     obj = JsonObject(**obj)
     assert obj[path] == expected
+
+
+def test_flex_encoder():
+
+    class mock:
+        def to_dict(self):
+            return "666"
+
+    l = [555, mock()]
+
+    js = json.dumps(l, cls=FlexJSONEncoder)
+
+    assert isinstance(js, str), print(js)
+
+    liste = json.loads(js)
+    assert liste == [555, "666"], print(liste)

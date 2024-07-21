@@ -1,6 +1,6 @@
 [project]
 name = "pygcloud"
-version = "0.0.62"
+version = "0.0.63"
 authors = [
   { name="Jean-Lou Dupont", email="jld@jldupont.com" },
 ]

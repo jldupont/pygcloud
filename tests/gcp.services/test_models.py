@@ -176,4 +176,8 @@ def test_backend_service_to_json(sample_backend_service):
     bes = BackendServiceSpec.from_string(sample_backend_service)
 
     js = bes.to_json_string()
-    assert isinstance(js, str)
+    assert isinstance(js, str), print(js)
+
+    import json
+    jso = json.loads(js)
+    assert isinstance(jso, dict)
