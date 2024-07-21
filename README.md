@@ -39,8 +39,8 @@ For the "Updatable", we do the complete steps i.e. describe, create or update.
 
 # Example Usage
 
-```
-from pygcloud.models import Param, EnvParam
+```python
+from pygcloud.models import Param, EnvParam, service_groups
 from pygcloud.gcp.services.storage import StorageBucket
 from pygcloud.deployer import Deployer
 
@@ -52,14 +52,38 @@ project_id = EnvParam("--project", "_PROJECT_ID")
 # The Deployer can be reused for multiple services
 deployer = Deployer(common_params=[project_id])
 
+# Create a group for a number of services
+srv_group_common = service_groups.create("common")
+
 # The first parameter is the name. Most services require a unique name.
-# The second parameter is a list of parameters added to the gcloud command.
-bucket = StorageBucket("my-bucket", ["--public-access-prevention"])
+# `params_create` correspond to the gcloud parameters pertinent
+# to the `create` method.
+# e.g. gcloud storage buckets create my-bucket
+#
+bucket = StorageBucket("my-bucket",
+    params_create=["--public-access-prevention"],
+    params_update=["--public-access-prevention"])
+
+#
+# Any number of services can be added to a group
+#
+srv_group_common.append(bucket)
 
 # Deploy the service
 # For Storage Buckets, an existence check is done using the `describe` gcloud command
 # before creating or updating the bucket.
-deployer.deploy(bucket)
+
+# Which group of services to deploy
+# This parameter can come from the environment e.g. Cloud Build
+#
+# In this case, we only have 1 group defined "common".
+# If the environment variable `_SRV_GROUP` contains `common`,
+# all the services associated with this group defined here
+# will get deployed. If `_SRV_GROUP` is not specified in the
+# environment variables, the group `main` is assumed.
+srv_group_name = EnvValue("_SRV_GROUP", default="main")
+
+deployer.deploy(srv_group_name)
 ```
 
 Additional usage tips can be found in the `tests/gcp.services` folder.

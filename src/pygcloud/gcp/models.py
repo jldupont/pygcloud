@@ -4,7 +4,7 @@ Data models related to GCP services
 @author: jldupont
 """
 from typing import List, Dict
-from dataclasses import dataclass, field, is_dataclass
+from dataclasses import dataclass, field
 from pygcloud.utils import JsonObject
 from pygcloud.utils import FlexJSONEncoder
 
@@ -15,7 +15,7 @@ class Spec:
         """
         Helper for typical URI type name i.e.
 
-        projects/PROJECT/locations/LOCATION/RESOURCE/id",
+        projects/PROJECT/locations/LOCATION/RESOURCE/id
         """
         if not getattr(self, "name", False):
             return
@@ -112,7 +112,8 @@ class Spec:
 
         for _field in fields:
             value = getattr(self, _field)
-            if is_dataclass(value):
+
+            if hasattr(value, "to_dict"):
                 value = value.to_dict()
 
             result[_field] = value

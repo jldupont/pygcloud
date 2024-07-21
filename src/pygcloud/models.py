@@ -134,7 +134,10 @@ class EnvParam(Param):
     """
     For parameters coming from environment variables
     """
-    def __init__(self, key: str, env_var_name: str, default: str = None):
+    def __init__(self,
+                 key: str,
+                 env_var_name: str,
+                 default: Union[str, None] = None):
         """
         key: parameter name
         env_var_name: environment variable name
@@ -151,7 +154,7 @@ class EnvParam(Param):
         return self.value
 
 
-Params = NewType("Param", Union[List[Tuple[str, str]], List[Param]])
+Params = NewType("Params", Union[List[Tuple[str, str]], List[Param]])
 Label = NewType("Label", Tuple[str, str])
 GroupName = NewType("GroupName", Union[str, EnvValue])
 
