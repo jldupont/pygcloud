@@ -6,6 +6,7 @@ Data models related to GCP services
 from typing import List, Dict
 from dataclasses import dataclass, field, is_dataclass
 from pygcloud.utils import JsonObject
+from pygcloud.utils import FlexJSONEncoder
 
 
 class Spec:
@@ -51,7 +52,7 @@ class Spec:
 
         fields = cls.__annotations__
 
-        result: dict = {}
+        result: dict = {}  # type: ignore
 
         for key, value in obj.items():
             _field = fields.get(key, None)
@@ -120,7 +121,8 @@ class Spec:
 
     def to_json_string(self):
         import json
-        return json.dumps(self.to_dict())
+        return json.dumps(self.to_dict(),
+                          cls=FlexJSONEncoder)
 
 
 @dataclass

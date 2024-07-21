@@ -11,6 +11,7 @@
 
 * [Cloud Run](https://cloud.google.com/run/docs/deploying)
 """
+from typing import Union, Optional
 from pygcloud.models import GCPServiceRevisionBased, Params, \
     GCPServiceSingletonImmutable
 from pygcloud.gcp.labels import LabelGenerator
@@ -30,7 +31,8 @@ class CloudRun(GCPServiceRevisionBased, LabelGenerator):
     GROUP = ["beta", "run"]
     GROUP_SUB_DESCRIBE = ["services", ]
 
-    def __init__(self, name: str, *params: Params, region: str = None):
+    def __init__(self, name: str, *params: Params,
+                 region: Optional[Union[str, None]] = None):
         super().__init__(name=name, ns="run")
         assert isinstance(region, str)
         self.params = list(params)
@@ -68,7 +70,8 @@ class CloudRunNeg(GCPServiceSingletonImmutable):
     SPEC_CLASS = CloudRunNegSpec
     GROUP = ["beta", "compute", "network-endpoint-groups"]
 
-    def __init__(self, name: str, *params: Params, region: str = None):
+    def __init__(self, name: str, *params: Params,
+                 region: Optional[Union[str, None]] = None):
         assert isinstance(region, str)
         super().__init__(name, ns="crneg")
         self._region = region

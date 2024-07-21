@@ -23,7 +23,7 @@ def flatten(*liste: Union[List[Any], Tuple[Any]]):
     return result
 
 
-def split_head_tail(liste) -> Tuple[List[Any], List[Any]]:
+def split_head_tail(liste: List[Any]) -> Tuple[List[Any], List[Any]]:
     """
     Cases:
     1) head ... tail ---> normal case
@@ -31,8 +31,8 @@ def split_head_tail(liste) -> Tuple[List[Any], List[Any]]:
     3) tail          ---> normal case
     4) ...           ---> degenerate
     """
-    head = []
-    tail = []
+    head: List[Any] = []
+    tail: List[Any] = []
 
     current = head
 
@@ -120,3 +120,16 @@ class JsonObject(DotDict):
         """
         json_obj = json.loads(json_str)
         return cls(json_obj)
+
+
+class FlexJSONEncoder(json.JSONEncoder):
+    def __init__(self, *args, **kwargs):
+        json.JSONEncoder.__init__(self, *args, **kwargs)
+        self._replacement_map = {}
+
+    def default(self, o):
+        if not getattr(o, "to_dict", False):
+            return json.JSONEncoder.default(self, o)
+
+        dic = o.to_dict()
+        return json.dumps(dic)

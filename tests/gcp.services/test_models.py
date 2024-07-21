@@ -166,3 +166,14 @@ def test_to_dict(sample_task_queue):
     j = json.dumps(d)
 
     assert 'RUNNING' in j
+
+
+def test_backend_service_to_json(sample_backend_service):
+    """
+    This checks that the `to_json` method works recursively
+    using the FlexJSONEncoder
+    """
+    bes = BackendServiceSpec.from_string(sample_backend_service)
+
+    js = bes.to_json_string()
+    assert isinstance(js, str)
