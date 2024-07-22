@@ -14,7 +14,7 @@ class ServicesAddress(GCPServiceSingletonImmutable):
     https://cloud.google.com/sdk/gcloud/reference/compute/addresses
     """
     LISTING_CAPABLE = True
-    DEPENDS_ON_API = ["compute.googleapis.com",]
+    DEPENDS_ON_API = "compute.googleapis.com"
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = IPAddress
     GROUP = ["compute", "addresses"]

@@ -17,7 +17,7 @@ class ServiceEnable(GCPServiceSingletonImmutable):
           this one is aimed at enabling services.
     """
     LISTING_CAPABLE = False
-    DEPENDS_ON_API = ["serviceusage.googleapis.com",]
+    DEPENDS_ON_API = "serviceusage.googleapis.com"
     REQUIRES_DESCRIBE_BEFORE_CREATE = False
     GROUP = ["services", ]
 

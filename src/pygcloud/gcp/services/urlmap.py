@@ -11,7 +11,7 @@ class UrlMap(GCPServiceSingletonImmutable):
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/url-maps
     """
     LISTING_CAPABLE = True
-    DEPENDS_ON_API = ["compute.googleapis.com",]
+    DEPENDS_ON_API = "compute.googleapis.com"
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     GROUP = ["compute", "url-maps"]
 

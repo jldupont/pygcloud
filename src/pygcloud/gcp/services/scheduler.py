@@ -18,7 +18,7 @@ class CloudScheduler(GCPServiceUpdatable):
     """
     LISTING_CAPABLE = True
     LISTING_REQUIRES_LOCATION = True
-    DEPENDS_ON_API = ["cloudscheduler.googleapis.com",]
+    DEPENDS_ON_API = "cloudscheduler.googleapis.com"
     SPEC_CLASS = SchedulerJob
     GROUP = ["scheduler", "jobs"]
 

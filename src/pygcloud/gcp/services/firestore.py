@@ -31,7 +31,7 @@ class FirestoreDatabase(FirestoreDbBase):
     NOTE: the 'describe' capability does not follow the usual pattern
     """
     LISTING_CAPABLE = True
-    DEPENDS_ON_API = ["firestore.googleapis.com", "datastore.googleapis.com"]
+    DEPENDS_ON_API = "firestore.googleapis.com"
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     GROUP = ["firestore", "databases"]
     SPEC_CLASS = FirestoreDb

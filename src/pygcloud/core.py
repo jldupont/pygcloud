@@ -19,7 +19,7 @@ class CommandLine:
                  log_error: bool = False):
         assert isinstance(_exec_path, str)
         self._exec_path = _exec_path
-        self._last_command_args = None
+        self._last_command_args: Union[List[Any], None] = None
         self._exit_on_error = exit_on_error
         self._last_result = None
         self._log_error = log_error
@@ -29,16 +29,18 @@ class CommandLine:
         return self._last_result
 
     @property
-    def last_command_args(self) -> List[Any]:
+    def last_command_args(self) -> Union[List[Any], None]:
         return self._last_command_args
 
-    def exec(self, params: Params, common: Params = None) -> Result:
+    def exec(self,
+             params: Params,
+             common: Union[Params, None] = None) -> Result:
         assert isinstance(params, list), f"Expected list, got: {type(params)}"
 
         if common is None:
             common = []
 
-        command_args = prepare_params([self._exec_path] + params + common)
+        command_args: List[Any] = prepare_params([self._exec_path] + params + common)
 
         logger.debug(f"CommandLine.exec: {command_args}")
 

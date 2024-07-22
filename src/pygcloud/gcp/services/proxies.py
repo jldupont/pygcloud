@@ -12,7 +12,7 @@ class HTTPSProxyService(GCPServiceUpdatable):
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/target-https-proxies
     """
     LISTING_CAPABLE = True
-    DEPENDS_ON_API = ["compute.googleapis.com",]
+    DEPENDS_ON_API = "compute.googleapis.com"
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = HTTPSProxy
     GROUP = ["compute", "target-https-proxies"]

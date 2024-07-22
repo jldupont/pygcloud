@@ -542,7 +542,7 @@ class ServiceGroup(list):
 
     def append(self, what: Union[GCPService, Callable]):
         assert isinstance(what, GCPService) or \
-            isinstance(what, Callable)
+            callable(what)
         return super().append(what)
 
 

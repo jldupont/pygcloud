@@ -45,7 +45,7 @@ class Spec:
         """
         if isinstance(obj, list):
             return [
-                cls(**item) for item in obj
+                cls.from_obj(item) for item in obj
             ]
 
         import typing

@@ -27,7 +27,7 @@ class StorageBucket(GCPServiceUpdatable):
     https://cloud.google.com/sdk/gcloud/reference/storage
     """
     LISTING_CAPABLE = True
-    DEPENDS_ON_API = ["storage.googleapis.com",]
+    DEPENDS_ON_API = "storage.googleapis.com"
     REQUIRES_UPDATE_AFTER_CREATE = False
     SPEC_CLASS = GCSBucket
     GROUP = ["storage", "buckets"]

@@ -26,7 +26,7 @@ class CloudRun(GCPServiceRevisionBased, LabelGenerator):
              e.g. in the environment variables
     """
     LISTING_CAPABLE = True
-    DEPENDS_ON_API = ["run.googleapis.com",]
+    DEPENDS_ON_API = "run.googleapis.com"
     SPEC_CLASS = CloudRunRevisionSpec
     GROUP = ["beta", "run"]
     GROUP_SUB_DESCRIBE = ["services", ]
@@ -65,7 +65,7 @@ class CloudRunNeg(GCPServiceSingletonImmutable):
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/network-endpoint-groups
     """
     LISTING_CAPABLE = True
-    DEPENDS_ON_API = ["run.googleapis.com", "compute.googleapis.com"]
+    DEPENDS_ON_API = "compute.googleapis.com"
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = CloudRunNegSpec
     GROUP = ["beta", "compute", "network-endpoint-groups"]

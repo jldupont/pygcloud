@@ -13,7 +13,7 @@ class ServicesIdentityIAP(GCPServiceSingletonImmutable):
 
     https://cloud.google.com/sdk/gcloud/reference/beta/identity
     """
-    DEPENDS_ON_API = ["iap.googleapis.com",]
+    DEPENDS_ON_API = "iap.googleapis.com"
     LISTING_CAPABLE = False
 
     @property

@@ -16,9 +16,11 @@ logger = logging.getLogger("pygcloud.deployer")
 
 class Deployer:
 
-    def __init__(self, cmd: CommandLine = None, exit_on_error=True,
+    def __init__(self,
+                 cmd: Union[CommandLine, None] = None,
+                 exit_on_error=True,
                  log_error=True,
-                 common_params: Params = None,
+                 common_params: Union[Params, None] = None,
                  just_describe: bool = False):
         """
         exit_on_error (bool): by default, applies to create

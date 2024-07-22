@@ -13,7 +13,7 @@ class TasksQueues(GCPServiceUpdatable):
 
     LISTING_CAPABLE = True
     LISTING_REQUIRES_LOCATION = True
-    DEPENDS_ON_API = ["cloudtasks.googleapis.com",]
+    DEPENDS_ON_API = "cloudtasks.googleapis.com"
     REQUIRES_UPDATE_AFTER_CREATE = False
     SPEC_CLASS = TaskQueue
     GROUP = ["tasks", "queues"]

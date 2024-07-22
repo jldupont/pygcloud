@@ -57,7 +57,8 @@ def prepare_params(params: Union[List[Any], List[Tuple[str, str]]]) \
     We use 'str' on all items because of potential special instances
     such as LazyEnvValue.
     """
-    liste = flatten(params)
+    liste: List[Any] = flatten(params)
+    item: Any
     new_liste = []
 
     for item in liste:
