@@ -5,7 +5,7 @@ import pytest
 from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
     HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
-    FirestoreDb, ProjectDescription, TaskQueue
+    FirestoreDb, ProjectDescription, TaskQueue, UrlMap
 
 
 def test_project_desc(sample_project_desc):
@@ -181,3 +181,9 @@ def test_backend_service_to_json(sample_backend_service):
     import json
     jso = json.loads(js)
     assert isinstance(jso, dict)
+
+
+def test_url_map(sample_url_map):
+
+    um = UrlMap.from_string(sample_url_map)
+    assert um.name == "urlmap-backend-service"

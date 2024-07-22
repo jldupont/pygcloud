@@ -342,3 +342,11 @@ class TaskQueue(Spec):
     location: str = field(default_factory=str)
     rateLimits: dict = field(default_factory=dict)
     retryConfig: dict = field(default_factory=dict)
+
+
+@dataclass
+class UrlMap(Spec):
+
+    id: str = field(default_factory=int)
+    name: str = field(default_factory=str)
+    defaultService: str = field(default_factory=str)

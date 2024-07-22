@@ -3644,7 +3644,7 @@ CLOUDRUN_NEG_SPEC = """
 }
 """  # NOQA
 
-TASK_QUEUE = """
+TASK_QUEUE_SPEC = """
 {
   "name": "projects/PROJECT/locations/northamerica-northeast1/queues/test",
   "rateLimits": {
@@ -3659,5 +3659,17 @@ TASK_QUEUE = """
     "minBackoff": "0.100s"
   },
   "state": "RUNNING"
+}
+"""  # NOQA
+
+URL_MAP_SPEC = """
+{
+    "creationTimestamp": "2024-05-08T17:29:33.834-07:00",
+    "defaultService": "https://www.googleapis.com/compute/v1/projects/sys-playground-dev/global/backendServices/backend-service",
+    "fingerprint": "rUH-NY9dEXs=",
+    "id": "922127737791030786",
+    "kind": "compute#urlMap",
+    "name": "urlmap-backend-service",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/sys-playground-dev/global/urlMaps/urlmap-backend-service"
 }
 """  # NOQA

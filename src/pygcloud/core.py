@@ -40,7 +40,8 @@ class CommandLine:
         if common is None:
             common = []
 
-        command_args: List[Any] = prepare_params([self._exec_path] + params + common)
+        command_args: List[Any] = prepare_params([self._exec_path] +
+                                                 params + common)
 
         logger.debug(f"CommandLine.exec: {command_args}")
 

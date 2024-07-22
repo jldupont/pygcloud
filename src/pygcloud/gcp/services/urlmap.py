@@ -4,6 +4,7 @@ URL Maps
 @author: jldupont
 """
 from pygcloud.models import GCPServiceSingletonImmutable
+from pygcloud.gcp.models import UrlMap
 
 
 class UrlMap(GCPServiceSingletonImmutable):
@@ -14,6 +15,7 @@ class UrlMap(GCPServiceSingletonImmutable):
     DEPENDS_ON_API = "compute.googleapis.com"
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     GROUP = ["compute", "url-maps"]
+    SPEC_CLASS = UrlMap
 
 
 class UrlMapDefaultService(UrlMap):
