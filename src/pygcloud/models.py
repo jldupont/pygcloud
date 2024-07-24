@@ -247,15 +247,15 @@ class GCPService(ServiceNode):
     that requires checking for existence before attempting creation.
     For example: Firestore database.
     """
-    SERVICE_CATEGORY = ServiceCategory.INDETERMINATE
-    REQUIRES_UPDATE_AFTER_CREATE = False
-    REQUIRES_DESCRIBE_BEFORE_CREATE = False
-    LISTING_CAPABLE = None
-    LISTING_REQUIRES_LOCATION = None
-    DEPENDS_ON_API = []
+    SERVICE_CATEGORY: ServiceCategory = ServiceCategory.INDETERMINATE
+    REQUIRES_UPDATE_AFTER_CREATE: bool = False
+    REQUIRES_DESCRIBE_BEFORE_CREATE: bool = False
+    LISTING_CAPABLE: bool = False
+    LISTING_REQUIRES_LOCATION: bool = False
+    DEPENDS_ON_API: Union[str, None] = None
     SPEC_CLASS = None
-    GROUP = []
-    GROUP_SUB_DESCRIBE = []
+    GROUP: List[str] = []
+    GROUP_SUB_DESCRIBE: List[str] = []
 
     @property
     def category(self):

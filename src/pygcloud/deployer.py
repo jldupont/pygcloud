@@ -3,12 +3,13 @@
 """
 import logging
 import sys
-from typing import Union, Callable
+from typing import Union, Callable, List
 from .core import CommandLine, GCloud
 from .constants import ServiceCategory, Instruction
 from .models import GCPService, Result, Params, \
     ServiceGroup, service_groups, GroupName, \
     GroupNameUtility
+from pygcloud import events
 
 
 logger = logging.getLogger("pygcloud.deployer")
@@ -31,6 +32,14 @@ class Deployer:
         self.log_error = log_error
         self.common_params = common_params or []
         self._just_describe = just_describe
+        self._history_hooks = []
+
+    @property
+    def history_hooks(self):
+        return self._history_hooks
+
+    def add_to_history_hooks(self, hook_name: str):
+        self._history_hooks.append(hook_name)
 
     def set_just_describe(self, enable: bool = True):
         self._just_describe = enable
@@ -54,6 +63,8 @@ class Deployer:
 
     def before_deploy(self, service: GCPService) -> Union[Instruction, None]:
         logger.info(f"Before deploying {service.ns}:{service.name}")
+        self.add_to_history_hooks("before_deploy")
+        events.before_deploy(self, service)
         return service.before_deploy()
 
     def before_create(self, service: GCPService): pass
@@ -64,6 +75,8 @@ class Deployer:
         return result
 
     def after_deploy(self, service: GCPService, result: Result):
+        self.add_to_history_hooks("after_deploy")
+        events.after_deploy(self, service)
         service.after_deploy()
         return result
 
@@ -230,11 +243,14 @@ class Deployer:
 
         Returns the result of the last deploy attempt
         """
+        self.add_to_history_hooks("start_deploy")
+        events.start_deploy(self, what)
+
         if isinstance(what, GCPService):
             return self._deploy(what)
 
-        result = None
-        services = None
+        result: Union[Result, Instruction]
+        services: List[GCPService] = []
 
         if isinstance(what, ServiceGroup):
             services = what
@@ -250,6 +266,8 @@ class Deployer:
             if result == Instruction.ABORT_DEPLOY_ALL:
                 break
 
+        self.add_to_history_hooks("end_deploy")
+        events.end_deploy(self, what)
         return result
 
     def create(self, service: GCPService) -> Result:

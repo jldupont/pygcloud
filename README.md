@@ -114,6 +114,10 @@ Some services are more difficult to inventory than others. This is the case for 
 
 The gcloud command line is currently built for Python 3.9. The accompanied Docker image provided by Google is built for Python 3.9. To simplify usage of pygcloud, I opted to follow this gcloud constraint.
 
+# EntryPoints
+
+This package supports entrypoints. They are defined in the package's `pyproject.toml` file.
+
 # TODO
 
 * File bug report about GCS not supporting --clear-labels along with --update-labels (as in Cloud Run as example)

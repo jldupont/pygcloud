@@ -223,7 +223,7 @@ class CloudRunRevisionSpec(Spec):
 
     @classmethod
     def from_json_list(cls, json_list):
-        liste: List = cls.parse_json(json_list)
+        liste: List = cls.parse_json(json_list)  # type: ignore
 
         entries = []
         for obj_dict in liste:
@@ -347,6 +347,6 @@ class TaskQueue(Spec):
 @dataclass
 class UrlMap(Spec):
 
-    id: str = field(default_factory=int)
+    id: str = field(default_factory=str)
     name: str = field(default_factory=str)
     defaultService: str = field(default_factory=str)

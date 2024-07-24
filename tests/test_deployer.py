@@ -288,3 +288,23 @@ def test_deploy_abort_all(deployer, mock_service):
     assert isinstance(result, Instruction)
     assert result == Instruction.ABORT_DEPLOY_ALL
     assert not called
+
+
+def test_hooks(deployer, mock_service):
+    """
+    Empty service group should anyway
+    have the "start" and "end" hooks called
+    """
+
+    service_groups.clear()
+    sg = service_groups.create("sg")
+    sg.append(mock_service)
+
+    deployer.deploy("sg")
+
+    assert deployer.history_hooks == [
+        "start_deploy",
+        "before_deploy",
+        "after_deploy",
+        "end_deploy"
+    ], print(deployer.history_hooks)

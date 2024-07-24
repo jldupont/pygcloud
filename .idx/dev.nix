@@ -10,11 +10,6 @@
     pkgs.python39Packages.pip
     pkgs.openssh
     pkgs.docker
-    # pkgs.go
-    # pkgs.python311
-    # pkgs.python311Packages.pip
-    # pkgs.nodejs_20
-    # pkgs.nodePackages.nodemon
   ];
   # Sets environment variables in the workspace
   env = {};
