@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 import json
 from collections.abc import Iterable
 from typing import List, Any, Tuple, Union
@@ -11,8 +12,7 @@ def flatten(*liste: Union[List[Any], Tuple[Any]]):
     """
     Flatten a list of lists
     """
-    assert isinstance(liste, tuple), \
-        f"Expected list, got: {type(liste)}"
+    assert isinstance(liste, tuple), f"Expected list, got: {type(liste)}"
 
     result = []
     for item in liste:
@@ -47,8 +47,7 @@ def split_head_tail(liste: List[Any]) -> Tuple[List[Any], List[Any]]:
     return (head, tail)
 
 
-def prepare_params(params: Union[List[Any], List[Tuple[str, str]]]) \
-        -> List[Any]:
+def prepare_params(params: Union[List[Any], List[Tuple[str, str]]]) -> List[Any]:
     """
     Prepare a list of parameters for a command line invocation
 
@@ -90,6 +89,7 @@ class DotDict(dict):
         value = d["l1.l2"]
         assert value == "v2"
     """
+
     def __getitem__(self, path):
         if "." not in path:
             return super().__getitem__(path)

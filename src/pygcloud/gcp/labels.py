@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 from typing import List
 from functools import cache
 from pygcloud.models import Label, ServiceNode
@@ -27,23 +28,27 @@ class LabelGenerator:
         A valid label must, encoded or not, must use
         less than 64 characters
         """
+
         def raise_if_too_long(value):
             assert isinstance(value, str)
             if len(value) > 63:
-                raise ValueError("Label value is greater than 63 characters "
-                                 f"for {target.__class__.name}")
+                raise ValueError(
+                    "Label value is greater than 63 characters "
+                    f"for {target.__class__.name}"
+                )
 
         def raise_if_double_dash(value):
             assert isinstance(value, str)
-            if '--' in value:
-                raise ValueError("Invalid '--' in label component(s)  "
-                                 f"{target.__class__.name}")
+            if "--" in value:
+                raise ValueError(
+                    "Invalid '--' in label component(s)  " f"{target.__class__.name}"
+                )
 
         raise_if_double_dash(target.ns)
 
         unencoded_name_is_valid = validate_name(target.name)
 
-        if unencoded_name_is_valid and '--' not in target.name:
+        if unencoded_name_is_valid and "--" not in target.name:
             label_value = cls.generate_one_label_value_unencoded(target)
             raise_if_too_long(label_value)
             return label_value
@@ -94,6 +99,4 @@ class LabelGenerator:
         labels: List[Label] = self.compute_use_entries()
         string_ = self.generate_string_from_labels(labels)
 
-        return [
-            f"{param_prefix}", string_
-        ]
+        return [f"{param_prefix}", string_]

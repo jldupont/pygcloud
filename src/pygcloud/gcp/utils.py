@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 import base64
 
 
@@ -16,8 +17,9 @@ class Codec:
     @staticmethod
     def encode(input: str) -> str:
         assert isinstance(input, str)
-        result = base64.b64encode(input.encode("utf-8"),
-                                  altchars=Codec.ALTCHARS).decode()
+        result = base64.b64encode(
+            input.encode("utf-8"), altchars=Codec.ALTCHARS
+        ).decode()
         return result.replace("=", "")
 
     @staticmethod
@@ -30,11 +32,11 @@ class Codec:
         padded_input = input + "=" * pad_count
 
         try:
-            b64decoded = base64.b64decode(padded_input,
-                                          altchars=Codec.ALTCHARS)
+            b64decoded = base64.b64decode(padded_input, altchars=Codec.ALTCHARS)
             bindecoded = b64decoded.decode("utf-8")
         except UnicodeDecodeError:
-            raise ValueError("Error decoding. "
-                             "What is encoded using the right encoder?")
+            raise ValueError(
+                "Error decoding. " "What is encoded using the right encoder?"
+            )
 
         return bindecoded

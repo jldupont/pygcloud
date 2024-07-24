@@ -3,6 +3,7 @@ Services Identity
 
 @author: jldupont
 """
+
 import logging
 from pygcloud.models import GCPServiceSingletonImmutable, Result
 
@@ -13,6 +14,7 @@ class ServicesIdentityIAP(GCPServiceSingletonImmutable):
 
     https://cloud.google.com/sdk/gcloud/reference/beta/identity
     """
+
     DEPENDS_ON_API = "iap.googleapis.com"
     LISTING_CAPABLE = False
 
@@ -25,9 +27,14 @@ class ServicesIdentityIAP(GCPServiceSingletonImmutable):
 
     def params_create(self):
         return [
-            "beta", "services", "identity", "create",
-            "--service", "iap.googleapis.com",
-            "--format", "json"
+            "beta",
+            "services",
+            "identity",
+            "create",
+            "--service",
+            "iap.googleapis.com",
+            "--format",
+            "json",
         ]
 
     def after_create(self, result: Result) -> Result:
@@ -44,10 +51,10 @@ class ServicesIdentityIAP(GCPServiceSingletonImmutable):
             self._service_account_email = jsobj["email"]
 
         except Exception:
-            raise Exception("Could not find service account email in:"
-                            f" {result.message}")
+            raise Exception(
+                "Could not find service account email in:" f" {result.message}"
+            )
 
-        logging.debug("ServiceAccount for IAP successfully created"
-                      " (if not already)")
+        logging.debug("ServiceAccount for IAP successfully created" " (if not already)")
 
         return result

@@ -1,4 +1,5 @@
 """@author: jldupont"""
+
 from enum import Enum
 
 __all__ = ["ServiceCategory"]
@@ -16,5 +17,4 @@ class Instruction(Enum):
     ABORT_DEPLOY_ALL = "abort_deploy_all"
 
     def is_abort(self):
-        return self == self.ABORT_DEPLOY or \
-            self == self.ABORT_DEPLOY_ALL
+        return self == self.ABORT_DEPLOY or self == self.ABORT_DEPLOY_ALL

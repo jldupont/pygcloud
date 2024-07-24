@@ -3,6 +3,7 @@ Catalog facility for the supported GCP services
 
 @author: jldupont
 """
+
 from typing import List
 from functools import cache
 from pygcloud.gcp.services import *  # NOQA
@@ -12,10 +13,7 @@ from pygcloud.models import ServiceNode, GCPService
 
 @cache
 def map():
-    return {
-        classe.__name__: classe
-        for classe in ServiceNode.__all_classes__
-    }
+    return {classe.__name__: classe for classe in ServiceNode.__all_classes__}
 
 
 def lookup(class_name: str):
@@ -24,15 +22,12 @@ def lookup(class_name: str):
 
 @cache
 def get_listable_services():
-    return [
-        classe
-        for classe in ServiceNode.__all_classes__
-        if classe.LISTING_CAPABLE
-    ]
+    return [classe for classe in ServiceNode.__all_classes__ if classe.LISTING_CAPABLE]
 
 
-def get_service_classes_from_services_list(liste: List[ServiceDescription]) \
-        -> List[GCPService]:
+def get_service_classes_from_services_list(
+    liste: List[ServiceDescription],
+) -> List[GCPService]:
     """
     From the list of enabled services in the target project,
     make up list of GCPService classes

@@ -3,6 +3,7 @@ Compute Engine Forwarding Rules
 
 @author: jldupont
 """
+
 from pygcloud.models import GCPServiceSingletonImmutable
 from pygcloud.gcp.models import FwdRule
 
@@ -11,6 +12,7 @@ class FwdRuleHTTPSProxyService(GCPServiceSingletonImmutable):
     """
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/forwarding-rules
     """
+
     LISTING_CAPABLE = True
     DEPENDS_ON_API = "compute.googleapis.com"
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
@@ -25,18 +27,19 @@ class FwdRuleHTTPSProxyService(GCPServiceSingletonImmutable):
         self._ip_address_name = ip_address_name
 
     def params_describe(self):
-        return [
-            "describe", self.name,
-            "--global",
-            "--format", "json"
-        ]
+        return ["describe", self.name, "--global", "--format", "json"]
 
     def params_create(self):
         return [
-            "create", self.name,
+            "create",
+            self.name,
             "--global",
-            "--target-https-proxy", self._proxy_name,
-            "--address", self._ip_address_name,
-            "--ports", "443",
-            "--format", "json"
+            "--target-https-proxy",
+            self._proxy_name,
+            "--address",
+            self._ip_address_name,
+            "--ports",
+            "443",
+            "--format",
+            "json",
         ]

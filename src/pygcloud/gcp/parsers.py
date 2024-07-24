@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 from typing import List
 from functools import cache
 from pygcloud.utils import JsonObject
@@ -23,10 +24,7 @@ class _ProjectIAMBindings:
         liste = entry.members
         role = entry.role
 
-        return [
-            IAMBinding(email=member, role=role, ns=...)
-            for member in liste
-        ]
+        return [IAMBinding(email=member, role=role, ns=...) for member in liste]
 
     def _itemize_all(self) -> List[IAMBinding]:
 
@@ -45,6 +43,7 @@ class ProjectIAMBindings(_ProjectIAMBindings):
 
     By default, all namespace prefix are removed from the email address
     """
+
     def __init__(self, json_str: str):
         self.obj = JsonObject.from_string(json_str)
         self._bindings = None
@@ -95,8 +94,7 @@ class ProjectIAMBindings(_ProjectIAMBindings):
 
     def check_for_target_binding(self, target_binding: IAMBinding) -> bool:
 
-        bindings_for_member = \
-            self.find_bindings_by_member_email(target_binding.email)
+        bindings_for_member = self.find_bindings_by_member_email(target_binding.email)
 
         for binding in bindings_for_member:
             if binding.role == target_binding.role:

@@ -3,6 +3,7 @@ Data models related to GCP services
 
 @author: jldupont
 """
+
 from typing import List, Dict
 from dataclasses import dataclass, field
 from pygcloud.utils import JsonObject
@@ -30,6 +31,7 @@ class Spec:
     @classmethod
     def parse_json(cls, json_str: str) -> dict:
         import json
+
         try:
             json_obj = json.loads(json_str)
         except Exception:
@@ -44,9 +46,7 @@ class Spec:
         based on the annotations
         """
         if isinstance(obj, list):
-            return [
-                cls.from_obj(item) for item in obj
-            ]
+            return [cls.from_obj(item) for item in obj]
 
         import typing
 
@@ -101,9 +101,7 @@ class Spec:
 
         assert isinstance(json_list, list)
 
-        return [
-            cls.from_obj(obj) for obj in json_list
-        ]
+        return [cls.from_obj(obj) for obj in json_list]
 
     def to_dict(self):
         result = {}
@@ -122,8 +120,8 @@ class Spec:
 
     def to_json_string(self):
         import json
-        return json.dumps(self.to_dict(),
-                          cls=FlexJSONEncoder)
+
+        return json.dumps(self.to_dict(), cls=FlexJSONEncoder)
 
 
 @dataclass
@@ -141,6 +139,7 @@ class ServiceDescription(Spec):
     A service description as retrieved through
     `gcloud services list --enabled`
     """
+
     name: str
     state: str
     parent: str
@@ -191,6 +190,7 @@ class IPAddress(Spec):
     """
     Compute Engine IP address
     """
+
     name: str
     address: str
     addressType: str
@@ -202,6 +202,7 @@ class CloudRunRevisionSpec(Spec):
     """
     Cloud Run Revision Specification (flattened)
     """
+
     name: str
     url: str
     labels: Dict
@@ -280,6 +281,7 @@ class SSLCertificate(Spec):
     """
     CAUTION: sensitive information in the 'certificate' field
     """
+
     name: str
     type: str
     managed: dict = field(default_factory=dict)

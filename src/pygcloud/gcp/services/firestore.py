@@ -6,6 +6,7 @@ correctly, we strip the parenthesis from the name.
 
 @author: jldupont
 """
+
 from pygcloud.models import Params, GCPServiceSingletonImmutable
 from pygcloud.helpers import remove_parenthesis
 from pygcloud.gcp.models import FirestoreDb
@@ -30,6 +31,7 @@ class FirestoreDatabase(FirestoreDbBase):
 
     NOTE: the 'describe' capability does not follow the usual pattern
     """
+
     LISTING_CAPABLE = True
     DEPENDS_ON_API = "firestore.googleapis.com"
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
@@ -41,17 +43,15 @@ class FirestoreDatabase(FirestoreDbBase):
         self._params_create = params_create
 
     def params_describe(self):
-        return [
-            "describe",
-            "--database", self.db_name,
-            "--format", "json"
-        ]
+        return ["describe", "--database", self.db_name, "--format", "json"]
 
     def params_create(self):
         return [
             "create",
-            "--database", self.db_name,
-            "--format", "json"
+            "--database",
+            self.db_name,
+            "--format",
+            "json",
         ] + self._params_create
 
 
@@ -61,6 +61,7 @@ class FirestoreIndexComposite(GCPServiceSingletonImmutable):
 
     Cannot describe an index easily without an ID unfortunately
     """
+
     DEPENDS_ON_API = ["firestore.googleapis.com", "datastore.googleapis.com"]
     GROUP = ["firestore", "indexes", "composite"]
 
@@ -72,6 +73,8 @@ class FirestoreIndexComposite(GCPServiceSingletonImmutable):
     def params_create(self):
         return [
             "create",
-            "--database", self.db_name,
-            "--format", "json"
+            "--database",
+            self.db_name,
+            "--format",
+            "json",
         ] + self._params_create

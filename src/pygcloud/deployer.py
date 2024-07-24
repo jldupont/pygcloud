@@ -1,14 +1,21 @@
 """
 @author: jldupont
 """
+
 import logging
 import sys
 from typing import Union, Callable, List
 from .core import CommandLine, GCloud
 from .constants import ServiceCategory, Instruction
-from .models import GCPService, Result, Params, \
-    ServiceGroup, service_groups, GroupName, \
-    GroupNameUtility
+from .models import (
+    GCPService,
+    Result,
+    Params,
+    ServiceGroup,
+    service_groups,
+    GroupName,
+    GroupNameUtility,
+)
 from pygcloud import events
 
 
@@ -17,12 +24,14 @@ logger = logging.getLogger("pygcloud.deployer")
 
 class Deployer:
 
-    def __init__(self,
-                 cmd: Union[CommandLine, None] = None,
-                 exit_on_error=True,
-                 log_error=True,
-                 common_params: Union[Params, None] = None,
-                 just_describe: bool = False):
+    def __init__(
+        self,
+        cmd: Union[CommandLine, None] = None,
+        exit_on_error=True,
+        log_error=True,
+        common_params: Union[Params, None] = None,
+        just_describe: bool = False,
+    ):
         """
         exit_on_error (bool): by default, applies to create
         and update operations
@@ -59,7 +68,8 @@ class Deployer:
         self.common_params.extend(params)
         return self
 
-    def before_describe(self, service: GCPService): pass
+    def before_describe(self, service: GCPService):
+        pass
 
     def before_deploy(self, service: GCPService) -> Union[Instruction, None]:
         logger.info(f"Before deploying {service.ns}:{service.name}")
@@ -67,9 +77,14 @@ class Deployer:
         events.before_deploy(self, service)
         return service.before_deploy()
 
-    def before_create(self, service: GCPService): pass
-    def before_update(self, service: GCPService): pass
-    def before_delete(self, service: GCPService): pass
+    def before_create(self, service: GCPService):
+        pass
+
+    def before_update(self, service: GCPService):
+        pass
+
+    def before_delete(self, service: GCPService):
+        pass
 
     def after_describe(self, service: GCPService, result: Result):
         return result
@@ -98,14 +113,14 @@ class Deployer:
                 logger.error(result.message)
             sys.exit(1)
 
-    def after_delete(self, service: GCPService, result: Result): pass
+    def after_delete(self, service: GCPService, result: Result):
+        pass
 
     def describe(self, service: GCPService) -> Result:
 
         self.before_describe(service)
         service.before_describe()
-        params = service.GROUP + service.GROUP_SUB_DESCRIBE + \
-            service.params_describe()
+        params = service.GROUP + service.GROUP_SUB_DESCRIBE + service.params_describe()
         result = self.cmd.exec(params, common=self.common_params)
         service.after_describe(result)
         result = self.after_describe(service, result)
@@ -123,8 +138,9 @@ class Deployer:
 
         return False
 
-    def deploy_singleton_immutable(self, service: GCPService) \
-            -> Union[Result, Instruction]:
+    def deploy_singleton_immutable(
+        self, service: GCPService
+    ) -> Union[Result, Instruction]:
         """
         We ignore exceptions arising from the service already being created.
         The service's "after_create" method will need to check for this.
@@ -150,8 +166,7 @@ class Deployer:
         result = self.create(service)
         return self.after_deploy(service, result)
 
-    def deploy_revision_based(self, service: GCPService) \
-            -> Union[Result, Instruction]:
+    def deploy_revision_based(self, service: GCPService) -> Union[Result, Instruction]:
         """
         We skip the "update" step. The "create" parameters will be used.
         The "SingletonImmutable" and "RevisionBased" categories are
@@ -171,8 +186,7 @@ class Deployer:
         result = self.create(service)
         return self.after_deploy(service, result)
 
-    def deploy_updateable(self, service: GCPService) \
-            -> Union[Result, Instruction]:
+    def deploy_updateable(self, service: GCPService) -> Union[Result, Instruction]:
         """
         We do the complete steps i.e. describe, create or update.
         """
@@ -195,8 +209,7 @@ class Deployer:
         self.after_deploy(service, result)
         return result
 
-    def _deploy(self, what: Union[GCPService, Callable]) \
-            -> Union[Result, Instruction]:
+    def _deploy(self, what: Union[GCPService, Callable]) -> Union[Result, Instruction]:
 
         if isinstance(what, Callable):
             function = what
@@ -236,8 +249,9 @@ class Deployer:
 
         raise RuntimeError(f"Unknown service category: {service.category}")
 
-    def deploy(self, what: Union[GCPService, ServiceGroup, GroupName]) \
-            -> Union[Result, Instruction]:
+    def deploy(
+        self, what: Union[GCPService, ServiceGroup, GroupName]
+    ) -> Union[Result, Instruction]:
         """
         Either deploys a single service or a group of them
 
@@ -267,7 +281,7 @@ class Deployer:
                 break
 
         self.add_to_history_hooks("end_deploy")
-        events.end_deploy(self, what)
+        events.end_deploy(self, what, result)
         return result
 
     def create(self, service: GCPService) -> Result:

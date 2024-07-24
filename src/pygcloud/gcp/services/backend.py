@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 from pygcloud.models import GCPServiceSingletonImmutable, Params
 from pygcloud.gcp.models import BackendServiceSpec
 
@@ -11,36 +12,33 @@ class BackendService(GCPServiceSingletonImmutable):
 
     https://cloud.google.com/sdk/gcloud/reference/compute/backend-services
     """
+
     LISTING_CAPABLE = True
     DEPENDS_ON_API = "compute.googleapis.com"
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = BackendServiceSpec
     GROUP = ["compute", "backend-services"]
 
-    def __init__(self, name: str, params_describe: Params,
-                 params_create: Params):
+    def __init__(self, name: str, params_describe: Params, params_create: Params):
         super().__init__(name=name, ns="be")
         self._params_describe = params_describe
         self._params_create = params_create
 
     def params_describe(self):
-        return [
-            "describe", self.name,
-            "--format", "json"
-        ] + self._params_describe
+        return ["describe", self.name, "--format", "json"] + self._params_describe
 
     def params_create(self):
-        return [
-            "create", self.name,
-            "--format", "json"
-        ] + self._params_create
+        return ["create", self.name, "--format", "json"] + self._params_create
 
 
 class BackendServiceAddNeg(GCPServiceSingletonImmutable):
     """
     https://cloud.google.com/sdk/gcloud/reference/beta/compute/backend-services/add-backend
     """
-    DEPENDS_ON_API = ["compute.googleapis.com",]
+
+    DEPENDS_ON_API = [
+        "compute.googleapis.com",
+    ]
     REQUIRES_DESCRIBE_BEFORE_CREATE = False
     GROUP = ["compute", "backend-services"]
 
@@ -53,9 +51,13 @@ class BackendServiceAddNeg(GCPServiceSingletonImmutable):
 
     def params_create(self):
         return [
-            "add-backend", self.name,
+            "add-backend",
+            self.name,
             "--global",
-            "--network-endpoint-group", self._neg_name,
-            "--network-endpoint-group-region", self._region,
-            "--format", "json"
+            "--network-endpoint-group",
+            self._neg_name,
+            "--network-endpoint-group-region",
+            self._region,
+            "--format",
+            "json",
         ]

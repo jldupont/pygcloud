@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 import os
 import logging
 from functools import cache
@@ -18,6 +19,7 @@ class OptionalParam(UserList):
     If the value resolves to something other than None,
     then the list resolves to [param, value]
     """
+
     def __init__(self, param, value):
         if value is None:
             super().__init__()
@@ -29,6 +31,7 @@ class EnvValue(str):
     """
     Retrieve a value from an environment variable
     """
+
     def __new__(cls, name, default=None):
         value = os.environ.get(name, default)
         instance = super().__new__(cls, value)
@@ -42,6 +45,7 @@ class LazyEnvValue(str):
     Other operators aside from __eq__ and __neq__
     might be required in the future
     """
+
     def __init__(self, name):
         super().__init__()
         self._name = name
@@ -111,6 +115,7 @@ class LazyAttrValue:
 @dataclass
 class Param:
     """Description of a gcloud parameter"""
+
     key: str
     value: str
 
@@ -134,10 +139,8 @@ class EnvParam(Param):
     """
     For parameters coming from environment variables
     """
-    def __init__(self,
-                 key: str,
-                 env_var_name: str,
-                 default: Union[str, None] = None):
+
+    def __init__(self, key: str, env_var_name: str, default: Union[str, None] = None):
         """
         key: parameter name
         env_var_name: environment variable name
@@ -163,8 +166,7 @@ class GroupNameUtility:
 
     @staticmethod
     def is_of_type(what: GroupName):
-        return isinstance(what, str) or \
-            isinstance(what, EnvValue)
+        return isinstance(what, str) or isinstance(what, EnvValue)
 
     @staticmethod
     def resolve_group_name(name: GroupName) -> str:
@@ -191,13 +193,13 @@ class ServiceMeta(type):
     def only_add_real_service_class(cls, classe):
         new_class_name = classe.__name__.lower()
 
-        if 'mock' in new_class_name:
+        if "mock" in new_class_name:
             return
 
-        if new_class_name == 'servicenode':
+        if new_class_name == "servicenode":
             return
 
-        if 'gcpservice' in new_class_name:
+        if "gcpservice" in new_class_name:
             return
 
         cls.__all_classes__.append(classe)
@@ -217,6 +219,7 @@ class ServiceNode(metaclass=ServiceMeta):
     Protocol to establish "use" relationships
     between services
     """
+
     @property
     @abstractmethod
     def name(self):
@@ -247,6 +250,7 @@ class GCPService(ServiceNode):
     that requires checking for existence before attempting creation.
     For example: Firestore database.
     """
+
     SERVICE_CATEGORY: ServiceCategory = ServiceCategory.INDETERMINATE
     REQUIRES_UPDATE_AFTER_CREATE: bool = False
     REQUIRES_DESCRIBE_BEFORE_CREATE: bool = False
@@ -313,8 +317,7 @@ class GCPService(ServiceNode):
             self._callables_before_deploy.extend(task)
             return self
 
-        raise Exception("Expecting task or task list, "
-                        f"got: {type(task)}")
+        raise Exception("Expecting task or task list, " f"got: {type(task)}")
 
     @classmethod
     @cache
@@ -338,14 +341,17 @@ class GCPService(ServiceNode):
         Raises exception if a valid label cannot be derived
         """
         if self.validate_label(self) is None:
-            logging.warning("Label validation is not available for:"
-                            f" {self.__class__.name}")
+            logging.warning(
+                "Label validation is not available for:" f" {self.__class__.name}"
+            )
         else:
             self.validate_label(self)
 
         if not self.validate_label(target_service):
-            logging.warning("Label validation is not available for:"
-                            f" {target_service.__class__.name}")
+            logging.warning(
+                "Label validation is not available for:"
+                f" {target_service.__class__.name}"
+            )
         else:
             self.validate_label(target_service)
 
@@ -465,6 +471,7 @@ class GCPServiceSingletonImmutable(GCPService):
     service already being created: we do this by interpreting
     the result code in the "after_create" method.
     """
+
     SERVICE_CATEGORY = ServiceCategory.SINGLETON_IMMUTABLE
 
     def before_create(self):
@@ -499,6 +506,7 @@ class GCPServiceRevisionBased(GCPService):
     """
     Base class for GCP services that deploy with unique revisions
     """
+
     SERVICE_CATEGORY = ServiceCategory.REVISION_BASED
 
     def before_update(self):
@@ -513,6 +521,7 @@ class GCPServiceUpdatable(GCPService):
     Base class for GCP services that can be updated
     but must be created first
     """
+
     SERVICE_CATEGORY = ServiceCategory.UPDATABLE
 
 
@@ -541,8 +550,7 @@ class ServiceGroup(list):
             raise Exception(f"Expecting a valid name, got: {name}")
 
     def append(self, what: Union[GCPService, Callable]):
-        assert isinstance(what, GCPService) or \
-            callable(what)
+        assert isinstance(what, GCPService) or callable(what)
         return super().append(what)
 
 
@@ -558,6 +566,7 @@ class ServiceGroups(list):
     case would be to use the `create` method
     so that the groups are properly tracked.
     """
+
     def __init__(self):
         super().__init__()
         self._map = dict()

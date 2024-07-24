@@ -6,6 +6,7 @@ gcloud compute ssl-certificates create ${NAME} \
 
 @author: jldupont
 """
+
 from pygcloud.models import GCPServiceSingletonImmutable
 from pygcloud.gcp.models import SSLCertificate
 
@@ -16,6 +17,7 @@ class SSLCertificateService(GCPServiceSingletonImmutable):
 
     CAUTION: sensitive information in the 'certificate' field
     """
+
     LISTING_CAPABLE = True
     DEPENDS_ON_API = "compute.googleapis.com"
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
@@ -28,14 +30,7 @@ class SSLCertificateService(GCPServiceSingletonImmutable):
         self._domain = domain
 
     def params_describe(self):
-        return [
-            "describe", self.name,
-            "--format", "json"
-        ]
+        return ["describe", self.name, "--format", "json"]
 
     def params_create(self):
-        return [
-            "create", self.name,
-            "--domains", self.domain,
-            "--format", "json"
-        ]
+        return ["create", self.name, "--domains", self.domain, "--format", "json"]

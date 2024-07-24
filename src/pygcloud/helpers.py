@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 import re
 import logging
 from typing import Dict, Tuple, List, Callable
@@ -62,18 +63,22 @@ def get_hook_callable(entry: EntryPoint) -> Callable:
     return entry.load()
 
 
-def execute_hooks(name: str, deployer,
-                  *p, **kw):
+def execute_hooks(name: str, deployer, *p, **kw):
     """
     Go through the list of hooks and
     execute their callable
     """
+    from .deployer import Deployer
+
+    assert isinstance(name, str)
+    assert isinstance(deployer, Deployer)
+
     hooks = get_hooks(name)
 
     for hook in hooks:
         try:
             func = get_hook_callable(hook)
-            func(name, deployer, *p, **kw)
+            func(deployer, *p, **kw)
         except Exception as e:
             print(e)
             logging.debug(f"Failed to call entry-point: {hook}: {e}")

@@ -18,6 +18,7 @@ Google Cloud Storage
 
 @author: jldupont
 """
+
 from pygcloud.models import Params, GCPServiceUpdatable
 from pygcloud.gcp.models import GCSBucket
 
@@ -26,32 +27,25 @@ class StorageBucket(GCPServiceUpdatable):
     """
     https://cloud.google.com/sdk/gcloud/reference/storage
     """
+
     LISTING_CAPABLE = True
     DEPENDS_ON_API = "storage.googleapis.com"
     REQUIRES_UPDATE_AFTER_CREATE = False
     SPEC_CLASS = GCSBucket
     GROUP = ["storage", "buckets"]
 
-    def __init__(self, name: str, params_create: Params = [],
-                 params_update: Params = []):
+    def __init__(
+        self, name: str, params_create: Params = [], params_update: Params = []
+    ):
         super().__init__(name=name, ns="gcs")
         self._params_create = params_create
         self._params_update = params_update
 
     def params_describe(self):
-        return [
-            "describe", f"gs://{self.name}",
-            "--format", "json"
-        ]
+        return ["describe", f"gs://{self.name}", "--format", "json"]
 
     def params_create(self):
-        return [
-            "create", f"gs://{self.name}",
-            "--format", "json"
-        ] + self._params_create
+        return ["create", f"gs://{self.name}", "--format", "json"] + self._params_create
 
     def params_update(self):
-        return [
-            "update", f"gs://{self.name}",
-            "--format", "json"
-        ] + self._params_update
+        return ["update", f"gs://{self.name}", "--format", "json"] + self._params_update

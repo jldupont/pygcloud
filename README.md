@@ -116,7 +116,7 @@ The gcloud command line is currently built for Python 3.9. The accompanied Docke
 
 # EntryPoints
 
-This package supports entrypoints. They are defined in the package's `pyproject.toml` file.
+This package supports entrypoints. They are defined in the package's `pyproject.toml` file. The prototypes of the callables can be found in the `pygcloud.events` module.
 
 # TODO
 

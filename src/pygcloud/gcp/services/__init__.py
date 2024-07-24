@@ -13,5 +13,5 @@ __all__ = [
     "services",
     "storage",
     "tasks",
-    "urlmap"
+    "urlmap",
 ]

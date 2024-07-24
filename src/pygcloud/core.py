@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 import logging
 import subprocess
 import sys
@@ -15,8 +16,9 @@ __all__ = ["CommandLine", "GCloud", "gcloud"]
 
 class CommandLine:
 
-    def __init__(self, _exec_path: str, exit_on_error: bool = False,
-                 log_error: bool = False):
+    def __init__(
+        self, _exec_path: str, exit_on_error: bool = False, log_error: bool = False
+    ):
         assert isinstance(_exec_path, str)
         self._exec_path = _exec_path
         self._last_command_args: Union[List[Any], None] = None
@@ -32,44 +34,37 @@ class CommandLine:
     def last_command_args(self) -> Union[List[Any], None]:
         return self._last_command_args
 
-    def exec(self,
-             params: Params,
-             common: Union[Params, None] = None) -> Result:
+    def exec(self, params: Params, common: Union[Params, None] = None) -> Result:
         assert isinstance(params, list), f"Expected list, got: {type(params)}"
 
         if common is None:
             common = []
 
-        command_args: List[Any] = prepare_params([self._exec_path] +
-                                                 params + common)
+        command_args: List[Any] = prepare_params([self._exec_path] + params + common)
 
         logger.debug(f"CommandLine.exec: {command_args}")
 
         try:
             result = subprocess.run(
-                command_args,              # Command to execute
+                command_args,  # Command to execute
                 capture_output=True,
-                text=True                  # Decode output as text
+                text=True,  # Decode output as text
             )
         except FileNotFoundError:
             raise FileNotFoundError(f"Command not found: {self._exec_path}")
         except PermissionError:
-            raise PermissionError("Permission denied (or possibly "
-                                  f"invalid exec path): {self._exec_path}")
+            raise PermissionError(
+                "Permission denied (or possibly "
+                f"invalid exec path): {self._exec_path}"
+            )
 
         self._last_command_args = command_args
 
         if result.returncode == 0:
-            r = Result(
-                success=True,
-                message=result.stdout.strip(),
-                code=0
-            )
+            r = Result(success=True, message=result.stdout.strip(), code=0)
         else:
             r = Result(
-                success=False,
-                message=result.stderr.strip(),
-                code=result.returncode
+                success=False, message=result.stderr.strip(), code=result.returncode
             )
 
         already_logged = False
@@ -106,17 +101,19 @@ class GCloud(CommandLine):
     gcloud run services list
     """
 
-    def __init__(self,
-                 *head_tail: Union[str, List[Union[str, Tuple[str, str]]],
-                                   Param], cmd="gcloud", **kw):
+    def __init__(
+        self,
+        *head_tail: Union[str, List[Union[str, Tuple[str, str]]], Param],
+        cmd="gcloud",
+        **kw,
+    ):
         """
         head_tail: [head_parameters ...] tail_parameters
         """
         super().__init__(cmd, **kw)
         self.head_tail = head_tail
 
-    def __call__(self, *head_after: List[Union[str, Tuple[str, str], Param]]) \
-            -> Result:
+    def __call__(self, *head_after: List[Union[str, Tuple[str, str], Param]]) -> Result:
         """
         head_after: parameters that will be added at the head of the list
               following what was provided during initialization

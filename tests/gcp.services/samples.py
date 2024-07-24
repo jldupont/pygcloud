@@ -157,7 +157,7 @@ IP_ADDRESS = """
     "https://www.googleapis.com/compute/v1/projects/PROJECT/global/forwardingRules/fwd-proxy-service"
   ]
 }
-"""   # NOQA
+"""  # NOQA
 
 CLOUD_RUN_REVISION_SPEC = """
 {
@@ -504,7 +504,7 @@ PUBSUB_TOPIC = """
 """  # NOQA
 
 
-SERVICES_LIST = r'''
+SERVICES_LIST = r"""
 [
   {
     "config": {
@@ -3626,7 +3626,7 @@ SERVICES_LIST = r'''
     "state": "ENABLED"
   }
 ]
-'''  # NOQA
+"""  # NOQA
 
 CLOUDRUN_NEG_SPEC = """
 {
