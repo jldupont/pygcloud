@@ -8,7 +8,7 @@ from functools import cache
 from collections import UserList
 from typing import List, Tuple, NewType, Union, Callable, Any
 from abc import abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from .constants import ServiceCategory, Instruction
 
 
@@ -687,10 +687,37 @@ class Policy(metaclass=_PolicyMeta):
         return cls
 
     @classmethod
-    def eval(cls, groups: List[ServiceGroup], service: GCPService):
+    def evaluate(cls, groups: List[ServiceGroup], service: GCPService):
         """
         NOTE must be implemented in derived classes
 
         NOTE Must raise an exception when policy is violated
         """
         raise NotImplementedError
+
+
+@dataclass
+class PolicingResult:
+    """
+    passed: True if the policy evaluation passed
+    raised: when an exception was raised in DRY_RUN mode
+    allowed: when skipped because policy allowed by default on service
+    """
+
+    service: GCPService
+    policy: Policy
+    violation: Union[PolicyViolation, None] = field(default=None)
+
+    raised: bool = field(default=False)
+    passed: bool = field(default=False)
+    allowed: bool = field(default=False)
+
+
+@dataclass
+class PolicingResults:
+    """
+    outcome: the takeaway result
+    results: the individual results
+    """
+    outcome: Union[PolicingResult, None]
+    results: List[PolicingResult]

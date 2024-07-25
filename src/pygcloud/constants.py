@@ -18,3 +18,8 @@ class Instruction(Enum):
 
     def is_abort(self):
         return self == self.ABORT_DEPLOY or self == self.ABORT_DEPLOY_ALL
+
+
+class PolicerMode(Enum):
+    DRY_RUN = "dryrun"
+    RUN = "run"
