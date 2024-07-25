@@ -54,13 +54,19 @@ It is possible to customize this.
 All policies are derived from the `Policy` based class.
 
 ```python
+    from pygcloud.models import Policy
+
     class MyPolicy(Policy):
         ...
 
-    #
-    # Just add the class to the Policer
-    #
-    Policer.add(MyPolicy)
+    # Once a policy is declared, it is automatically
+    # added to the list of enabled policies.
+
+    # Disable whilst testing it out.
+    # The policy will still be evaluated with
+    # accompanied warning messages.
+    # Exceptions will not stop the Policer.
+    Policer.disable(MyPolicy)
 
     # Usually this statement is added just before
     # invoking the Deployer

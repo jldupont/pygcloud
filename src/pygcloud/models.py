@@ -607,3 +607,57 @@ class ServiceGroups(list):
 
 # We only really need one group of groups
 service_groups = ServiceGroups()
+
+
+class _PolicyMeta(type):
+    """
+    Collect derived classes
+    """
+
+    @classmethod
+    @property
+    def derived_classes(cls):
+        return cls.__all_classes__
+
+    @classmethod
+    def only_add_real_service_class(cls, classe):
+        new_class_name = classe.__name__.lower()
+
+        if "mock" in new_class_name:
+            return
+
+        if new_class_name[0] == "_":
+            return
+
+        if not getattr(cls, "__all_classes__", False):
+            setattr(cls, "__all_classes__", [])
+
+        cls.__all_classes__.append(classe)
+
+    def __new__(cls, name, bases, attrs):
+
+        new_class = super().__new__(cls, name, bases, attrs)
+
+        # Skip the base class
+        if len(bases) > 0:
+            cls.only_add_real_service_class(new_class)
+
+        return new_class
+
+
+class PolicyViolation(Exception):
+    """Base class for all policy violations"""
+
+
+class Policy(metaclass=_PolicyMeta):
+    """
+    The base class for all policies
+    """
+
+    def eval(self):
+        """
+        NOTE must be implemented in derived classes
+
+        NOTE Must raise an exception when policy is violated
+        """
+        raise NotImplementedError
