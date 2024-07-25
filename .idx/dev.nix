@@ -10,6 +10,7 @@
     pkgs.python39Packages.pip
     pkgs.openssh
     pkgs.docker
+    pkgs.gnumake
   ];
   # Sets environment variables in the workspace
   env = {};
