@@ -28,11 +28,12 @@ class MockFirestoreDatabase(FirestoreDatabase):
         return super().after_create(new_result)
 
 
-def test_firestore_database_already_exists(deployer):
+def test_firestore_database_already_exists(deployer, mock_sg):
 
     d = MockFirestoreDatabase("(default)")
+    mock_sg.add(d)
 
-    deployer.deploy(d)
+    deployer.deploy(mock_sg)
 
     assert deployer.cmd.last_command_args == [
         "echo", "firestore", "databases", "describe",
@@ -40,11 +41,12 @@ def test_firestore_database_already_exists(deployer):
     ], print(deployer.cmd.last_command_args)
 
 
-def test_firestore_index_composite(deployer):
+def test_firestore_index_composite(deployer, mock_sg):
 
     i = FirestoreIndexComposite("default")
+    mock_sg + i
 
-    deployer.deploy(i)
+    deployer.deploy(mock_sg)
 
     assert deployer.cmd.last_command_args == [
         "echo", "firestore", "indexes", "composite", "create",

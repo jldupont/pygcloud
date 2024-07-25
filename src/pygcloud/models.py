@@ -553,6 +553,9 @@ class ServiceGroup(list):
         assert isinstance(what, GCPService) or callable(what)
         return super().append(what)
 
+    add = append
+    __add__ = append
+
 
 class ServiceGroups(list):
     """

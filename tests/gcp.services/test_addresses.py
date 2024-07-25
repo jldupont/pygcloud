@@ -19,10 +19,11 @@ class MockServicesAddress(ServicesAddress):
         return super().after_create(result)
 
 
-def test_services_address_create(deployer):
+def test_services_address_create(deployer, mock_sg):
 
     srv = MockServicesAddress("ip_address")
+    mock_sg.append(srv)
 
-    deployer.deploy(srv)
+    deployer.deploy(mock_sg)
 
     assert isinstance(srv.spec, IPAddress), print(srv.spec)

@@ -37,7 +37,7 @@ def cr():
     return MockCloudRun("my-service", Param("--p1", "v1"), region="region")
 
 
-def test_run_deploy(deployer, cr):
+def test_run_deploy(deployer, mock_sg, cr):
 
     common_params = [
         Param("--project", "my-project")
@@ -45,7 +45,9 @@ def test_run_deploy(deployer, cr):
 
     deployer.add_common_params(common_params)
 
-    deployer.deploy(cr)
+    mock_sg.add(cr)
+
+    deployer.deploy(mock_sg)
 
     assert deployer.cmd.last_command_args == \
         [
@@ -58,10 +60,12 @@ def test_run_deploy(deployer, cr):
         ], print(deployer.cmd.last_command_args)
 
 
-def test_run_with_use(deployer, cr, sn1):
+def test_run_with_use(deployer, mock_sg, cr, sn1):
 
     cr.use(sn1)
-    deployer.deploy(cr)
+    mock_sg.add(cr)
+
+    deployer.deploy(mock_sg)
 
     assert deployer.cmd.last_command_args == \
         [
@@ -74,10 +78,12 @@ def test_run_with_use(deployer, cr, sn1):
         ], print(deployer.cmd.last_command_args)
 
 
-def test_cloud_run_just_describe(deployer, cr):
+def test_cloud_run_just_describe(deployer, mock_sg, cr):
 
     cr.set_just_describe()
-    deployer.deploy(cr)
+
+    mock_sg + cr
+    deployer.deploy(mock_sg)
 
     assert cr.last_result.success, print(cr.last_result)
     # if the create phase was attempted,

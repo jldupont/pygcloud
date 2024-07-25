@@ -25,7 +25,7 @@ class _Policer:
         try:
             policy.eval()
 
-        except PolicyViolation:
+        except PolicyViolation as e:
 
             if policy in self._disabled:
                 warn(f"Disabled '{name}' raised violation but ignoring: {e}")

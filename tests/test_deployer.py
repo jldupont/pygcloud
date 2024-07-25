@@ -51,10 +51,12 @@ class MockServiceDoesNotExists(MockServiceUpdatable):
         return result
 
 
-def test_deployer_already_exists(deployer):
+def test_deployer_already_exists(deployer, mock_sg):
 
     s = MockServiceAlreadyExists("already_exists", "service")
-    deployer.deploy(s)
+
+    mock_sg + s
+    deployer.deploy(mock_sg)
 
     assert s.last_result.success
     assert s.updated
@@ -66,10 +68,12 @@ def test_deployer_already_exists(deployer):
         ["echo", "update", "param_update", "--param", "value"]
 
 
-def test_deployer_needs_creation(deployer):
+def test_deployer_needs_creation(deployer, mock_sg):
 
     s = MockServiceDoesNotExists()
-    deployer.deploy(s)
+
+    mock_sg + s
+    deployer.deploy(mock_sg)
 
     assert s.last_result.success
     assert s.created
@@ -81,12 +85,13 @@ def test_deployer_needs_creation(deployer):
         ["echo", "create", "param_create", "--param", "value"]
 
 
-def test_deployer_with_common_params(deployer, common_params):
+def test_deployer_with_common_params(deployer, mock_sg, common_params):
 
     deployer.set_common_params(common_params)
 
     s = MockServiceAlreadyExists()
-    deployer.deploy(s)
+    mock_sg + s
+    deployer.deploy(mock_sg)
 
     assert deployer.cmd.last_command_args == \
         [
@@ -125,23 +130,25 @@ class MockServiceSingletonImmutable(GCPServiceSingletonImmutable):
         return super().after_create(result)
 
 
-def test_singleton_first_creation(deployer, common_params):
+def test_singleton_first_creation(deployer, mock_sg, common_params):
 
     deployer.set_common_params(common_params)
 
     s = MockServiceSingletonImmutable(state_exists=False)
-    deployer.deploy(s)
+    mock_sg + s
+    deployer.deploy(mock_sg)
 
     assert s.last_result.success
     assert not s.already_exists
 
 
-def test_singleton_already_exists(deployer, common_params):
+def test_singleton_already_exists(deployer, mock_sg, common_params):
 
     deployer.set_common_params(common_params)
 
     s = MockServiceSingletonImmutable(state_exists=True)
-    deployer.deploy(s)
+    mock_sg + s
+    deployer.deploy(mock_sg)
 
     assert s.last_result.success
     assert s.already_exists
@@ -154,10 +161,11 @@ class MockServiceRevisionBased(GCPServiceRevisionBased):
         return ["create", "param_create"]
 
 
-def test_revision_based_normal(deployer):
+def test_revision_based_normal(deployer, mock_sg):
 
     s = MockServiceRevisionBased()
-    deployer.deploy(s)
+    mock_sg + s
+    deployer.deploy(mock_sg)
 
     assert s.last_result.success
 
@@ -173,12 +181,13 @@ class MockServiceNotDeployable(GCPServiceRevisionBased):
         return Result(success=False, message="Some Error", code=1)
 
 
-def test_revision_based_not_deployable(deployer):
+def test_revision_based_not_deployable(deployer, mock_sg):
 
     s = MockServiceNotDeployable()
+    mock_sg + s
 
     with pytest.raises(SystemExit):
-        deployer.deploy(s)
+        deployer.deploy(mock_sg)
 
 
 def test_deploy_service_group(deployer, mock_service):

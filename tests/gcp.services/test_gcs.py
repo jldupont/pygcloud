@@ -13,11 +13,12 @@ class MockStorageBucket(StorageBucket):
         return super().after_describe(result)
 
 
-def test_gcs(deployer, sample_gcs_bucket):
+def test_gcs(deployer, mock_sg, sample_gcs_bucket):
 
     b = MockStorageBucket("bucket")
+    mock_sg + b
 
-    deployer.deploy(b)
+    deployer.deploy(mock_sg)
 
     # "update" because the "describe" stage will succeed
 

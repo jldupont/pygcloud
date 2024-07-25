@@ -2,8 +2,13 @@ import pytest
 import os
 from pygcloud.deployer import Deployer
 from pygcloud.core import CommandLine
-from pygcloud.models import GCPService, LazyEnvValue
+from pygcloud.models import GCPService, LazyEnvValue, service_groups
 from pygcloud.constants import ServiceCategory
+
+
+@pytest.fixture
+def mock_sg():
+    return service_groups.create("mock_sg")
 
 
 @pytest.fixture

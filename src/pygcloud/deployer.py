@@ -250,18 +250,15 @@ class Deployer:
         raise RuntimeError(f"Unknown service category: {service.category}")
 
     def deploy(
-        self, what: Union[GCPService, ServiceGroup, GroupName]
+        self, what: Union[ServiceGroup, GroupName]
     ) -> Union[Result, Instruction]:
         """
-        Either deploys a single service or a group of them
+        Always deploy a group of service(s)
 
         Returns the result of the last deploy attempt
         """
         self.add_to_history_hooks("start_deploy")
         events.start_deploy(self, what)
-
-        if isinstance(what, GCPService):
-            return self._deploy(what)
 
         result: Union[Result, Instruction]
         services: List[GCPService] = []
@@ -273,7 +270,7 @@ class Deployer:
             services = service_groups.get(what, None)
 
         if services is None:
-            raise Exception("No services could be found")
+            raise Exception("No service(s) could be found")
 
         for service in services:
             result: Union[Result, Instruction] = self._deploy(service)
