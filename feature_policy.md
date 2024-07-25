@@ -54,7 +54,7 @@ It is possible to customize this.
 All policies are derived from the `Policy` based class.
 
 ```python
-    from pygcloud.models import Policy
+    from pygcloud.models import Policy, GCPService
 
     class MyPolicy(Policy):
         ...
@@ -67,6 +67,15 @@ All policies are derived from the `Policy` based class.
     # accompanied warning messages.
     # Exceptions will not stop the Policer.
     Policer.disable(MyPolicy)
+
+    class SomeGCPService(GCPService):
+        ...
+
+    #
+    # A service can be allowed by default.
+    # This can be useful during 
+    #
+    MyPolicy.allow(SomeGCPService, "Good reason here")
 
     # Usually this statement is added just before
     # invoking the Deployer

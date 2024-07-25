@@ -645,6 +645,8 @@ class _PolicyMeta(type):
         if len(bases) > 0:
             cls.only_add_real_service_class(new_class)
 
+        setattr(new_class, "_allowed", [])
+
         return new_class
 
 
@@ -655,9 +657,37 @@ class PolicyViolation(Exception):
 class Policy(metaclass=_PolicyMeta):
     """
     The base class for all policies
+
+    We are using class methods to simplify usage i.e.
+    instead of having the user track policy instances
+    in the build code
     """
 
-    def eval(self):
+    def __init__(self):
+        raise Exception("Cannot be instantiated")
+
+    @classmethod
+    @property
+    def name(cls):
+        return cls.__name__
+
+    @classmethod
+    def allows(cls, service: GCPService):
+        assert isinstance(service, GCPService)
+        return service in cls._allowed
+
+    @classmethod
+    def allow(cls, service: GCPService, reason: str):
+        assert isinstance(service, GCPService)
+        assert isinstance(reason, str)
+
+        logging.warning(f"The service '{service.name}' was "
+                        f"allowed by default on policy '{cls.name}'")
+        cls._allowed.append(service)
+        return cls
+
+    @classmethod
+    def eval(cls, groups: List[ServiceGroup], service: GCPService):
         """
         NOTE must be implemented in derived classes
 
