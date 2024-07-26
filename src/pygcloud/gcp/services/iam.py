@@ -14,6 +14,7 @@ class ServiceAccount(GCPServiceSingletonImmutable):
     https://cloud.google.com/sdk/gcloud/reference/iam/service-accounts
     """
     SPEC_CLASS = ServiceAccountSpec
+    REQUIRES_DESCRIBE_BEFORE_CREATE = True
     LISTING_CAPABLE = True
     DEPENDS_ON_API = "iam.googleapis.com"
     GROUP = ["iam", "service-accounts"]
