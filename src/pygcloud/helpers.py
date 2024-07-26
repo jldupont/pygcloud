@@ -32,7 +32,11 @@ def get_points() -> Dict[str, List[EntryPoint]]:
     _map: Dict[str, List[EntryPoint]] = dict()
 
     processed_names = []
-    _entry_points = entry_points().get("pygcloud.events", None)  # type: ignore
+    try:
+        _entry_points = entry_points().get("pygcloud.events", None)  # type: ignore
+    except:  # NOQA
+        # compability with python 3.12
+        _entry_points = entry_points().select(group="pygcloud.events")
 
     if _entry_points is None:
         raise Exception("Is the package installed locally ?")
