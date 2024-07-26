@@ -48,7 +48,7 @@ class ServiceAccount(GCPServiceSingletonImmutable):
 class ServiceAccountCapableMixin:
     """
     Mixin for GCP Service derived classes
-    
+
     It signals the capability of the service
     to accept a service account for its execution
     """

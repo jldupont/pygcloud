@@ -2,7 +2,8 @@
 @author: jldupont
 """
 import pytest
-from pygcloud.models import Policy, ServiceGroups, GCPService, PolicyViolation
+from typing import List
+from pygcloud.models import Policy, ServiceGroup, GCPService, PolicyViolation
 from pygcloud.policer import Policer, PolicingResults, PolicingResult
 from pygcloud.policies import PolicyServiceAccount
 from pygcloud.gcp.services.iam import ServiceAccountCapableMixin
@@ -10,10 +11,9 @@ from pygcloud.constants import PolicerMode
 
 
 class MockPolicy(Policy):
-    ...
 
     @classmethod
-    def evaluate(cls, groups: ServiceGroups, service: GCPService):
+    def evaluate(cls, groups: List[ServiceGroup], service: GCPService):
         ...
 
 

@@ -9,6 +9,7 @@ from typing import List, Union
 from .models import Policy, PolicyViolation, PolicingResult, PolicingResults
 from .models import service_groups, ServiceGroup, GCPService
 from .constants import PolicerMode
+from .policies import *  # NOQA
 
 
 warn = logging.warning
@@ -74,7 +75,7 @@ class _Policer:
             if policy in self._disabled:
                 warn(f"Disabled '{policy.name}' raised: {e}")
             else:
-                error(f"Policy 'name' raised: {e}")
+                error(f"Policy '{policy.name}' raised: {e}")
 
             if self.mode == PolicerMode.RUN:
                 sys.exit(1)

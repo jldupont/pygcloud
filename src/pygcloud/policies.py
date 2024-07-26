@@ -1,9 +1,11 @@
 """
 @author: jldupont
 """
+from typing import List
 from pygcloud.models import Policy, PolicyViolation
-from pygcloud.models import ServiceGroups, GCPService
+from pygcloud.models import ServiceGroup, GCPService
 from pygcloud.gcp.services.iam import ServiceAccountCapableMixin
+from pygcloud.gcp.services.projects import ProjectIAMBindingService
 
 
 class PolicyServiceAccount(Policy):
@@ -12,12 +14,12 @@ class PolicyServiceAccount(Policy):
     """
 
     @classmethod
-    def evaluate(cls, groups: ServiceGroups, service: GCPService):
+    def evaluate(cls, groups: List[ServiceGroup], service: GCPService):
 
         if isinstance(service, ServiceAccountCapableMixin):
             if service.service_account is None:
                 raise PolicyViolation("Service can and should be provisioned "
-                                      "with a non-default Service Account")
+                                      f"with a non-default Service Account: {service.name}")
 
 
 class PolicyProjectLevelBindings(Policy):
@@ -27,15 +29,17 @@ class PolicyProjectLevelBindings(Policy):
     """
 
     @classmethod
-    def evaluate(cls, groups: ServiceGroups, service: GCPService):
-        ...
+    def evaluate(cls, groups: List[ServiceGroup], service: GCPService):
+
+        if isinstance(service, ProjectIAMBindingService):
+            raise PolicyViolation(f"Project level IAM binding: {service.name}")
 
 
-class PolicyIngress(Policy):
+class PolicyIngressToBackend(Policy):
     """
     A service
     """
 
     @classmethod
-    def evaluate(cls, groups: ServiceGroups, service: GCPService):
+    def evaluate(cls, groups: List[ServiceGroup], service: GCPService):
         ...

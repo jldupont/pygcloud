@@ -656,6 +656,8 @@ class _PolicyMeta(type):
     Collect derived classes
     """
 
+    __all_classes__ = []
+
     @classmethod
     @property
     def derived_classes(cls):
