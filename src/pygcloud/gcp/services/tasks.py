@@ -26,7 +26,7 @@ class TasksQueues(GCPServiceUpdatable, IAMBindingCapableMixin):
         name: str,
         location: str,
         params_create: Params = [],
-        params_update: Params = []
+        params_update: Params = [],
     ):
         super().__init__(name=name, ns="queues")
         self._params_create = params_create
@@ -37,9 +37,21 @@ class TasksQueues(GCPServiceUpdatable, IAMBindingCapableMixin):
         return ["describe", self.name, "--format", "json", "--location", self.location]
 
     def params_create(self):
-        return ["create", self.name, "--format", "json", "--location", self.location] \
-            + self._params_create
+        return [
+            "create",
+            self.name,
+            "--format",
+            "json",
+            "--location",
+            self.location,
+        ] + self._params_create
 
     def params_update(self):
-        return ["update", self.name, "--format", "json", "--location", self.location] \
-            + self._params_update
+        return [
+            "update",
+            self.name,
+            "--format",
+            "json",
+            "--location",
+            self.location,
+        ] + self._params_update

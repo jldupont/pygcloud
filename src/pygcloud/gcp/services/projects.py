@@ -10,6 +10,7 @@ class ProjectIAMBindingService(GCPServiceSingletonImmutable):
     """
     Add an IAM binding at the project level
     """
+
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = IAMPolicy
 
@@ -21,10 +22,7 @@ class ProjectIAMBindingService(GCPServiceSingletonImmutable):
         self._project_id = project_id
 
     def params_describe(self):
-        return [
-            "projects", "get-iam-policy", self._project_id,
-            "--format", "json"
-        ]
+        return ["projects", "get-iam-policy", self._project_id, "--format", "json"]
 
     def after_describe(self, result: Result):
 
@@ -44,8 +42,13 @@ class ProjectIAMBindingService(GCPServiceSingletonImmutable):
 
     def params_create(self):
         return [
-            "projects", "add-iam-policy-binding", self._project_id,
-            "--member", self._binding.member,
-            "--role", self._binding.role,
-            "--format", "json"
+            "projects",
+            "add-iam-policy-binding",
+            self._project_id,
+            "--member",
+            self._binding.member,
+            "--role",
+            self._binding.role,
+            "--format",
+            "json",
         ]

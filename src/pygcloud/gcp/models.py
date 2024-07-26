@@ -208,14 +208,13 @@ class _IAMMember:
     def from_obj(cls, obj):
 
         if isinstance(obj, list):
-            return [
-                cls.from_obj(item) for item in obj
-            ]
+            return [cls.from_obj(item) for item in obj]
 
-        assert isinstance(obj, str), \
-            print(f"{cls.__name__}: Expecting string, got: {obj}")
+        assert isinstance(obj, str), print(
+            f"{cls.__name__}: Expecting string, got: {obj}"
+        )
 
-        parts = obj.split(':')
+        parts = obj.split(":")
         ns = parts[0]
         email = parts[-1]
 
@@ -229,6 +228,7 @@ class IAMMember(_IAMMember, Spec):
          e.g. ns: projectEditor
               email: $project_id
     """
+
     ns: str
     email: str
 
@@ -262,10 +262,7 @@ class IAMPolicy(Spec):
         """
         binding: IAMBindings
 
-        member = IAMMember(
-            ns=binding.ns,
-            email=binding.email
-        )
+        member = IAMMember(ns=binding.ns, email=binding.email)
 
         # scan through all bindings looking
         # for all entries pertaining to the target member
@@ -310,7 +307,7 @@ class CloudRunRevisionSpec(Spec):
             "url": obj["status.url"],
             "labels": obj["spec.template.metadata.labels"],
             "name": obj["metadata.name"],
-            "service_account": obj["spec.template.spec.serviceAccountName"]
+            "service_account": obj["spec.template.spec.serviceAccountName"],
         }
 
         return cls(**d)

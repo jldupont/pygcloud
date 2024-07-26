@@ -33,6 +33,7 @@ class OptionalParamFromAttribute(UserList):
     resolves to "not None", return the list
     []
     """
+
     def __init__(self, param: str, obj: Any, attr: str):
         assert isinstance(param, str)
         assert isinstance(attr, str)
@@ -529,8 +530,7 @@ class GCPServiceSingletonImmutable(GCPService):
         # Case 2: Check if the service already exists
         lmsg = result.message.lower()
 
-        if "already_exists" in lmsg or \
-                "already exists" in lmsg:
+        if "already_exists" in lmsg or "already exists" in lmsg:
 
             # fake idempotence
             self.already_exists = True
@@ -722,8 +722,10 @@ class Policy(metaclass=_PolicyMeta):
         assert isinstance(service, GCPService)
         assert isinstance(reason, str)
 
-        logging.warning(f"The service '{service.name}' was "
-                        f"allowed by default on policy '{cls.name}'")
+        logging.warning(
+            f"The service '{service.name}' was "
+            f"allowed by default on policy '{cls.name}'"
+        )
         cls._allowed.append(service)
         return cls
 
@@ -760,5 +762,6 @@ class PolicingResults:
     outcome: the takeaway result - if passed => None
     results: the individual results
     """
+
     outcome: Union[PolicingResult, None]
     results: List[PolicingResult]

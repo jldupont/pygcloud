@@ -3,16 +3,21 @@ IAM related services
 
 @author: jldupont
 """
-from pygcloud.models import GCPService, Result, \
-    GCPServiceSingletonImmutable, OptionalParamFromAttribute
-from pygcloud.gcp.models import ServiceAccountSpec, \
-        IAMBinding, IAMPolicy
+
+from pygcloud.models import (
+    GCPService,
+    Result,
+    GCPServiceSingletonImmutable,
+    OptionalParamFromAttribute,
+)
+from pygcloud.gcp.models import ServiceAccountSpec, IAMBinding, IAMPolicy
 
 
 class ServiceAccount(GCPServiceSingletonImmutable):
     """
     https://cloud.google.com/sdk/gcloud/reference/iam/service-accounts
     """
+
     SPEC_CLASS = ServiceAccountSpec
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     LISTING_CAPABLE = True
@@ -35,14 +40,10 @@ class ServiceAccount(GCPServiceSingletonImmutable):
     def params_describe(self):
         sa = f"{self.name}@{self._project_id}.iam.gserviceaccount.com"
 
-        return [
-            "describe", sa, "--format", "json"
-        ]
+        return ["describe", sa, "--format", "json"]
 
     def params_create(self):
-        return [
-            "create", self.name, "--format", "json"
-        ]
+        return ["create", self.name, "--format", "json"]
 
 
 class ServiceAccountCapableMixin:
@@ -52,6 +53,7 @@ class ServiceAccountCapableMixin:
     It signals the capability of the service
     to accept a service account for its execution
     """
+
     @property
     def service_account(self):
         return getattr(self, "_service_account", None)
@@ -74,13 +76,15 @@ class IAMBindingService(GCPServiceSingletonImmutable):
     This adds, if not present already, an IAM binding
     to the specified service
     """
+
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     SPEC_CLASS = IAMPolicy
 
     def __init__(self, service: GCPService, binding: IAMBinding):
         assert isinstance(service, GCPService)
-        assert isinstance(service, IAMBindingCapableMixin), \
-            f"The service '{service}' does not support IAM bindings"
+        assert isinstance(
+            service, IAMBindingCapableMixin
+        ), f"The service '{service}' does not support IAM bindings"
         assert isinstance(binding, IAMBinding)
 
         super().__init__()
@@ -89,11 +93,14 @@ class IAMBindingService(GCPServiceSingletonImmutable):
 
     def params_describe(self):
         return [
-            self._service.GROUP, self._service.GROUP_SUB_DESCRIBE,
-            "get-iam-policy", self._service.name,
-            "--format", "json",
+            self._service.GROUP,
+            self._service.GROUP_SUB_DESCRIBE,
+            "get-iam-policy",
+            self._service.name,
+            "--format",
+            "json",
             OptionalParamFromAttribute("--region", self._service, "region"),
-            OptionalParamFromAttribute("--location", self._service, "location")
+            OptionalParamFromAttribute("--location", self._service, "location"),
         ]
 
     def after_describe(self, result: Result):
@@ -108,13 +115,18 @@ class IAMBindingService(GCPServiceSingletonImmutable):
 
     def params_create(self):
         return [
-            self._service.GROUP, self._service.GROUP_SUB_DESCRIBE,
-            "add-iam-policy-binding", self._service.name,
-            "--member", self._binding.member,
-            "--role", self._binding.role,
-            "--format", "json",
+            self._service.GROUP,
+            self._service.GROUP_SUB_DESCRIBE,
+            "add-iam-policy-binding",
+            self._service.name,
+            "--member",
+            self._binding.member,
+            "--role",
+            self._binding.role,
+            "--format",
+            "json",
             OptionalParamFromAttribute("--region", self._service, "region"),
-            OptionalParamFromAttribute("--location", self._service, "location")
+            OptionalParamFromAttribute("--location", self._service, "location"),
         ]
 
 

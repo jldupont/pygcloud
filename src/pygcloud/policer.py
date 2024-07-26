@@ -3,6 +3,7 @@ Policer
 
 @author: jldupont
 """
+
 import logging
 import sys
 from typing import List, Union
@@ -38,13 +39,10 @@ class _Policer:
     def _eval_one(self, policy: Policy, service: GCPService) -> PolicingResult:
 
         if policy.allows(service):
-            warn(f"Policy '{policy.name}' allows "
-                 f"service '{service.name}'. Skipping.")
-            return PolicingResult(
-                service=service,
-                policy=policy,
-                allowed=True
+            warn(
+                f"Policy '{policy}' allows " f"service '{service}'. Skipping."
             )
+            return PolicingResult(service=service, policy=policy, allowed=True)
 
         passed = False
         raised = False
@@ -60,8 +58,7 @@ class _Policer:
             passed = False
 
             if policy in self._disabled:
-                warn(f"Disabled '{policy.name}' raised"
-                     f" violation but ignoring: {e}")
+                warn(f"Disabled '{policy}' raised" f" violation but ignoring: {e}")
 
             else:
                 if self.mode == PolicerMode.RUN:
@@ -73,9 +70,9 @@ class _Policer:
             raised = True
 
             if policy in self._disabled:
-                warn(f"Disabled '{policy.name}' raised: {e}")
+                warn(f"Disabled '{policy}' raised: {e}")
             else:
-                error(f"Policy '{policy.name}' raised: {e}")
+                error(f"Policy '{policy}' raised: {e}")
 
             if self.mode == PolicerMode.RUN:
                 sys.exit(1)
@@ -85,7 +82,7 @@ class _Policer:
             policy=policy,
             passed=passed,
             raised=raised,
-            violation=violation
+            violation=violation,
         )
 
     def _process_one(self, policy: Policy) -> List[PolicingResult]:
@@ -140,10 +137,7 @@ class _Policer:
                 outcome = head_result
             results.extend(batch_result)
 
-        return PolicingResults(
-            outcome=outcome,
-            results=results
-        )
+        return PolicingResults(outcome=outcome, results=results)
 
 
 # Singleton instance
