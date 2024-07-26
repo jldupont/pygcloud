@@ -98,7 +98,7 @@ class IAMBindingService(GCPServiceSingletonImmutable):
     def params_create(self):
         return [
             self._service.GROUP, self._service.GROUP_SUB_DESCRIBE,
-            "add-iam-policy", self._service.name,
+            "add-iam-policy-binding", self._service.name,
             "--member", self._binding.member,
             "--role", self._binding.role,
             "--format", "json",
