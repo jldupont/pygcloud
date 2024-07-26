@@ -12,7 +12,7 @@ from .models import service_groups, ServiceGroup, GCPService
 from .constants import PolicerMode
 from .policies import *  # NOQA
 
-
+info = logging.info
 warn = logging.warning
 error = logging.error
 
@@ -134,6 +134,11 @@ class _Policer:
             if not head_result.passed:
                 outcome = head_result
             results.extend(batch_result)
+
+        if outcome is None:
+            info("> Policer: OK")
+        else:
+            info("> Policer: outcome: {outcome}")
 
         return PolicingResults(outcome=outcome, results=results)
 
