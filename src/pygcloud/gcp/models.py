@@ -254,6 +254,8 @@ class IAMPolicy(Spec):
         bindings = IAMBindings.from_json_list(json_str, path="bindings")
         return cls(bindings=bindings)
 
+    from_string = from_json_list
+
     def contains(self, binding: IAMBinding) -> bool:
         """
         Determine if a specific binding is contained in the policy

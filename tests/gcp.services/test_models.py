@@ -217,3 +217,17 @@ def test_iam_policy(sample_bucket_iam_policy):
         )
 
     assert p.contains(tb)
+
+
+def test_iam_policy_empty_bindings(sample_empty_bindings):
+
+    p = IAMPolicy.from_json_list(sample_empty_bindings)
+
+    assert len(p.bindings) == 0
+
+
+def test_iam_policy_empty_bindings2(sample_empty_bindings):
+
+    p = IAMPolicy.from_string(sample_empty_bindings)
+
+    assert len(p.bindings) == 0

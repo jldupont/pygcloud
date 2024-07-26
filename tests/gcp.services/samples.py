@@ -3723,3 +3723,10 @@ BUCKET_IAM_BINDINGS_SPEC = """
   "etag": "CAM="
 }
 """  # NOQA
+
+SAMPLE_EMPTY_BINDINGS = """
+{
+  "etag": "BwYeHBpL5sU=",
+  "version": 1
+}
+"""  # NOQA

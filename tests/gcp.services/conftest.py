@@ -9,7 +9,7 @@ from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC, \
     BACKEND_SERVICE, FWD_RULE, STORAGE_BUCKET, SSL_CERTIFICATE, HTTPS_PROXY, \
     SCHEDULER_JOB, PUBSUB_TOPIC, SERVICES_LIST, FIRESTORE_DB, \
     CLOUDRUN_NEG_SPEC, PROJECT_DESC, TASK_QUEUE_SPEC, URL_MAP_SPEC, SERVICE_ACCOUNT_SPEC, \
-    BUCKET_IAM_BINDINGS_SPEC
+    BUCKET_IAM_BINDINGS_SPEC, SAMPLE_EMPTY_BINDINGS
 # from pygcloud.gcp.services.iam import ServiceAccountIAM
 
 
@@ -203,3 +203,8 @@ def sample_service_account_spec():
 @pytest.fixture
 def sample_bucket_iam_policy():
     return BUCKET_IAM_BINDINGS_SPEC
+
+
+@pytest.fixture
+def sample_empty_bindings():
+    return SAMPLE_EMPTY_BINDINGS
