@@ -3,7 +3,8 @@ import pytest
 from dataclasses import dataclass
 
 from pygcloud.models import Param, EnvParam, Result, EnvValue, \
-    ServiceGroup, service_groups, LazyEnvValue, LazyAttrValue
+    ServiceGroup, service_groups, LazyEnvValue, LazyAttrValue, \
+    OptionalParamFromAttribute
 
 
 def test_env_can_be_modified():
@@ -178,3 +179,16 @@ def test_lazy_attr_value(obj, path, expected):
 
     assert lv == expected, print(lv)
     assert str(lv) == str(expected), print(lv)
+
+
+def test_OptionalParamFromAttribute():
+
+    d = Data(d={}, e="test", f=666)
+
+    op = OptionalParamFromAttribute("--param", d, "e")
+
+    assert op == ["--param", "test"], print(op)
+
+    op2 = OptionalParamFromAttribute("--param", d, "whatever")
+    assert op2 == []
+

@@ -124,3 +124,14 @@ class ServiceAccount(GCPServiceSingletonImmutable):
         return [
             "create", self.name, "--format", "json"
         ]
+
+
+class ServiceAccountCapableMixin:
+
+    @property
+    def service_account(self):
+        return getattr(self, "_service_account", None)
+
+    @service_account.setter
+    def service_account(self, sa: ServiceAccount):
+        setattr(self, "_service_account", sa)

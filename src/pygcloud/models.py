@@ -27,6 +27,26 @@ class OptionalParam(UserList):
             super().__init__([param, value])
 
 
+class OptionalParamFromAttribute(UserList):
+    """
+    If the value of the attribute on the obj
+    resolves to "not None", return the list
+    []
+    """
+    def __init__(self, param: str, obj: Any, attr: str):
+        assert isinstance(param, str)
+        assert isinstance(attr, str)
+
+        if obj is None:
+            return super().__init__()
+
+        value = getattr(obj, attr, None)
+        if value is None:
+            return super().__init__()
+
+        super().__init__([param, value])
+
+
 class EnvValue(str):
     """
     Retrieve a value from an environment variable
@@ -249,9 +269,13 @@ class GCPService(ServiceNode):
     REQUIRES_DESCRIBE_BEFORE_CREATE: for "create only" services
     that requires checking for existence before attempting creation.
     For example: Firestore database.
+
+    SERVICE_ACCOUNT_SUPPORTED: if the service can be deployed with its
+    own service account.
     """
 
     SERVICE_CATEGORY: ServiceCategory = ServiceCategory.INDETERMINATE
+    SERVICE_ACCOUNT_SUPPORTED = False
     REQUIRES_UPDATE_AFTER_CREATE: bool = False
     REQUIRES_DESCRIBE_BEFORE_CREATE: bool = False
     LISTING_CAPABLE: bool = False

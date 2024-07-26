@@ -17,12 +17,14 @@ from pygcloud.models import (
     GCPServiceRevisionBased,
     Params,
     GCPServiceSingletonImmutable,
+    OptionalParamFromAttribute
 )
 from pygcloud.gcp.labels import LabelGenerator
 from pygcloud.gcp.models import CloudRunRevisionSpec, CloudRunNegSpec
+from pygcloud.gcp.services.iam import ServiceAccountCapableMixin
 
 
-class CloudRun(GCPServiceRevisionBased, LabelGenerator):
+class CloudRun(GCPServiceRevisionBased, LabelGenerator, ServiceAccountCapableMixin):
     """
     https://cloud.google.com/sdk/gcloud/reference/run
 
@@ -31,6 +33,7 @@ class CloudRun(GCPServiceRevisionBased, LabelGenerator):
     """
 
     LISTING_CAPABLE = True
+    SERVICE_ACCOUNT_SUPPORTED = True
     DEPENDS_ON_API = "run.googleapis.com"
     SPEC_CLASS = CloudRunRevisionSpec
     GROUP = ["beta", "run"]
@@ -61,6 +64,9 @@ class CloudRun(GCPServiceRevisionBased, LabelGenerator):
                 "--clear-labels",
                 "--region",
                 self.region,
+                OptionalParamFromAttribute("--service-account",
+                                           self.service_account,
+                                           "email"),
                 "--format",
                 "json",
             ]

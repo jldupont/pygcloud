@@ -5,10 +5,11 @@ import pytest
 from pygcloud.models import Result, Param
 from pygcloud.gcp.services.run import CloudRun
 from pygcloud.gcp.models import CloudRunRevisionSpec, CloudRunNegSpec
+from pygcloud.gcp.services.iam import ServiceAccountCapableMixin
 from samples import CLOUD_RUN_REVISION_SPEC
 
 
-class MockCloudRun(CloudRun):
+class MockCloudRun(CloudRun, ServiceAccountCapableMixin):
 
     def after_describe(self, result):
 
