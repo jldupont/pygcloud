@@ -5,7 +5,7 @@
 import json
 from collections.abc import Iterable
 from typing import List, Any, Tuple, Union
-from .models import Param
+from .models import Param, LazyValue
 
 
 def flatten(*liste: Union[List[Any], Tuple[Any]]):
@@ -61,6 +61,14 @@ def prepare_params(params: Union[List[Any], List[Tuple[str, str]]]) -> List[Any]
     new_liste = []
 
     for item in liste:
+
+        if isinstance(item, LazyValue):
+            try:
+                value = item.value
+            except ValueError:
+                raise ValueError(f"Dependency not resolved on {repr(item)}")
+            new_liste.append(value)
+            continue
 
         if isinstance(item, str):
 

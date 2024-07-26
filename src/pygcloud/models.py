@@ -58,7 +58,13 @@ class EnvValue(str):
         return instance
 
 
-class LazyEnvValue(str):
+class LazyValue:
+    """
+    Abstract base class for lazy resolvers
+    """
+
+
+class LazyEnvValue(str, LazyValue):
     """
     Retrieve a value from an environment variable
 
@@ -75,7 +81,6 @@ class LazyEnvValue(str):
         v = os.environ.get(self._name, None)
         if v is None:
             raise ValueError(f"Environment var '{self._name}' does not exist")
-
         return v
 
     def __str__(self):
@@ -92,7 +97,7 @@ class LazyEnvValue(str):
         return f"LazyEnvValue({self._name}) = {v}"
 
 
-class LazyAttrValue:
+class LazyAttrValue(LazyValue):
     """
     Retrieve a value from an object
 
@@ -108,17 +113,21 @@ class LazyAttrValue:
 
     @property
     def value(self):
-        parts = self._path.split(".")
-        result = self._obj
+        try:
+            parts = self._path.split(".")
+            result = self._obj
 
-        while parts:
-            key = parts.pop(0)
-            if isinstance(result, dict):
-                result = result[key]
-            else:
-                result = getattr(result, key)
+            while parts:
+                key = parts.pop(0)
+                if isinstance(result, dict):
+                    result = result[key]
+                else:
+                    result = getattr(result, key)
 
-        return result
+            return result
+        except Exception as e:
+            logging.warning(e)
+            raise ValueError("Cannot resolve value")
 
     def __eq__(self, other):
         return self.value == other
@@ -129,7 +138,9 @@ class LazyAttrValue:
     def __str__(self):
         return str(self.value)
 
-    __repr__ = __str__
+    def __repr__(self):
+        obj_repr = repr(self._obj)
+        return f"LazyAttrValue({obj_repr}, {self._path})"
 
 
 @dataclass

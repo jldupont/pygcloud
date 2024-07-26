@@ -3,7 +3,7 @@ import pytest
 from dataclasses import dataclass
 
 from pygcloud.models import Param, EnvParam, Result, EnvValue, \
-    ServiceGroup, service_groups, LazyEnvValue, LazyAttrValue, \
+    ServiceGroup, service_groups, LazyValue, LazyEnvValue, LazyAttrValue, \
     OptionalParamFromAttribute
 
 
@@ -25,6 +25,7 @@ def test_lazy_env_value():
         print(lv)
 
     assert isinstance(lv, LazyEnvValue)
+    assert isinstance(lv, LazyValue)
 
     os.environ["$$_$$"] = "test"
 

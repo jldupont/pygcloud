@@ -62,6 +62,16 @@ def test_prepare_params_lazy(env_first_key, env_first_value):
     ], print(result)
 
 
+def test_lazy_not_resolved():
+
+    lv = LazyEnvValue("???whatever???")
+
+    liste = [lv, "tail"]
+
+    with pytest.raises(ValueError):
+        prepare_params(liste)
+
+
 @pytest.mark.parametrize("obj, path,expected", [
     ({"l1": "v1"},         "l1",   "v1"),
     ({"l1": {"l2": "v2"}}, "l1.l2", "v2"),
