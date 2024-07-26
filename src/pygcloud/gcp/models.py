@@ -302,6 +302,7 @@ class CloudRunRevisionSpec(Spec):
     name: str
     url: str
     labels: Dict
+    service_account: str
 
     @classmethod
     def from_obj(cls, obj):
@@ -309,6 +310,7 @@ class CloudRunRevisionSpec(Spec):
             "url": obj["status.url"],
             "labels": obj["spec.template.metadata.labels"],
             "name": obj["metadata.name"],
+            "service_account": obj["spec.template.spec.serviceAccountName"]
         }
 
         return cls(**d)

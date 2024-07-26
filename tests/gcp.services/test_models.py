@@ -29,6 +29,7 @@ def test_cloud_run_revision_spec(sample_cloud_run_revision_spec):
 
     assert crr.name == "SERVICE"
     assert crr.url == "https://SERVICE-4ro7a33l3a-nn.a.run.app"
+    assert crr.service_account == "215695389495-compute@developer.gserviceaccount.com"
 
 
 def test_cloud_run_revision_spec_list(sample_cloud_run_revision_spec):

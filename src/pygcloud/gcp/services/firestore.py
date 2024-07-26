@@ -4,6 +4,8 @@ name is actually "(default)". So, in order to limit confusion, we treat the
 name "default" and "(default)" the same. But for the rest of pygcloud to work
 correctly, we strip the parenthesis from the name.
 
+NOTE: Firestore does not support database level IAM bindings
+
 @author: jldupont
 """
 
