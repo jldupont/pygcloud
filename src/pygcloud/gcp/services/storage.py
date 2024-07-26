@@ -21,9 +21,10 @@ Google Cloud Storage
 
 from pygcloud.models import Params, GCPServiceUpdatable
 from pygcloud.gcp.models import GCSBucket
+from pygcloud.gcp.services.iam import IAMBindingCapableMixin
 
 
-class StorageBucket(GCPServiceUpdatable):
+class StorageBucket(GCPServiceUpdatable, IAMBindingCapableMixin):
     """
     https://cloud.google.com/sdk/gcloud/reference/storage
     """
@@ -37,15 +38,19 @@ class StorageBucket(GCPServiceUpdatable):
     def __init__(
         self, name: str, params_create: Params = [], params_update: Params = []
     ):
+        assert isinstance(name, str)
+        if not name.startswith("gs://"):
+            name = f"gs://{name}"
+
         super().__init__(name=name, ns="gcs")
         self._params_create = params_create
         self._params_update = params_update
 
     def params_describe(self):
-        return ["describe", f"gs://{self.name}", "--format", "json"]
+        return ["describe", f"{self.name}", "--format", "json"]
 
     def params_create(self):
-        return ["create", f"gs://{self.name}", "--format", "json"] + self._params_create
+        return ["create", f"{self.name}", "--format", "json"] + self._params_create
 
     def params_update(self):
-        return ["update", f"gs://{self.name}", "--format", "json"] + self._params_update
+        return ["update", f"{self.name}", "--format", "json"] + self._params_update
