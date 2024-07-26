@@ -19,8 +19,11 @@ class ServiceAccount(GCPServiceSingletonImmutable):
     DEPENDS_ON_API = "iam.googleapis.com"
     GROUP = ["iam", "service-accounts"]
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, project_id: str):
+        assert isinstance(name, str)
+        assert isinstance(project_id, str)
         super().__init__(name=name, ns="sa")
+        self._project_id = project_id
 
     @property
     def email(self):
@@ -30,8 +33,10 @@ class ServiceAccount(GCPServiceSingletonImmutable):
         return self.spec.email
 
     def params_describe(self):
+        sa = f"{self.name}@{self._project_id}.iam.gserviceaccount.com"
+
         return [
-            "describe", self.name, "--format", "json"
+            "describe", sa, "--format", "json"
         ]
 
     def params_create(self):
