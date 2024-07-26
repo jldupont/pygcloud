@@ -23,6 +23,7 @@ class Spec:
 
         parts = self.name.split("/")
         if len(parts) != 6:
+            self.name = parts[-1]
             return
 
         self.location = parts[3]
@@ -352,3 +353,20 @@ class UrlMap(Spec):
     id: str = field(default_factory=str)
     name: str = field(default_factory=str)
     defaultService: str = field(default_factory=str)
+
+
+@dataclass
+class ServiceAccountSpec(Spec):
+    name: str
+    email: str
+    projectId: str
+    uniqueId: str
+    oauth2ClientId: str
+    displayName: str = field(default_factory=str)
+    description: str = field(default_factory=str)
+
+    def is_default(self):
+        """
+        Is this service account a default one
+        """
+        return "iam.gserviceaccount.com" not in self.email

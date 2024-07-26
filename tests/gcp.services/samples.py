@@ -37,6 +37,8 @@ FIRESTORE_DB = """
 
 # gcloud projects get-iam-policy $PROJECT_ID
 #
+# https://cloud.google.com/resource-manager/reference/rest/Shared.Types/Policy
+#
 PROJECT_BINDINGS = """
 {
   "bindings": [
@@ -3665,11 +3667,24 @@ TASK_QUEUE_SPEC = """
 URL_MAP_SPEC = """
 {
     "creationTimestamp": "2024-05-08T17:29:33.834-07:00",
-    "defaultService": "https://www.googleapis.com/compute/v1/projects/sys-playground-dev/global/backendServices/backend-service",
+    "defaultService": "https://www.googleapis.com/compute/v1/projects/PROJECT/global/backendServices/backend-service",
     "fingerprint": "rUH-NY9dEXs=",
     "id": "922127737791030786",
     "kind": "compute#urlMap",
     "name": "urlmap-backend-service",
-    "selfLink": "https://www.googleapis.com/compute/v1/projects/sys-playground-dev/global/urlMaps/urlmap-backend-service"
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/PROJECT/global/urlMaps/urlmap-backend-service"
+}
+"""  # NOQA
+
+SERVICE_ACCOUNT_SPEC = """
+{
+  "description": "xyz",
+  "displayName": "Default compute service account",
+  "email": "215695389495-compute@developer.gserviceaccount.com",
+  "etag": "MDEwMjE5MjA=",
+  "name": "projects/PROJECT/serviceAccounts/215695389495-compute@developer.gserviceaccount.com",
+  "oauth2ClientId": "107724310278069622036",
+  "projectId": "PROJECT",
+  "uniqueId": "107724310278069622036"
 }
 """  # NOQA

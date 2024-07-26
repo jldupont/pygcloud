@@ -7,13 +7,17 @@ from pygcloud.models import Policy
 class PolicyServiceAccount(Policy):
     """
     Services should have a non-default Service Account
-
-    Go through all ServiceGroup to identify services
-    that have the option to use a service account other
-    than the default assigned by GCP
     """
 
 
-class PolicyX(Policy):
+class PolicyProjectLevelBindings(Policy):
     """
+    Prohibit the usage of IAM bindings from outside
+    of the service's project
+    """
+
+
+class PolicyIngress(Policy):
+    """
+    A service
     """

@@ -491,7 +491,10 @@ class GCPServiceSingletonImmutable(GCPService):
             return super().after_create(result)
 
         # Case 2: Check if the service already exists
-        if "already_exists" in result.message.lower():
+        lmsg = result.message.lower()
+
+        if "already_exists" in lmsg or \
+                "already exists" in lmsg:
 
             # fake idempotence
             self.already_exists = True
@@ -716,7 +719,7 @@ class PolicingResult:
 @dataclass
 class PolicingResults:
     """
-    outcome: the takeaway result
+    outcome: the takeaway result - if passed => None
     results: the individual results
     """
     outcome: Union[PolicingResult, None]

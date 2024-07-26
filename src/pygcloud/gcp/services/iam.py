@@ -8,6 +8,7 @@ import logging
 from typing import Union
 from pygcloud.models import GCPServiceSingletonImmutable, Result
 from pygcloud.gcp.parsers import ProjectIAMBindings, IAMBinding
+from pygcloud.gcp.models import ServiceAccountSpec
 
 
 class ServiceAccountIAM(GCPServiceSingletonImmutable):
@@ -99,4 +100,27 @@ class ServiceAccountIAM(GCPServiceSingletonImmutable):
             role,
             "--format",
             "json",
+        ]
+
+
+class ServiceAccount(GCPServiceSingletonImmutable):
+    """
+    https://cloud.google.com/sdk/gcloud/reference/iam/service-accounts
+    """
+    SPEC_CLASS = ServiceAccountSpec
+    LISTING_CAPABLE = True
+    DEPENDS_ON_API = "iam.googleapis.com"
+    GROUP = ["iam", "service-accounts"]
+
+    def __init__(self, name: str):
+        super().__init__(name=name, ns="sa")
+
+    def params_describe(self):
+        return [
+            "describe", self.name, "--format", "json"
+        ]
+
+    def params_create(self):
+        return [
+            "create", self.name, "--format", "json"
         ]

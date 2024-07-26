@@ -8,7 +8,7 @@ from pygcloud.gcp.parsers import ProjectIAMBindings, IAMBinding
 from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC, \
     BACKEND_SERVICE, FWD_RULE, STORAGE_BUCKET, SSL_CERTIFICATE, HTTPS_PROXY, \
     SCHEDULER_JOB, PUBSUB_TOPIC, SERVICES_LIST, FIRESTORE_DB, \
-    CLOUDRUN_NEG_SPEC, PROJECT_DESC, TASK_QUEUE_SPEC, URL_MAP_SPEC
+    CLOUDRUN_NEG_SPEC, PROJECT_DESC, TASK_QUEUE_SPEC, URL_MAP_SPEC, SERVICE_ACCOUNT_SPEC
 from pygcloud.gcp.services.iam import ServiceAccountIAM
 
 
@@ -183,3 +183,8 @@ def sample_task_queue():
 @pytest.fixture
 def sample_url_map():
     return URL_MAP_SPEC
+
+
+@pytest.fixture
+def sample_service_account_spec():
+    return SERVICE_ACCOUNT_SPEC

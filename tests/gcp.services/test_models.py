@@ -5,7 +5,8 @@ import pytest
 from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
     HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
-    FirestoreDb, ProjectDescription, TaskQueue, UrlMap
+    FirestoreDb, ProjectDescription, TaskQueue, UrlMap, \
+    ServiceAccountSpec
 
 
 def test_project_desc(sample_project_desc):
@@ -187,3 +188,10 @@ def test_url_map(sample_url_map):
 
     um = UrlMap.from_string(sample_url_map)
     assert um.name == "urlmap-backend-service"
+
+
+def test_service_account_spec(sample_service_account_spec):
+
+    sa = ServiceAccountSpec.from_string(sample_service_account_spec)
+    assert sa.name == "215695389495-compute@developer.gserviceaccount.com"
+    assert sa.is_default()

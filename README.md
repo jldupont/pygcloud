@@ -90,9 +90,26 @@ Additional usage tips can be found in the `tests/gcp.services` folder.
 
 # Use relationships
 
-pygcloud supports specifying relationships between services. These are captured in the service instance labels.
+Some services have explicit relationship(s) with other services e.g. 
 
-The relation type `use` is defined directionally i.e. from one service to another. It is envisaged to be pertinent in the context of an application running on a compute related service (e.g. Cloud Run) utilizing another service (e.g. GCS).
+* Forwarding Rule and IP Address
+* Cloud Run and Service Account, Region
+* Backend Service and IAP, Forwarding Rule
+* Certificate and domain
+* Forwarding Rule and TargetHTTPSProxies
+* HTTPSProxy and Certificate, URL Map
+* Scheduler and Pubsub Topic
+* Cloud Run NEG and Region
+* URL Map and Backend Service 
+* etc.
+
+Many relationships are also explicit through `IAM bindings`.
+
+Some relationships are valuable but cannot be obtained through service specifications nor IAM bindings. The main culprits are `default service accounts` with their large binding scope: the ability to determine precisely the "real" relationships between services is compromised.
+
+## Relationships to external services (WIP)
+
+`pygcloud` supports specifying relationships between GCP services and external ones. These are captured in the service instance labels.
 
 # About GCP Labels
 

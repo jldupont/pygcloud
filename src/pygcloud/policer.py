@@ -21,6 +21,10 @@ class _Policer:
         self._disabled: List[Policy] = []
         self._mode: PolicerMode = PolicerMode.RUN
 
+    def disable(self, policy: Policy):
+        assert isinstance(policy, Policy)
+        self._disabled.append(policy)
+
     @property
     def mode(self):
         return self._mode
@@ -125,10 +129,6 @@ class _Policer:
             outcome=outcome,
             results=results
         )
-
-    def disable(self, policy: Policy):
-        assert isinstance(policy, Policy)
-        self._disabled.append(policy)
 
 
 # Singleton instance

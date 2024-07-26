@@ -1,6 +1,6 @@
 # Policing Infrastructure
 
-`pygcloud` supports policing of infrastructure deployments.
+`pygcloud` supports policing of infrastructure deployments. It can perform this function by inspecting the services listed for deployment in the `service group(s)`.
 
 # Some Use-Cases
 
@@ -86,3 +86,5 @@ All policies are derived from the `Policy` based class.
 # Additional Considerations
 
 * Consider the capability to decouple policing from deployment in order to uphold `separation of concerns` governance. A way to support this is to decouple infrastructure code & deployment in a separate project from application code.
+
+* Consider policing "as-is" services in a project
