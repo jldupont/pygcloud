@@ -115,6 +115,13 @@ class ServiceAccount(GCPServiceSingletonImmutable):
     def __init__(self, name: str):
         super().__init__(name=name, ns="sa")
 
+    @property
+    def email(self):
+        if self.spec is None:
+            return None
+
+        return self.spec.email
+
     def params_describe(self):
         return [
             "describe", self.name, "--format", "json"

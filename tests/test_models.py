@@ -191,4 +191,3 @@ def test_OptionalParamFromAttribute():
 
     op2 = OptionalParamFromAttribute("--param", d, "whatever")
     assert op2 == []
-
