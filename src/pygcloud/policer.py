@@ -29,6 +29,11 @@ class _Policer:
     def mode(self):
         return self._mode
 
+    @mode.setter
+    def mode(self, mode: PolicerMode):
+        assert isinstance(mode, PolicerMode)
+        self._mode = mode
+
     def _eval_one(self, policy: Policy, service: GCPService) -> PolicingResult:
 
         if policy.allows(service):
@@ -56,6 +61,10 @@ class _Policer:
             if policy in self._disabled:
                 warn(f"Disabled '{policy.name}' raised"
                      f" violation but ignoring: {e}")
+
+            else:
+                if self.mode == PolicerMode.RUN:
+                    raise
 
         except Exception as e:
 
