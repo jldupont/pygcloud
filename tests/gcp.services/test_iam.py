@@ -130,7 +130,7 @@ def test_iam_binding_service(deployer, mock_sg, mock_bidon_binding):
 
     assert srv.captured_create_params == [
         ['beta', 'run'], ['services'],
-        'add-iam-policy', 'cr_srv',
+        'add-iam-policy-binding', 'cr_srv',
         '--member', 'ns:whatever_email',
         '--role', 'whatever_role',
         '--format', 'json',
