@@ -4,12 +4,18 @@
 import pytest
 from pygcloud.gcp.labels import LabelGenerator
 from pygcloud.models import GCPService, Result
-from pygcloud.gcp.parsers import ProjectIAMBindings, IAMBinding
+from pygcloud.gcp.models import IAMBinding
 from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC, \
     BACKEND_SERVICE, FWD_RULE, STORAGE_BUCKET, SSL_CERTIFICATE, HTTPS_PROXY, \
     SCHEDULER_JOB, PUBSUB_TOPIC, SERVICES_LIST, FIRESTORE_DB, \
-    CLOUDRUN_NEG_SPEC, PROJECT_DESC, TASK_QUEUE_SPEC, URL_MAP_SPEC, SERVICE_ACCOUNT_SPEC
-from pygcloud.gcp.services.iam import ServiceAccountIAM
+    CLOUDRUN_NEG_SPEC, PROJECT_DESC, TASK_QUEUE_SPEC, URL_MAP_SPEC, SERVICE_ACCOUNT_SPEC, \
+    BUCKET_IAM_BINDINGS_SPEC
+# from pygcloud.gcp.services.iam import ServiceAccountIAM
+
+
+@pytest.fixture
+def sample_project_bindings():
+    return PROJECT_BINDINGS
 
 
 @pytest.fixture
@@ -17,9 +23,11 @@ def sample_project_desc():
     return PROJECT_DESC
 
 
+'''
 @pytest.fixture
 def project_bindings():
     return ProjectIAMBindings(PROJECT_BINDINGS)
+'''
 
 
 @pytest.fixture
@@ -86,6 +94,7 @@ def sn3():
     return MockSn("name3", "ns3")
 
 
+'''
 @pytest.fixture
 def mock_service_account_iam_class():
     class MockServiceAccountIAM(ServiceAccountIAM):
@@ -108,6 +117,7 @@ def mock_service_account_iam_class():
             return result
 
     return MockServiceAccountIAM
+'''
 
 
 @pytest.fixture
@@ -188,3 +198,8 @@ def sample_url_map():
 @pytest.fixture
 def sample_service_account_spec():
     return SERVICE_ACCOUNT_SPEC
+
+
+@pytest.fixture
+def sample_bucket_iam_policy():
+    return BUCKET_IAM_BINDINGS_SPEC

@@ -3688,3 +3688,38 @@ SERVICE_ACCOUNT_SPEC = """
   "uniqueId": "107724310278069622036"
 }
 """  # NOQA
+
+BUCKET_IAM_BINDINGS_SPEC = """
+{
+  "bindings": [
+    {
+      "members": [
+        "projectEditor:PROJECT",
+        "projectOwner:PROJECT"
+      ],
+      "role": "roles/storage.legacyBucketOwner"
+    },
+    {
+      "members": [
+        "projectViewer:PROJECT"
+      ],
+      "role": "roles/storage.legacyBucketReader"
+    },
+    {
+      "members": [
+        "projectEditor:PROJECT",
+        "projectOwner:PROJECT"
+      ],
+      "role": "roles/storage.legacyObjectOwner"
+    },
+    {
+      "members": [
+        "projectViewer:PROJECT",
+        "serviceAccount:test777@PROJECT.iam.gserviceaccount.com"
+      ],
+      "role": "roles/storage.legacyObjectReader"
+    }
+  ],
+  "etag": "CAM="
+}
+"""  # NOQA

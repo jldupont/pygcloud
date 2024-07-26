@@ -21,10 +21,11 @@ from pygcloud.models import (
 )
 from pygcloud.gcp.labels import LabelGenerator
 from pygcloud.gcp.models import CloudRunRevisionSpec, CloudRunNegSpec
-from pygcloud.gcp.services.iam import ServiceAccountCapableMixin
+from pygcloud.gcp.services.iam import ServiceAccountCapableMixin, IAMBindingCapableMixin
 
 
-class CloudRun(GCPServiceRevisionBased, LabelGenerator, ServiceAccountCapableMixin):
+class CloudRun(GCPServiceRevisionBased, LabelGenerator,
+               ServiceAccountCapableMixin, IAMBindingCapableMixin):
     """
     https://cloud.google.com/sdk/gcloud/reference/run
 

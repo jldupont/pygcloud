@@ -6,7 +6,7 @@ from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
     HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
     FirestoreDb, ProjectDescription, TaskQueue, UrlMap, \
-    ServiceAccountSpec
+    ServiceAccountSpec, IAMPolicy, IAMBinding
 
 
 def test_project_desc(sample_project_desc):
@@ -195,3 +195,25 @@ def test_service_account_spec(sample_service_account_spec):
     sa = ServiceAccountSpec.from_string(sample_service_account_spec)
     assert sa.name == "215695389495-compute@developer.gserviceaccount.com"
     assert sa.is_default()
+
+
+def test_iam_policy(sample_bucket_iam_policy):
+
+    p = IAMPolicy.from_json_list(sample_bucket_iam_policy)
+    assert isinstance(p, IAMPolicy)
+
+    first = p.bindings[0]
+
+    assert first.role == "roles/storage.legacyBucketOwner"
+    assert len(first.members) == 2, print(first)
+
+    m0 = first.members[0]
+    assert m0.email == "PROJECT", print(m0)
+
+    tb = IAMBinding(
+        ns="projectViewer",
+        email="PROJECT",
+        role="roles/storage.legacyObjectReader"
+        )
+
+    assert p.contains(tb)

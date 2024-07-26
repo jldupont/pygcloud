@@ -46,8 +46,12 @@ class Spec:
         This recursively builds a class instance
         based on the annotations
         """
+
         if isinstance(obj, list):
             return [cls.from_obj(item) for item in obj]
+
+        if not isinstance(obj, dict):
+            return obj
 
         import typing
 
@@ -56,6 +60,7 @@ class Spec:
         result: dict = {}  # type: ignore
 
         for key, value in obj.items():
+
             _field = fields.get(key, None)
             if _field is None:
                 continue
@@ -73,7 +78,13 @@ class Spec:
             # and not something like:
             # List[Union[...]]
             classe = typing.get_args(_field)[0]
-            entries = classe.from_obj(value)
+
+            # print(f"Key = {key}, origin={origin}, classe={classe.__name__}, value={value}")
+
+            if hasattr(classe, "from_obj"):
+                entries = classe.from_obj(value)
+            else:
+                entries = value
 
             result[key] = entries
 
@@ -90,7 +101,11 @@ class Spec:
         return cls.from_obj(obj)
 
     @classmethod
-    def from_json_list(cls, json_str: str):
+    def from_json_list(cls, json_str: str, path: str = None):
+        """
+        Excepts to parse a JSON list from the specified string.
+        An optional 'path' can be specified i.e. key to reach list.
+        """
         assert isinstance(json_str, str)
 
         import json
@@ -99,6 +114,9 @@ class Spec:
             json_list = json.loads(json_str)
         except Exception as e:
             raise Exception(f"Error trying to load list from JSON string: {e}")
+
+        if path is not None:
+            json_list = json_list.get(path, [])
 
         assert isinstance(json_list, list)
 
@@ -154,13 +172,6 @@ class ServiceDescription(Spec):
 
 
 @dataclass
-class IAMBindings(Spec):
-
-    members: List[str]
-    role: str
-
-
-@dataclass
 class IAMBinding(Spec):
     """
     By default, if the 'email' does not
@@ -168,11 +179,13 @@ class IAMBinding(Spec):
     set to "serviceAccount"
     """
 
-    ns: str
     email: str
     role: str
+    ns: str = field(default=None)
 
     def __post_init__(self):
+        if self.ns is not None:
+            return
 
         maybe_split = self.email.split(":")
         if len(maybe_split) == 2:
@@ -184,6 +197,86 @@ class IAMBinding(Spec):
     @property
     def sa_email(self):
         return f"{self.ns}:{self.email}"
+
+    @property
+    def member(self):
+        return f"{self.ns}:{self.email}"
+
+
+class _IAMMember:
+    @classmethod
+    def from_obj(cls, obj):
+
+        if isinstance(obj, list):
+            return [
+                cls.from_obj(item) for item in obj
+            ]
+
+        assert isinstance(obj, str), \
+            print(f"{cls.__name__}: Expecting string, got: {obj}")
+
+        parts = obj.split(':')
+        ns = parts[0]
+        email = parts[-1]
+
+        return cls(ns=ns, email=email)
+
+
+@dataclass
+class IAMMember(_IAMMember, Spec):
+    """
+    NOTE in some cases, 'email' is really a name or id
+         e.g. ns: projectEditor
+              email: $project_id
+    """
+    ns: str
+    email: str
+
+    @property
+    def member(self):
+        return f"{self.ns}:{self.email}"
+
+
+@dataclass
+class IAMBindings(Spec):
+
+    members: List[IAMMember]
+    role: str
+
+
+@dataclass
+class IAMPolicy(Spec):
+
+    bindings: List[IAMBindings]
+
+    @classmethod
+    def from_json_list(cls, json_str: str, path: str = None):
+        bindings = IAMBindings.from_json_list(json_str, path="bindings")
+        return cls(bindings=bindings)
+
+    def contains(self, binding: IAMBinding) -> bool:
+        """
+        Determine if a specific binding is contained in the policy
+        """
+        binding: IAMBindings
+
+        member = IAMMember(
+            ns=binding.ns,
+            email=binding.email
+        )
+
+        # scan through all bindings looking
+        # for all entries pertaining to the target member
+        for _binding in self.bindings:
+            # print(f"> processing binding: {_binding}")
+
+            if member in _binding.members:
+                # print(f"Found member: {member}")
+
+                if binding.role == _binding.role:
+                    return True
+
+        return False
 
 
 @dataclass
@@ -224,7 +317,7 @@ class CloudRunRevisionSpec(Spec):
         return cls.from_obj(obj)
 
     @classmethod
-    def from_json_list(cls, json_list):
+    def from_json_list(cls, json_list, path: str = None):
         liste: List = cls.parse_json(json_list)  # type: ignore
 
         entries = []

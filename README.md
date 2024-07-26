@@ -137,9 +137,11 @@ This package supports entrypoints. They are defined in the package's `pyproject.
 
 # TODO
 
+* Explain why "delete" operations are not supported
 * File bug report about GCS not supporting --clear-labels along with --update-labels (as in Cloud Run as example)
 * File bug report about Cloud Scheduler listing requiring --location (whilst most other services do not)
 * Implement simple retry policy to help manage spurious errors
+* Redo ServiceAccountIAM class
 
 # Links
 

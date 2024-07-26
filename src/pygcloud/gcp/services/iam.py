@@ -3,14 +3,111 @@ IAM related services
 
 @author: jldupont
 """
-
-import logging
-from typing import Union
-from pygcloud.models import GCPServiceSingletonImmutable, Result
-from pygcloud.gcp.parsers import ProjectIAMBindings, IAMBinding
-from pygcloud.gcp.models import ServiceAccountSpec
+from pygcloud.models import GCPService, Result, \
+    GCPServiceSingletonImmutable, OptionalParamFromAttribute
+from pygcloud.gcp.models import ServiceAccountSpec, \
+        IAMBinding, IAMPolicy
 
 
+class ServiceAccount(GCPServiceSingletonImmutable):
+    """
+    https://cloud.google.com/sdk/gcloud/reference/iam/service-accounts
+    """
+    SPEC_CLASS = ServiceAccountSpec
+    LISTING_CAPABLE = True
+    DEPENDS_ON_API = "iam.googleapis.com"
+    GROUP = ["iam", "service-accounts"]
+
+    def __init__(self, name: str):
+        super().__init__(name=name, ns="sa")
+
+    @property
+    def email(self):
+        if self.spec is None:
+            return None
+
+        return self.spec.email
+
+    def params_describe(self):
+        return [
+            "describe", self.name, "--format", "json"
+        ]
+
+    def params_create(self):
+        return [
+            "create", self.name, "--format", "json"
+        ]
+
+
+class ServiceAccountCapableMixin:
+
+    @property
+    def service_account(self):
+        return getattr(self, "_service_account", None)
+
+    @service_account.setter
+    def service_account(self, sa: ServiceAccount):
+        setattr(self, "_service_account", sa)
+
+
+class IAMBindingCapableMixin:
+    """
+    For services that accept IAM bindings directly
+    """
+
+
+class IAMBindingService(GCPServiceSingletonImmutable):
+    """
+    To manage IAM bindings on a service or resource
+
+    This adds, if not present already, an IAM binding
+    to the specified service
+    """
+    REQUIRES_DESCRIBE_BEFORE_CREATE = True
+    SPEC_CLASS = IAMPolicy
+
+    def __init__(self, service: GCPService, binding: IAMBinding):
+        assert isinstance(service, GCPService)
+        assert isinstance(service, IAMBindingCapableMixin), \
+            f"The service '{service}' does not support IAM bindings"
+        assert isinstance(binding, IAMBinding)
+
+        super().__init__()
+        self._service = service
+        self._binding = binding
+
+    def params_describe(self):
+        return [
+            self._service.GROUP, self._service.GROUP_SUB_DESCRIBE,
+            "get-iam-policy", self._service.name,
+            "--format", "json",
+            OptionalParamFromAttribute("--region", self._service, "region"),
+            OptionalParamFromAttribute("--location", self._service, "location")
+        ]
+
+    def after_describe(self, result: Result):
+        result = super().after_describe(result)
+
+        if not result.success:
+            return result
+
+        policy: IAMPolicy = self.spec
+        self.already_exists = policy.contains(self._binding)
+        return result
+
+    def params_create(self):
+        return [
+            self._service.GROUP, self._service.GROUP_SUB_DESCRIBE,
+            "add-iam-policy", self._service.name,
+            "--member", self._binding.member,
+            "--role", self._binding.role,
+            "--format", "json",
+            OptionalParamFromAttribute("--region", self._service, "region"),
+            OptionalParamFromAttribute("--location", self._service, "location")
+        ]
+
+
+'''
 class ServiceAccountIAM(GCPServiceSingletonImmutable):
     """
     Add role to Service Account
@@ -101,44 +198,4 @@ class ServiceAccountIAM(GCPServiceSingletonImmutable):
             "--format",
             "json",
         ]
-
-
-class ServiceAccount(GCPServiceSingletonImmutable):
-    """
-    https://cloud.google.com/sdk/gcloud/reference/iam/service-accounts
-    """
-    SPEC_CLASS = ServiceAccountSpec
-    LISTING_CAPABLE = True
-    DEPENDS_ON_API = "iam.googleapis.com"
-    GROUP = ["iam", "service-accounts"]
-
-    def __init__(self, name: str):
-        super().__init__(name=name, ns="sa")
-
-    @property
-    def email(self):
-        if self.spec is None:
-            return None
-
-        return self.spec.email
-
-    def params_describe(self):
-        return [
-            "describe", self.name, "--format", "json"
-        ]
-
-    def params_create(self):
-        return [
-            "create", self.name, "--format", "json"
-        ]
-
-
-class ServiceAccountCapableMixin:
-
-    @property
-    def service_account(self):
-        return getattr(self, "_service_account", None)
-
-    @service_account.setter
-    def service_account(self, sa: ServiceAccount):
-        setattr(self, "_service_account", sa)
+'''

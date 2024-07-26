@@ -463,6 +463,7 @@ class GCPService(ServiceNode):
         self.last_result = result
 
         if not result.success:
+            self.already_exists = False
             return result
 
         if result.success:

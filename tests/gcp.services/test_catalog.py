@@ -6,7 +6,7 @@ from pygcloud.gcp.models import ServiceDescription
 from pygcloud.gcp.catalog import ServiceNode, lookup, \
     get_listable_services, get_service_classes_from_services_list
 
-COUNT_TOTAL = 21
+COUNT_TOTAL = 22
 COUNT_LISTABLE = 14
 COUNT_LISTABLE_ENABLED_IN_SAMPLE = 13
 
