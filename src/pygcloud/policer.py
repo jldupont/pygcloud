@@ -106,6 +106,11 @@ class _Policer:
 
         for group in service_groups:
             for service in group:
+
+                # Some callables might be listed... skip
+                if not isinstance(service, GCPService):
+                    continue
+
                 result = self._eval_one(policy, service)
                 if not result.passed:
                     results.insert(0, result)
