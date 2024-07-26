@@ -16,10 +16,12 @@ class ProjectIAMBindingService(GCPServiceSingletonImmutable):
 
     def __init__(self, binding: IAMBinding, project_id: str):
         assert isinstance(binding, IAMBinding)
-        assert isinstance(project_id, str)
         super().__init__()
         self._binding = binding
         self._project_id = project_id
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self._binding}, {self._project_id})"
 
     def params_describe(self):
         return ["projects", "get-iam-policy", self._project_id, "--format", "json"]

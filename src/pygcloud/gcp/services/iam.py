@@ -26,7 +26,6 @@ class ServiceAccount(GCPServiceSingletonImmutable):
 
     def __init__(self, name: str, project_id: str):
         assert isinstance(name, str)
-        assert isinstance(project_id, str)
         super().__init__(name=name, ns="sa")
         self._project_id = project_id
 

@@ -336,12 +336,9 @@ class GCPService(ServiceNode):
         return self
 
     def __repr__(self):
-        return f"""
-        {self.__class__.__name__}
-        (already_exists={self.already_exists},
-        last_result={self.last_result}
-        )
-        """.strip()
+        return f"{self.__class__.__name__}"
+        f"({self._name}, already_exists={self.already_exists or ''},"
+        f"last_result={self.last_result or ''})"
 
     def add_task_before_deploy(self, task: Union[Callable, List[Callable]]):
 
@@ -723,8 +720,7 @@ class Policy(metaclass=_PolicyMeta):
         assert isinstance(reason, str)
 
         logging.warning(
-            f"The service '{service.name}' was "
-            f"allowed by default on policy '{cls.name}'"
+            f"The service '{service}' was " f"allowed by default on policy '{cls.name}'"
         )
         cls._allowed.append(service)
         return cls

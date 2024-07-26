@@ -39,9 +39,7 @@ class _Policer:
     def _eval_one(self, policy: Policy, service: GCPService) -> PolicingResult:
 
         if policy.allows(service):
-            warn(
-                f"Policy '{policy}' allows " f"service '{service}'. Skipping."
-            )
+            warn(f"Policy '{policy}' allows " f"service '{service}'. Skipping.")
             return PolicingResult(service=service, policy=policy, allowed=True)
 
         passed = False
