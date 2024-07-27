@@ -17,6 +17,7 @@ This package simplifies the deployment of GCP services through the gcloud comman
 * Capability to group deployment of services together
 * Capability to describe relationships between services
 * Capability to perform trial run
+* [Policing before deployment](./feature_policy.md)
 
 # Enabling Features 
 
@@ -38,6 +39,8 @@ For the "RevisionBased", we skip the "update" step. The "create" method will be 
 For the "Updatable", we do the complete steps i.e. describe, create or update.
 
 # Example Usage
+
+A longer example is available [here](./example_usage.md)
 
 ```python
 from pygcloud.models import Param, EnvParam, service_groups

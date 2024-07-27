@@ -138,7 +138,7 @@ class _Policer:
         if outcome is None:
             info("> Policer: OK")
         else:
-            info("> Policer: outcome: {outcome}")
+            info(f"> Policer: outcome: {outcome}")
 
         return PolicingResults(outcome=outcome, results=results)
 
