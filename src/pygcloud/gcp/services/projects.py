@@ -15,8 +15,9 @@ class ProjectIAMBindingService(GCPServiceSingletonImmutable):
     SPEC_CLASS = IAMPolicy
 
     def __init__(self, binding: IAMBinding, project_id: str):
+
         assert isinstance(binding, IAMBinding)
-        super().__init__(f"{binding.member}, role={binding.role}", ns="projet_binding")
+        super().__init__(f"{repr(binding)}", ns="projet_binding")
         self._binding = binding
         self._project_id = project_id
 

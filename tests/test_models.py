@@ -43,7 +43,7 @@ def test_lazy_env_value2():
     # use repr in order to bypass element wise comparison
     # which would have used LazyEnvValue.__eq__ and thus
     # triggered attempt to get from os.environ
-    assert repr(ll) == "[LazyEnvValue($??) = None, 'abc']"
+    assert repr(ll) == "[LazyEnvValue($??, None), 'abc']"
 
     l2 = list(ll)
     first = l2[0]

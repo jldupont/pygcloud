@@ -86,7 +86,7 @@ class IAMBindingService(GCPServiceSingletonImmutable):
         ), f"The service '{service}' does not support IAM bindings"
         assert isinstance(binding, IAMBinding)
 
-        super().__init__(f"{service.name}, {binding.member}, role={binding.role}", ns="iam_binding")
+        super().__init__(f"{service.name}", ns="iam_binding")
         self._service = service
         self._binding = binding
 

@@ -21,10 +21,15 @@ class OptionalParam(UserList):
     """
 
     def __init__(self, param, value):
+        self._param = param
+        self._value = value
         if value is None:
             super().__init__()
         else:
             super().__init__([param, value])
+
+    def __repr__(self):
+        return f"OptionalParam({self._param, self._value})"
 
 
 class OptionalParamFromAttribute(UserList):
@@ -37,6 +42,7 @@ class OptionalParamFromAttribute(UserList):
     def __init__(self, param: str, obj: Any, attr: str):
         assert isinstance(param, str)
         assert isinstance(attr, str)
+        self._param = param
 
         if obj is None:
             return super().__init__()
@@ -47,6 +53,9 @@ class OptionalParamFromAttribute(UserList):
 
         super().__init__([param, value])
 
+    def __repr__(self):
+        return f"OptionalParamFromAttribute({self._param})"
+
 
 class EnvValue(str):
     """
@@ -56,7 +65,11 @@ class EnvValue(str):
     def __new__(cls, name, default=None):
         value = os.environ.get(name, default)
         instance = super().__new__(cls, value)
+        setattr(instance, "_name", value)
         return instance
+
+    def __repr__(self):
+        return f"EnvValue({self._value})"
 
 
 class LazyValue:
@@ -95,7 +108,7 @@ class LazyEnvValue(str, LazyValue):
 
     def __repr__(self):
         v = os.environ.get(self._name, None)
-        return f"LazyEnvValue({self._name}) = {v}"
+        return f"LazyEnvValue({self._name}, {v})"
 
 
 class LazyAttrValue(LazyValue):
@@ -166,6 +179,9 @@ class Param:
         # iteration protocol
         raise StopIteration
 
+    def __repr__(self):
+        return f"Param({self.key}, {self.value})"
+
 
 class EnvParam(Param):
     """
@@ -180,6 +196,9 @@ class EnvParam(Param):
         assert isinstance(key, str)
         assert isinstance(env_var_name, str)
 
+        self._key = key
+        self._env_var_name = env_var_name
+
         value = os.environ.get(env_var_name, default)
         if value is None:
             raise ValueError(f"Environment variable {env_var_name} not found")
@@ -187,6 +206,9 @@ class EnvParam(Param):
 
     def __str__(self):
         return self.value
+
+    def __repr__(self):
+        return f"EnvParam({self._key}, {self._env_var_name})"
 
 
 Params = NewType("Params", Union[List[Tuple[str, str]], List[Param]])
