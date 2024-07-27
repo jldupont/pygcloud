@@ -38,7 +38,6 @@ class CloudRun(
     """
 
     LISTING_CAPABLE = True
-    SERVICE_ACCOUNT_SUPPORTED = True
     DEPENDS_ON_API = "run.googleapis.com"
     SPEC_CLASS = CloudRunRevisionSpec
     GROUP = ["beta", "run"]

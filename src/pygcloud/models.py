@@ -312,13 +312,9 @@ class GCPService(ServiceNode):
     REQUIRES_DESCRIBE_BEFORE_CREATE: for "create only" services
     that requires checking for existence before attempting creation.
     For example: Firestore database.
-
-    SERVICE_ACCOUNT_SUPPORTED: if the service can be deployed with its
-    own service account.
     """
 
     SERVICE_CATEGORY: ServiceCategory = ServiceCategory.INDETERMINATE
-    SERVICE_ACCOUNT_SUPPORTED: bool = False
     REQUIRES_UPDATE_AFTER_CREATE: bool = False
     REQUIRES_DESCRIBE_BEFORE_CREATE: bool = False
     LISTING_CAPABLE: bool = False
