@@ -4,10 +4,13 @@ Data models related to GCP services
 @author: jldupont
 """
 
-from typing import List, Dict
+from typing import List, Dict, Union
 from dataclasses import dataclass, field
 from pygcloud.utils import JsonObject
 from pygcloud.utils import FlexJSONEncoder
+
+
+Str = Union[str, None]
 
 
 class Spec:
@@ -101,7 +104,7 @@ class Spec:
         return cls.from_obj(obj)
 
     @classmethod
-    def from_json_list(cls, json_str: str, path: str = None):
+    def from_json_list(cls, json_str: str, path: Str = None):
         """
         Excepts to parse a JSON list from the specified string.
         An optional 'path' can be specified i.e. key to reach list.
@@ -250,7 +253,7 @@ class IAMPolicy(Spec):
     bindings: List[IAMBindings]
 
     @classmethod
-    def from_json_list(cls, json_str: str, path: str = None):
+    def from_json_list(cls, json_str: str, path: Str = None):
         bindings = IAMBindings.from_json_list(json_str, path="bindings")
         return cls(bindings=bindings)
 

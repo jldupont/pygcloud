@@ -6,10 +6,19 @@ import os
 import logging
 from functools import cache
 from collections import UserList
-from typing import List, Tuple, NewType, Union, Callable, Any
+from typing import List, Tuple, Union, Any, Type
+from collections.abc import Callable
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from .constants import ServiceCategory, Instruction
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .gcp.models import Spec
+
+
+Str = Union[str, None]
+Bool = Union[bool, None]
 
 
 class OptionalParam(UserList):
@@ -188,7 +197,7 @@ class EnvParam(Param):
     For parameters coming from environment variables
     """
 
-    def __init__(self, key: str, env_var_name: str, default: Union[str, None] = None):
+    def __init__(self, key: str, env_var_name: str, default: Str = None):
         """
         key: parameter name
         env_var_name: environment variable name
@@ -211,9 +220,9 @@ class EnvParam(Param):
         return f"EnvParam({self._key}, {self._env_var_name})"
 
 
-Params = NewType("Params", Union[List[Tuple[str, str]], List[Param]])
-Label = NewType("Label", Tuple[str, str])
-GroupName = NewType("GroupName", Union[str, EnvValue])
+Params = Union[List[Tuple[str, str]], List[Param]]
+Label = Tuple[str, str]
+GroupName = Union[str, EnvValue]
 
 
 class GroupNameUtility:
@@ -309,13 +318,13 @@ class GCPService(ServiceNode):
     """
 
     SERVICE_CATEGORY: ServiceCategory = ServiceCategory.INDETERMINATE
-    SERVICE_ACCOUNT_SUPPORTED = False
+    SERVICE_ACCOUNT_SUPPORTED: bool = False
     REQUIRES_UPDATE_AFTER_CREATE: bool = False
     REQUIRES_DESCRIBE_BEFORE_CREATE: bool = False
     LISTING_CAPABLE: bool = False
     LISTING_REQUIRES_LOCATION: bool = False
-    DEPENDS_ON_API: Union[str, None] = None
-    SPEC_CLASS = None
+    DEPENDS_ON_API: Str = None
+    SPEC_CLASS: Union[Type["Spec"], None] = None
     GROUP: List[str] = []
     GROUP_SUB_DESCRIBE: List[str] = []
 
@@ -324,33 +333,33 @@ class GCPService(ServiceNode):
         return self.SERVICE_CATEGORY
 
     @property
-    def name(self):
+    def name(self) -> Str:
         return self._name
 
     @property
-    def ns(self):
+    def ns(self) -> Str:
         return self._ns
 
-    def __init__(self, name=None, ns=None):
+    def __init__(self, name: Str = None, ns: Str = None):
         """
         name: string (optional)
         ns: string (optional)
         """
-        self.already_exists = None  # indeterminated
-        self.last_result = None
-        self._name = name
-        self._ns = ns
+        self.already_exists: Bool = None  # indeterminated
+        self.last_result: Union[Result, None] = None
+        self._name: Str = name
+        self._ns: Str = ns
         self._uses: List[ServiceNode] = []
         self._callables_before_deploy: List[Callable] = []
-        self._just_describe = False
-        self._spec = None
+        self._just_describe: bool = False
+        self._spec: Union['Spec', None] = None
 
     @property
-    def spec(self):
+    def spec(self) -> Union['Spec', None]:
         return self._spec
 
     @property
-    def just_describe(self):
+    def just_describe(self) -> bool:
         return self._just_describe
 
     def set_just_describe(self, enable: bool = True):
@@ -376,7 +385,7 @@ class GCPService(ServiceNode):
 
     @classmethod
     @cache
-    def generate_label(cls, target: ServiceNode) -> str:
+    def generate_label(cls, target: ServiceNode) -> Union[str, None]:
         """
         Needs to be implemented in a derived class
         """
@@ -391,7 +400,7 @@ class GCPService(ServiceNode):
 
         return True
 
-    def before_use(self, target_service: ServiceNode):
+    def before_use(self, target_service: ServiceNode) -> None:
         """
         Raises exception if a valid label cannot be derived
         """
@@ -432,7 +441,7 @@ class GCPService(ServiceNode):
         current service.
         """
 
-        instruction = None
+        instruction: Union[Instruction, None] = None
         for task in self._callables_before_deploy:
 
             try:
@@ -675,7 +684,7 @@ class _PolicyMeta(type):
     Collect derived classes
     """
 
-    __all_classes__ = []
+    __all_classes__: List = []
 
     @classmethod
     @property
@@ -722,6 +731,8 @@ class Policy(metaclass=_PolicyMeta):
     instead of having the user track policy instances
     in the build code
     """
+
+    _allowed: List[GCPService] = []
 
     def __init__(self):
         raise Exception("Cannot be instantiated")
