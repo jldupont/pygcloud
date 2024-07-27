@@ -36,12 +36,3 @@ class PolicyProjectLevelBindings(Policy):
 
         if isinstance(service, ProjectIAMBindingService):
             raise PolicyViolation(f"Project level IAM binding: {service}")
-
-
-class PolicyIngressToBackend(Policy):
-    """
-    A service
-    """
-
-    @classmethod
-    def evaluate(cls, groups: List[ServiceGroup], service: GCPService): ...

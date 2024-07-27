@@ -720,7 +720,8 @@ class Policy(metaclass=_PolicyMeta):
         assert isinstance(reason, str)
 
         logging.warning(
-            f"The service '{service}' was " f"allowed by default on policy '{cls.name}'"
+            f"The service '{service}' was "
+            f"allowed by default on policy '{cls.name}', reason= {reason}"
         )
         cls._allowed.append(service)
         return cls
