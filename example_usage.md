@@ -1,3 +1,8 @@
+The following code deploys a pattern ressembling this one (see [link](https://cloud.google.com/load-balancing/docs/https/setting-up-https-serverless)):
+
+![Example of deployment](assets/lb-serverless-run-ext-https.svg "Cloud Run backend")
+
+
 ```python
 #!/usr/bin/env python3
 """
