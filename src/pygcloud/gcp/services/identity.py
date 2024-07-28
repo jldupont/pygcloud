@@ -19,7 +19,7 @@ class ServicesIdentityIAP(GCPServiceSingletonImmutable):
     LISTING_CAPABLE = False
 
     def __init__(self):
-        super().__init__("iap", "iap")
+        super().__init__("iap", ns="iap")
 
     @property
     def sa_email(self) -> str:
