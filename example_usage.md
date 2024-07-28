@@ -360,3 +360,27 @@ deployer = Deployer(common_params=[PROJECT])
 #
 deployer.deploy(srv_group_name)
 ```
+
+# Example output
+
+```
+(venv) (base) jldupont@jldupont:~/workspace/playground$ make ingress
+Deploying ingress_proxy ...
+INFO:builder:Starting deployment with pygcloud: group(ingress_proxy) project(PROJECT)
+WARNING:root:The service 'ProjectIAMBindingService(IAMBinding(email=LazyAttrValue(ServiceAccount, spec.email), role='roles/datastore.user', ns='serviceAccount'), PROJECT)' was allowed by default on policy 'PolicyProjectLevelBindings', reason= Firestore does not accept direct bindings
+WARNING:root:Policy '<class 'pygcloud.policies.PolicyServiceAccount'>' allows service 'ProjectIAMBindingService(IAMBinding(email=LazyAttrValue(ServiceAccount, spec.email), role='roles/datastore.user', ns='serviceAccount'), PROJECT)'. Skipping.
+WARNING:root:Policy '<class 'pygcloud.policies.PolicyProjectLevelBindings'>' allows service 'ProjectIAMBindingService(IAMBinding(email=LazyAttrValue(ServiceAccount, spec.email), role='roles/datastore.user', ns='serviceAccount'), PROJECT)'. Skipping.
+INFO:root:> Policer: outcome: PolicingResult(service=ProjectIAMBindingService(IAMBinding(email=LazyAttrValue(ServiceAccount, spec.email), role='roles/datastore.user', ns='serviceAccount'), PROJECT), policy=<class 'pygcloud.policies.PolicyProjectLevelBindings'>, violation=None, raised=False, passed=False, allowed=True)
+INFO:pygcloud.deployer:Before deploying iap:iap
+INFO:pygcloud.deployer:Before deploying iam_binding:CloudRun
+INFO:pygcloud.deployer:Before deploying ip:ingress-proxy-ip
+INFO:pygcloud.deployer:Before deploying be:backend-service
+INFO:pygcloud.deployer:Before deploying run:jeeves
+INFO:pygcloud.deployer:Before deploying crneg:backend-neg
+INFO:pygcloud.deployer:Before deploying be:backend-service
+INFO:pygcloud.deployer:Before deploying urlmap:urlmap-backend-service
+INFO:pygcloud.deployer:Before deploying ssl:proxy-certificate
+INFO:pygcloud.deployer:Before deploying https-proxy:proxy-service
+INFO:pygcloud.deployer:Before deploying fwd-rule:fwd-proxy-service
+INFO:builder:FwdRule checks out
+```
