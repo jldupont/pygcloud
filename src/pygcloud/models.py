@@ -12,7 +12,6 @@ from abc import abstractmethod
 from dataclasses import dataclass, field
 from .constants import ServiceCategory, Instruction
 from .base_types import BaseType
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .gcp.models import Spec

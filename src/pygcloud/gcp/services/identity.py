@@ -18,6 +18,9 @@ class ServicesIdentityIAP(GCPServiceSingletonImmutable):
     DEPENDS_ON_API = "iap.googleapis.com"
     LISTING_CAPABLE = False
 
+    def __init__(self):
+        super().__init__("iap", "iap")
+
     @property
     def sa_email(self) -> str:
         """
