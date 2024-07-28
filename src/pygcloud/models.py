@@ -6,11 +6,12 @@ import os
 import logging
 from functools import cache
 from collections import UserList
-from typing import List, Tuple, Union, Any, Type
+from typing import List, Tuple, Union, Any, Type, TYPE_CHECKING
 from collections.abc import Callable
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from .constants import ServiceCategory, Instruction
+from .base_types import BaseType
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -348,10 +349,10 @@ class GCPService(ServiceNode):
         self._uses: List[ServiceNode] = []
         self._callables_before_deploy: List[Callable] = []
         self._just_describe: bool = False
-        self._spec: Union['Spec', None] = None
+        self._spec: Union["Spec", None] = None
 
     @property
-    def spec(self) -> Union['Spec', None]:
+    def spec(self) -> Union["Spec", None]:
         return self._spec
 
     @property
@@ -675,51 +676,11 @@ class ServiceGroups(list):
 service_groups = ServiceGroups()
 
 
-class _PolicyMeta(type):
-    """
-    Collect derived classes
-    """
-
-    __all_classes__: List = []
-
-    @classmethod
-    @property
-    def derived_classes(cls):
-        return cls.__all_classes__
-
-    @classmethod
-    def only_add_real_service_class(cls, classe):
-        new_class_name = classe.__name__.lower()
-
-        if "mock" in new_class_name:
-            return
-
-        if new_class_name[0] == "_":
-            return
-
-        if not getattr(cls, "__all_classes__", False):
-            setattr(cls, "__all_classes__", [])
-
-        cls.__all_classes__.append(classe)
-
-    def __new__(cls, name, bases, attrs):
-
-        new_class = super().__new__(cls, name, bases, attrs)
-
-        # Skip the base class
-        if len(bases) > 0:
-            cls.only_add_real_service_class(new_class)
-
-        setattr(new_class, "_allowed", [])
-
-        return new_class
-
-
 class PolicyViolation(Exception):
     """Base class for all policy violations"""
 
 
-class Policy(metaclass=_PolicyMeta):
+class Policy(metaclass=BaseType):
     """
     The base class for all policies
 
