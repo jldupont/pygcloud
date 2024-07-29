@@ -4,10 +4,10 @@
 @author: jldupont
 """
 
-from typing import Union, Set, Type
+from typing import Union, Set, Type, Dict
 from enum import Enum
 from dataclasses import dataclass, field
-from .models import ServiceNode
+from .models import ServiceNode, service_groups, ServiceGroup
 from .base_types import BaseType
 
 
@@ -50,6 +50,9 @@ class Node:
         """This cannot be moved to base class"""
         return hash(self.name)
 
+    def __repr__(self):
+        return f"Node({self.name})"
+
 
 @dataclass
 class Group(metaclass=BaseType):
@@ -63,10 +66,16 @@ class Group(metaclass=BaseType):
     name: Str
     members: Set[Node] = field(default_factory=set)
 
+    def __post_init__(self):
+        assert isinstance(self.name, str)
+        self.__class__._process_instance(self)
+
     def add(self, member: Node):
         assert isinstance(member, Node), print(f"Got: {member}")
         self.members.add(member)
         return self
+
+    __add__ = add
 
     def __len__(self):
         return len(self.members)
@@ -76,9 +85,15 @@ class Group(metaclass=BaseType):
         assert isinstance(member, Node), print(f"Got: {member}")
         return member in self.members
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.name})"
+
+    def __hash__(self):
+        return hash(self.name)
+
 
 @dataclass
-class Edge:
+class Edge(metaclass=BaseType):
     """
     An edge between two nodes
     """
@@ -91,7 +106,49 @@ class Edge:
         assert isinstance(self.source, (Node, Group))
         assert isinstance(self.target, (Node, Group))
         assert isinstance(self.relation, Relation)
+        self.__class__._process_instance(self)
+
+    @property
+    def name(self):
+        return f"{self.source.name}-{self.relation.value}-{self.target.name}"
 
     def __hash__(self):
-        vector = f"{self.source.name}-{self.relation.value}-{self.target.name}"
-        return hash(vector)
+        return hash(self.name)
+
+    def __repr__(self):
+        return f"Edge({self.source.name}, {self.relation.value}, {self.target.name})"
+
+
+def generate():
+    """
+    Generator for the graph of all services defined in the
+    deployment `service_groups` as well as any other groups
+
+    The generator yields Groups first and Edges last.
+
+    A service instance can be part of multiple groups.
+    """
+
+    nodes: Dict = dict()
+    service: ServiceNode
+    service_group: ServiceGroup
+    group: Group
+
+    #
+    # Start with the groups
+    #
+    for service_group in service_groups:
+
+        group = Group(name=service_group.name)
+
+        for service in service_group:
+
+            service_class: Type[ServiceNode] = service.__class__
+            node = Node(name=service.name, kind=service_class)
+
+            # If it's already in there, then idempotence protects it
+            unique_id = (node.name, node.kind)
+            nodes[unique_id] = node
+            group.add(node)
+
+        yield group

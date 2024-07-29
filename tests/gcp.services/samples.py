@@ -141,6 +141,12 @@ PROJECT_BINDINGS = """
 }
 """
 
+#
+# https://cloud.google.com/sdk/gcloud/reference/compute/addresses/describe
+# https://cloud.google.com/compute/docs/reference/rest/v1/addresses
+#
+# The 'users' field is not documented in the REST API doc
+#
 IP_ADDRESS = """
 {
   "address": "34.144.203.24",

@@ -28,7 +28,7 @@ def mock_policy():
 
 def test_policy_derived_classes(mock_policy):
 
-    assert isinstance(Policy.derived_classes, list), \
+    assert isinstance(Policy.derived_classes, set), \
         print(Policy.derived_classes)
 
     assert PolicyServiceAccount in Policy.derived_classes

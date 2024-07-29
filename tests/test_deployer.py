@@ -203,25 +203,41 @@ def test_deploy_service_group(deployer, mock_service):
     assert mock_service.last_result.success
 
 
-def test_deploy_service_groups_retrieve_by_name(deployer, env_first_key,
-                                                mock_service):
+def test_service_group_idempotence(mock_service):
 
     service_groups.clear()
-    mock_service.last_result = None
+    sg = service_groups.create("mock")
+
+    sg.add(mock_service)
+
+    with pytest.raises(Exception):
+        sg.add(mock_service)
+
+
+def test_deploy_service_groups_retrieve_by_name(deployer, env_first_key,
+                                                mock_service_class):
+
+    service_groups.clear()
+    ms1 = mock_service_class.create()
+    ms2 = mock_service_class.create()
+    ms3 = mock_service_class.create()
+
+    ms3.last_result = None
 
     # Pretend the deployment group name comes from an environment variable
     group_name = EnvValue(env_first_key)
 
     # Pretend we have a group of services we want to deploy together
     sg = service_groups.create(group_name)
-    sg.append(mock_service)
-    sg.append(mock_service)
-    sg.append(mock_service)
+    sg.append(ms1)
+    sg.append(ms2)
+    sg.append(ms3)
 
     # Reference the deployment by some environment name
     deployer.deploy(group_name)
 
-    assert mock_service.last_result.success
+    assert ms3.last_result.success
+    assert ms3.last_result is not None
 
 
 def test_deploy_with_callable(deployer):

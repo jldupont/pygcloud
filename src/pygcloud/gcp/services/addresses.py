@@ -12,6 +12,7 @@ class ServicesAddress(GCPServiceSingletonImmutable):
     """
     For creating the IP address
 
+    https://cloud.google.com/compute/docs/reference/rest/v1/addresses
     https://cloud.google.com/sdk/gcloud/reference/compute/addresses
     """
 

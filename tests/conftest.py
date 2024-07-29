@@ -59,6 +59,17 @@ class MockGCPService(GCPService):
         self.update_result = result
         return result
 
+    @classmethod
+    def create(cls):
+        import uuid
+        uid = str(uuid.uuid4())
+        return cls(uid, ns="mock")
+
+
+@pytest.fixture
+def mock_service_class():
+    return MockGCPService
+
 
 @pytest.fixture
 def mock_service():

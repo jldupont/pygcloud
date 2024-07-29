@@ -594,6 +594,8 @@ class ServiceGroup(list):
 
     Useful for deploying services in group whilst
     keeping a central view of all services in a workload
+
+    A service instance can only be added once per group.
     """
 
     @property
@@ -602,6 +604,7 @@ class ServiceGroup(list):
 
     def __init__(self, name: Union[str, EnvValue]):
         self._name = None
+        self._all = set()
 
         if isinstance(name, str):
             self._name = name
@@ -614,6 +617,9 @@ class ServiceGroup(list):
 
     def append(self, what: Union[GCPService, Callable]):
         assert isinstance(what, GCPService) or callable(what)
+        if what in self._all:
+            raise Exception(f"{what} already in group: {self}")
+        self._all.add(what)
         return super().append(what)
 
     add = append

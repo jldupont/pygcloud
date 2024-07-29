@@ -145,6 +145,7 @@ This package supports entrypoints. They are defined in the package's `pyproject.
 * File bug report about Cloud Scheduler listing requiring --location (whilst most other services do not)
 * Implement simple retry policy to help manage spurious errors
 * Redo ServiceAccountIAM class
+* Policy: check for cross-project service accounts
 
 # Links
 

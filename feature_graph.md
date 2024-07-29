@@ -78,6 +78,15 @@ In terms of how this type fits with the others (i.e. Node, Edge), we have differ
 
 By following the strategy "separation of concerns", option 3 comes on top.
 
+## GCP data model
+
+The service specification defines the following fields as "edges":
+
+* `selfLink` : serves as the fully qualified name for the service `node`
+* `target`: a field to identify an end of an edge
+* `users`: a list of nodes
+* `usedBy`: a list of nodes
+
 # API in support of graphing
 
 A generator based API is provided.
