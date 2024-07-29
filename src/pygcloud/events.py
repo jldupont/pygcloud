@@ -14,6 +14,7 @@ NOTE The package must be installed locally through `install.sh` in order
 from typing import Union
 from .hooks import Hooks
 from .models import GCPService, ServiceGroup, GroupName, Result, Instruction
+from .models import Policy, PolicingResult, PolicingResults
 
 
 def dummy(*_p, **_kw):
@@ -52,9 +53,35 @@ def end_deploy(
     result: Union[Result, Instruction],
 ):
     """
-    Prototype of entrypoint 'end_deploy'
-
     Executed at the very end of the invocation of the
     the deployment task
     """
     Hooks.execute("end_deploy", deployer_instance, what, result)
+
+
+def start_policer():
+    """
+    When the Policer starts execution
+    """
+    Hooks.execute("start_policer")
+
+
+def before_police(policy: Policy, service: GCPService):
+    """
+    Before execution of the policy
+    """
+    Hooks.execute("before_police", policy, service)
+
+
+def after_police(policy: Policy, service: GCPService, result: PolicingResult):
+    """
+    Before execution of the policy
+    """
+    Hooks.execute("after_police")
+
+
+def end_policer(results: PolicingResults):
+    """
+    When the Policer has finished execution
+    """
+    Hooks.execute("end_policer", results)

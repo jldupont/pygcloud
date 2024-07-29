@@ -11,6 +11,7 @@ from .models import Policy, PolicyViolation, PolicingResult, PolicingResults
 from .models import service_groups, ServiceGroup, GCPService
 from .constants import PolicerMode
 from .policies import *  # NOQA
+from .events import start_policer, end_policer, before_police, after_police
 
 debug = logging.debug
 info = logging.info
@@ -40,6 +41,8 @@ class _Policer:
         self._mode = mode
 
     def _eval_one(self, policy: Policy, service: GCPService) -> PolicingResult:
+
+        before_police(policy, service)
 
         if policy.allows(service):
             warn(f"Policy '{policy}' allows " f"service '{service}'. Skipping.")
@@ -86,13 +89,17 @@ class _Policer:
             if self.mode == PolicerMode.RUN:
                 sys.exit(1)
 
-        return PolicingResult(
+        result = PolicingResult(
             service=service,
             policy=policy,
             passed=passed,
             raised=raised,
             violation=violation,
         )
+
+        after_police(policy, service, result)
+
+        return result
 
     def _process_one(self, policy: Policy) -> List[PolicingResult]:
         """
@@ -136,6 +143,10 @@ class _Policer:
 
         policies: for evaluating specific policies. Useful during testing.
         """
+
+        # Policer is a singleton: no use passing it around
+        start_policer()
+
         batch_result: List[PolicingResult]
         _all: List[Policy] = policies or Policy.derived_classes
 
@@ -156,7 +167,9 @@ class _Policer:
         else:
             info(f"> Policer: outcome: {outcome}")
 
-        return PolicingResults(outcome=outcome, results=results)
+        final_results = PolicingResults(outcome=outcome, results=results)
+        end_policer(final_results)
+        return final_results
 
 
 # Singleton instance
