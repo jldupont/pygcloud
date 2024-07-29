@@ -12,12 +12,13 @@ NOTE The package must be installed locally through `install.sh` in order
 """
 
 from typing import Union
-from .hooks import execute_hooks_deployer
+from .hooks import Hooks
 from .models import GCPService, ServiceGroup, GroupName, Result, Instruction
 
 
-def dummy(_deployer_instance, *_p, **_kw):
+def dummy(*_p, **_kw):
     """For test purposes only"""
+    raise NotImplementedError
 
 
 def start_deploy(deployer_instance, what: Union[GCPService, ServiceGroup, GroupName]):
@@ -27,14 +28,14 @@ def start_deploy(deployer_instance, what: Union[GCPService, ServiceGroup, GroupN
     Executed at the very beginning of the invocation of
     the deployment task
     """
-    execute_hooks_deployer("start_deploy", deployer_instance, what)
+    Hooks.execute("start_deploy", deployer_instance, what)
 
 
 def before_deploy(deployer_instance, service: GCPService):
     """
     Before a service deployment task is executed
     """
-    execute_hooks_deployer("before_deploy", deployer_instance, service)
+    Hooks.execute("before_deploy", deployer_instance, service)
 
 
 def after_deploy(deployer_instance, service: GCPService):
@@ -42,7 +43,7 @@ def after_deploy(deployer_instance, service: GCPService):
     After a service deployment task has completed
     either successfully or not
     """
-    execute_hooks_deployer("after_deploy", deployer_instance, service)
+    Hooks.execute("after_deploy", deployer_instance, service)
 
 
 def end_deploy(
@@ -56,4 +57,4 @@ def end_deploy(
     Executed at the very end of the invocation of the
     the deployment task
     """
-    execute_hooks_deployer("end_deploy", deployer_instance, what, result)
+    Hooks.execute("end_deploy", deployer_instance, what, result)
