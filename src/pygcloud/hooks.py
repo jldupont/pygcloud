@@ -1,0 +1,77 @@
+"""
+Support for standard Python EntryPoints and internal events
+
+@author: jldupont
+"""
+import logging
+from typing import List, Dict, Tuple
+from collections.abc import Callable
+from functools import cache
+from importlib.metadata import entry_points, EntryPoint
+
+
+@cache
+def get_points() -> Dict[str, List[EntryPoint]]:
+
+    _entry_points: Tuple[EntryPoint]
+    _map: Dict[str, List[EntryPoint]] = dict()
+
+    processed_names = []
+    try:
+        _entry_points = entry_points().get("pygcloud.events", None)  # type: ignore
+    except:  # NOQA
+        # compability with python 3.12
+        _entry_points = entry_points().select(group="pygcloud.events")
+
+    if _entry_points is None:
+        raise Exception("Is the package installed locally ?")
+
+    point: EntryPoint
+
+    for point in _entry_points:
+        name: str = point.name
+
+        liste: List[EntryPoint] = _map.get(name, [])
+        if name in processed_names:
+            continue
+
+        liste.append(point)
+        _map[name] = liste
+        processed_names.append(name)
+
+    return _map
+
+
+@cache
+def get_hooks(name: str) -> List[EntryPoint]:
+    return get_points().get(name, [])
+
+
+@cache
+def get_hook_callable(entry: EntryPoint) -> Callable:
+    return entry.load()
+
+
+def execute_hooks_deployer(name: str, deployer, *p, **kw):
+    """
+    Go through the list of hooks and
+    execute their callable
+    """
+    from .deployer import Deployer
+
+    assert isinstance(name, str)
+    assert isinstance(deployer, Deployer)
+
+    hooks: List[EntryPoint] = get_hooks(name)
+    hook: EntryPoint
+
+    for hook in hooks:
+        if "deploy" not in hook.name:
+            continue
+
+        try:
+            func = get_hook_callable(hook)
+            func(deployer, *p, **kw)
+        except Exception as e:
+            print(e)
+            logging.debug(f"Failed to call entry-point: {hook}: {e}")

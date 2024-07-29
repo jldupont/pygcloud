@@ -12,7 +12,7 @@ NOTE The package must be installed locally through `install.sh` in order
 """
 
 from typing import Union
-from .helpers import execute_hooks_deployer
+from .hooks import execute_hooks_deployer
 from .models import GCPService, ServiceGroup, GroupName, Result, Instruction
 
 
