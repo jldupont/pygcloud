@@ -9,12 +9,16 @@ import sys
 from typing import List, Union
 from .models import Policy, PolicyViolation, PolicingResult, PolicingResults
 from .models import service_groups, ServiceGroup, GCPService
+from .gcp.models import Spec
 from .constants import PolicerMode
 from .policies import *  # NOQA
 
+debug = logging.debug
 info = logging.info
 warn = logging.warning
 error = logging.error
+
+MaybePolicies = Union[List[Policy], None]
 
 
 class _Policer:
@@ -45,6 +49,14 @@ class _Policer:
         passed = False
         raised = False
         violation: Union[PolicyViolation, None] = None
+
+        if policy.REQUIRES_SERVICE_SPEC:
+            maybe_spec = getattr(service, "spec", None)
+            if maybe_spec is None:
+                debug(f"Policy '{policy}' on '{service}' because no spec")
+                return PolicingResult(
+                    service=service, policy=policy, skipped=True
+                )
 
         try:
             policy.evaluate(service_groups, service)
@@ -114,7 +126,7 @@ class _Policer:
 
         return results
 
-    def police(self) -> PolicingResults:
+    def police(self, policies: MaybePolicies = None) -> PolicingResults:
         """
         In `DRY_RUN` mode, the method will return a `PolicingResults` instance.
 
@@ -122,9 +134,11 @@ class _Policer:
         "DRY_RUN" mode.
 
         In `RUN` mode, if there is a violation, `sys.exit(1)` will be executed.
+
+        policies: for evaluating specific policies. Useful during testing.
         """
         batch_result: List[PolicingResult]
-        _all: List[Policy] = Policy.derived_classes
+        _all: List[Policy] = policies or Policy.derived_classes
 
         results: List[PolicingResult] = []
         outcome = None

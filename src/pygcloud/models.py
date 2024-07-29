@@ -692,7 +692,12 @@ class Policy(metaclass=BaseType):
     We are using class methods to simplify usage i.e.
     instead of having the user track policy instances
     in the build code
+
+    REQUIRES_SERVICE_SPEC: if the policy requires the availability
+    of the service specification for it to be effective. This is
+    particularily pertinent for the "after deployment use-cases".
     """
+    REQUIRES_SERVICE_SPEC: bool = False
 
     _allowed: List[GCPService] = []
 
@@ -737,6 +742,7 @@ class PolicingResult:
     passed: True if the policy evaluation passed
     raised: when an exception was raised in DRY_RUN mode
     allowed: when skipped because policy allowed by default on service
+    skipped: if the policy could not be evaluated
     """
 
     service: GCPService
@@ -746,6 +752,7 @@ class PolicingResult:
     raised: bool = field(default=False)
     passed: bool = field(default=False)
     allowed: bool = field(default=False)
+    skipped: bool = field(default=False)
 
 
 @dataclass

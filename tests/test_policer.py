@@ -21,6 +21,10 @@ class MockServiceSupportingServiceAccount(GCPService, ServiceAccountCapableMixin
     ...
 
 
+class MockPolicyRequiresSpec(Policy):
+    REQUIRES_SERVICE_SPEC = True
+
+
 @pytest.fixture
 def mock_policy():
     return MockPolicy
@@ -64,3 +68,15 @@ def test_policy_should_have_service_account(mock_sg):
 
     with pytest.raises(PolicyViolation):
         Policer.police()
+
+
+def test_policy_requires_spec(mock_sg, mock_service):
+
+    policies: List[Policy] = [MockPolicyRequiresSpec,]
+
+    mock_sg.clear()
+    mock_sg + mock_service
+
+    results = Policer.police(policies=policies)
+    first_result = results.results[0]
+    assert first_result.skipped
