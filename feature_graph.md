@@ -43,40 +43,21 @@ transformation to it.
 
 # Grouping
 
-The "group" construct is abstract by nature.
-
-At the moment, there is only one group type defined: "Deployment Service Group". It is very likely we will want to introduce more group types in the future. In order to prepare for this future state, we need to make some provisions ahead of time in order to limit backward compatibility challenges.
-
-In terms of requirements, I believe the following are valuable:
-
-* Support backward compatibility
-* Support type hinting
-* Support user generated group types
+The "group" construct is abstract by nature. Support for grouping is done through the `ServiceGroup` class. It is quite generic and open for extension.
 
 ## User defined groups
 
 ```python
-# Some other tyoe of logical grouping for operational purposes maybe ?
-group = SomeUserDefinedGroupClass(...)
-
 srv = StorageBucket(...)
+
+# Some other tyoe of logical grouping for operational purposes maybe ?
+group = ServiceGroups.create("my-group")
 group.append(srv)
 
 # Of the goals is to actually deploy this service too
-deployment_group.append(srv)
+deployment_group_common = ServiceGroups.create("common")
+deployment_group_common.append(srv)
 ```
-
-## Implementation
-
-There are a number of ways to solution for the group type and its role with the other graph related types. In order to account for the requirements above though, we can have a good level of confidence that a class based approach will meet them.
-
-In terms of how this type fits with the others (i.e. Node, Edge), we have different options:
-
-1. We could have the Node type contain a list of Groups for which it is member of
-2. We could have the "Group" type with a list of Nodes
-3. We could have another type "Members" which would reference both a "Group" and its member Nodes
-
-By following the strategy "separation of concerns", option 3 comes on top.
 
 ## GCP data model
 

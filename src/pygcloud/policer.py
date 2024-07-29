@@ -9,7 +9,6 @@ import sys
 from typing import List, Union
 from .models import Policy, PolicyViolation, PolicingResult, PolicingResults
 from .models import service_groups, ServiceGroup, GCPService
-from .gcp.models import Spec
 from .constants import PolicerMode
 from .policies import *  # NOQA
 

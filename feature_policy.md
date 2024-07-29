@@ -21,6 +21,7 @@ For a comprehensive list of policing strategies, see **TODO**
 * Support `dry run` policing to evaluate compliance
 * Support `production` deployment phase policing
 * Support for all supported `GCPService` classes (when applicable)
+* Support for post-deployment policing
 
 # How it works
 
@@ -83,6 +84,10 @@ All policies are derived from the `Policy` based class.
     #
     Policer.police()
 ```
+
+## Post-Deployment Policing
+
+It is possible to evaluate policies after the deployment too. The policies marked `REQUIRES_SERVICE_SPEC` are intended for this purpose and are skipped when the `spec` is not available on a service instance.
 
 # Additional Considerations
 

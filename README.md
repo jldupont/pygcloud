@@ -125,10 +125,10 @@ stateDiagram-v2
     direction LR
 
     state "Service Groups\n declaration" as SG
-    state "Policing before Deployment" as PB
-    state "Policing after Deployment" as PA
+    state "Policing before Deployment\n[Optional]" as PB
+    state "Policing after Deployment\n[Optional]" as PA
     state "Deploying" as D
-    state "Graphing" as G
+    state "Graphing\n[Optional]" as G
 
     SG --> PB 
     PB --> D
