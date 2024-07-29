@@ -16,15 +16,10 @@ This package simplifies the deployment of GCP services through the gcloud comman
 * Be as transparent to `gcloud` as possible
 * Capability to group deployment of services together
 * Capability to describe relationships between services
-* Capability to perform trial run
+* Capability to perform trial runs
 * [Policing before deployment](./feature_policy.md)
-
-# Enabling Features 
-
-* Infrastructure governance
-* Diagramming
-
-The above features are supported by employing the `after_*` methods of the `GCPService` class.
+* Policing after deployment (FUTURE)
+* Graph generation and diagramming (WIP)
 
 # Categories of Services
 
@@ -110,11 +105,45 @@ Many relationships are also explicit through `IAM bindings`.
 
 Some relationships are valuable but cannot be obtained through service specifications nor IAM bindings. The main culprits are `default service accounts` with their large binding scope: the ability to determine precisely the "real" relationships between services is compromised.
 
-## Relationships to external services (WIP)
+## Relationships to external services (FUTURE)
 
-`pygcloud` supports specifying relationships between GCP services and external ones. These are captured in the service instance labels.
+`pygcloud` supports specifying relationships between GCP services and external ones. 
 
-# About GCP Labels
+# Architecture
+
+Below is the list of the major components of this package:
+
+* Service Groups
+* Deployer
+* Policer
+* Grapher
+
+Service Groups hold much of the state necessary for the proper functionning of the core capabilities of this package.
+
+```mermaid
+stateDiagram-v2
+    direction LR
+
+    state "Service Groups\n declaration" as SG
+    state "Policing before Deployment" as PB
+    state "Policing after Deployment" as PA
+    state "Deploying" as D
+    state "Graphing" as G
+
+    SG --> PB 
+    PB --> D
+    D --> PA
+    PA --> G
+```
+
+## Policing
+
+Each policy defined (as derived class from `Policy`) gets automatically added to the list of policers in scope for evaluation.
+
+When the `Policer.police` classmethod is invoked, each policy is evaluated against each service declared in the service groups.
+
+
+# About GCP Labels (**being re-assessed**)
 
 Labels optionally carry the "use" relationships between service instances.
 
@@ -126,7 +155,7 @@ We work with the limitations (i.e. 64 entries, unique key names, value length li
 
 The field `$name` is sometimes encoded since the value contains characters not supported by GCP. Encoding strategy in these cases is always the same (bas64 with custom alphabet, padding `=` removed).
 
-# About Regions
+# About Regions and Locations
 
 Some services are more difficult to inventory than others. This is the case for Cloud Scheduler for example: `gloud scheduler jobs list` command requires specifying the `--location` where to perform the listing.
 

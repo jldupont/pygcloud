@@ -25,6 +25,7 @@ For a comprehensive list of policing strategies, see **TODO**
 # How it works
 
 * Policies can be evaluated followed, or not, by the deployment phase
+* Policies can be evaluated after a deployment phase in order to access to more information
 * Policies can be evaluated in `dry run` or `production` mode
   * In `dry run`, policy exception(s) are logged without exiting
   * In `production`, the first policy exception exists the process

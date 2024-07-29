@@ -118,6 +118,9 @@ class _Policer:
         """
         In `DRY_RUN` mode, the method will return a `PolicingResults` instance.
 
+        The last "outcome" will be returned: this is of course only occurs in
+        "DRY_RUN" mode.
+
         In `RUN` mode, if there is a violation, `sys.exit(1)` will be executed.
         """
         batch_result: List[PolicingResult]

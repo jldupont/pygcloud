@@ -77,9 +77,13 @@ def execute_hooks_deployer(name: str, deployer, *p, **kw):
     assert isinstance(name, str)
     assert isinstance(deployer, Deployer)
 
-    hooks = get_hooks(name)
+    hooks: List[EntryPoint] = get_hooks(name)
+    hook: EntryPoint
 
     for hook in hooks:
+        if "deploy" not in hook.name:
+            continue
+
         try:
             func = get_hook_callable(hook)
             func(deployer, *p, **kw)
