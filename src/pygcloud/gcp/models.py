@@ -4,7 +4,7 @@ Data models related to GCP services
 @author: jldupont
 """
 
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Any
 from dataclasses import dataclass, field
 from pygcloud.utils import JsonObject
 from pygcloud.utils import FlexJSONEncoder
@@ -291,6 +291,8 @@ class IPAddress(Spec):
     address: str
     addressType: str
     ipVersion: str
+    selfLink: str
+    users: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -335,6 +337,9 @@ class CloudRunRevisionSpec(Spec):
 
 @dataclass
 class BackendGroup(Spec):
+    """
+    group: e.g. can contain a link to a NEG
+    """
     balancingMode: str
     group: str
     capacityScaler: int
@@ -347,7 +352,10 @@ class BackendServiceSpec(Spec):
     port: int
     portName: str
     protocol: str
+    selfLink: str
     backends: List[BackendGroup]
+    iap: Dict = field(default_factory=dict)
+    usedBy: List[Any] = field(default_factory=list)
 
 
 @dataclass
@@ -360,6 +368,7 @@ class FwdRule(Spec):
     loadBalancingScheme: str
     networkTier: str
     portRange: str
+    selfLink: str
     target: str
 
 
@@ -382,13 +391,18 @@ class SSLCertificate(Spec):
 
     name: str
     type: str
+    selfLink: str
     managed: dict = field(default_factory=dict)
 
 
 @dataclass
 class HTTPSProxy(Spec):
+    """
+    sslCertificates: list of links
+    """
     name: str
-    sslCertificates: list = field(default_factory=list)
+    selfLink: str
+    sslCertificates: List[str] = field(default_factory=list)
     urlMap: str = field(default_factory=str)
 
 
@@ -430,6 +444,7 @@ class CloudRunNegSpec(Spec):
 
     name: str
     networkEndpointType: str
+    selfLink: str
     region: str = field(default_factory=str)
     cloudRun: dict = field(default_factory=dict)
 
@@ -446,7 +461,11 @@ class TaskQueue(Spec):
 
 @dataclass
 class UrlMap(Spec):
+    """
+    defaultService: a link to a service
+    """
 
+    selfLink: str
     id: str = field(default_factory=str)
     name: str = field(default_factory=str)
     defaultService: str = field(default_factory=str)

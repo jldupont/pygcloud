@@ -86,6 +86,7 @@ The service specification defines the following fields as "edges":
 * `target`: a field to identify an end of an edge
 * `users`: a list of nodes
 * `usedBy`: a list of nodes
+* `group`: sometimes used to hold links e.g. NEGs
 
 # API in support of graphing
 
