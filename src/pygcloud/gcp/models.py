@@ -6,11 +6,28 @@ Data models related to GCP services
 
 from typing import List, Dict, Union, Any
 from dataclasses import dataclass, field
+from collections import UserDict
 from pygcloud.utils import JsonObject
 from pygcloud.utils import FlexJSONEncoder
 
 
 Str = Union[str, None]
+
+
+class Links(UserDict):
+    """
+    Holds link references found in Spec
+
+    Once set, (key:value) mappings cannot be changed
+    """
+    def __setitem__(self, key, value):
+        current = self.get(key, None)
+        if current is not None:
+            raise ValueError(f"Link key already exists: {key}")
+        super().__setitem__(key, value)
+
+    def __delitem__(self, key: str):
+        raise ValueError(f"Single key cannot be removed: {key}")
 
 
 class Spec:

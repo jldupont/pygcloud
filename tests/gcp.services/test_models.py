@@ -2,11 +2,25 @@
 @author: jldupont
 """
 import pytest
-from pygcloud.gcp.models import IPAddress, CloudRunRevisionSpec, \
+from pygcloud.gcp.models import Links, IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
     HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
     FirestoreDb, ProjectDescription, TaskQueue, UrlMap, \
     ServiceAccountSpec, IAMPolicy, IAMBinding
+
+
+def test_links_single_set():
+
+    links = Links()
+    links["key"] = "value"
+
+    with pytest.raises(ValueError):
+        links["key"] = 666
+
+    assert "key" in links
+
+    with pytest.raises(ValueError):
+        del links['key']
 
 
 def test_project_desc(sample_project_desc):
