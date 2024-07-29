@@ -67,7 +67,7 @@ def get_hook_callable(entry: EntryPoint) -> Callable:
     return entry.load()
 
 
-def execute_hooks(name: str, deployer, *p, **kw):
+def execute_hooks_deployer(name: str, deployer, *p, **kw):
     """
     Go through the list of hooks and
     execute their callable
