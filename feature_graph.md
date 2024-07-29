@@ -54,7 +54,7 @@ srv = StorageBucket(...)
 group = ServiceGroups.create("my-group")
 group.append(srv)
 
-# Of the goals is to actually deploy this service too
+# One of the goals is should actually to deploy this service too
 deployment_group_common = ServiceGroups.create("common")
 deployment_group_common.append(srv)
 ```
