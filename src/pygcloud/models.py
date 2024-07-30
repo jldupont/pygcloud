@@ -6,19 +6,150 @@ import os
 import logging
 from functools import cache
 from collections import UserList
-from typing import List, Tuple, Union, Any, Type, TYPE_CHECKING
+from typing import List, Tuple, Union, Any, Type
 from collections.abc import Callable
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from .constants import ServiceCategory, Instruction
 from .base_types import BaseType
-
-if TYPE_CHECKING:
-    from .gcp.models import Spec
+from .utils import FlexJSONEncoder
 
 
 Str = Union[str, None]
 Bool = Union[bool, None]
+
+
+class Spec:
+
+    def __post_init__(self):
+        """
+        Helper for typical URI type name i.e.
+
+        projects/PROJECT/locations/LOCATION/RESOURCE/id
+        """
+        if not getattr(self, "name", False):
+            return
+
+        parts = self.name.split("/")
+        if len(parts) != 6:
+            self.name = parts[-1]
+            return
+
+        self.location = parts[3]
+        self.name = parts[-1]
+
+    @classmethod
+    def parse_json(cls, json_str: str) -> dict:
+        import json
+
+        try:
+            json_obj = json.loads(json_str)
+        except Exception:
+            raise ValueError(f"Cannot parse for JSON: {json_str}")
+
+        return json_obj
+
+    @classmethod
+    def from_obj(cls, obj):
+        """
+        This recursively builds a class instance
+        based on the annotations
+        """
+
+        if isinstance(obj, list):
+            return [cls.from_obj(item) for item in obj]
+
+        if not isinstance(obj, dict):
+            return obj
+
+        import typing
+
+        fields = cls.__annotations__
+
+        result: dict = {}  # type: ignore
+
+        for key, value in obj.items():
+
+            _field = fields.get(key, None)
+            if _field is None:
+                continue
+
+            origin = typing.get_origin(_field)
+
+            if origin != list:
+                result[key] = value
+                continue
+
+            # we are just dealing with the simplest case
+            # ... at least for now e.g.
+            # List[BackendGroup]
+            #
+            # and not something like:
+            # List[Union[...]]
+            classe = typing.get_args(_field)[0]
+
+            # print(f"Key = {key}, origin={origin}, classe={classe.__name__}, value={value}")
+
+            if hasattr(classe, "from_obj"):
+                entries = classe.from_obj(value)
+            else:
+                entries = value
+
+            result[key] = entries
+
+        return cls(**result)
+
+    @classmethod
+    def from_string(cls, json_str: str):
+        """
+        Create a dataclass from a JSON string
+        Make sure to only include fields declare
+        in the dataclass
+        """
+        obj = cls.parse_json(json_str)
+        return cls.from_obj(obj)
+
+    @classmethod
+    def from_json_list(cls, json_str: str, path: Str = None):
+        """
+        Excepts to parse a JSON list from the specified string.
+        An optional 'path' can be specified i.e. key to reach list.
+        """
+        assert isinstance(json_str, str)
+
+        import json
+
+        try:
+            json_list = json.loads(json_str)
+        except Exception as e:
+            raise Exception(f"Error trying to load list from JSON string: {e}")
+
+        if path is not None:
+            json_list = json_list.get(path, [])
+
+        assert isinstance(json_list, list)
+
+        return [cls.from_obj(obj) for obj in json_list]
+
+    def to_dict(self):
+        result = {}
+
+        fields = self.__annotations__
+
+        for _field in fields:
+            value = getattr(self, _field)
+
+            if hasattr(value, "to_dict"):
+                value = value.to_dict()
+
+            result[_field] = value
+
+        return result
+
+    def to_json_string(self):
+        import json
+
+        return json.dumps(self.to_dict(), cls=FlexJSONEncoder)
 
 
 class OptionalParam(UserList):

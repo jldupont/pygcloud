@@ -2,7 +2,7 @@
 @author: jldupont
 """
 import pytest
-from pygcloud.gcp.models import Links, IPAddress, CloudRunRevisionSpec, \
+from pygcloud.gcp.models import LinksMap, IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
     HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
     FirestoreDb, ProjectDescription, TaskQueue, UrlMap, \
@@ -11,7 +11,7 @@ from pygcloud.gcp.models import Links, IPAddress, CloudRunRevisionSpec, \
 
 def test_links_single_set():
 
-    links = Links()
+    links = LinksMap()
     links["key"] = "value"
 
     with pytest.raises(ValueError):

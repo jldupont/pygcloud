@@ -5,6 +5,16 @@ from pygcloud.models import Result, Param, EnvValue, \
     GCPServiceSingletonImmutable, GCPServiceRevisionBased, \
     GCPServiceUpdatable, \
     service_groups
+from pygcloud.linker import Links
+
+
+@pytest.fixture
+def mock_sg_service(mock_sg, mock_service):
+
+    service_groups.clear()
+    sg = service_groups.create("sg")
+    sg.append(mock_service)
+    return sg
 
 
 @pytest.fixture
@@ -218,9 +228,9 @@ def test_deploy_service_groups_retrieve_by_name(deployer, env_first_key,
                                                 mock_service_class):
 
     service_groups.clear()
-    ms1 = mock_service_class.create()
-    ms2 = mock_service_class.create()
-    ms3 = mock_service_class.create()
+    ms1 = mock_service_class()
+    ms2 = mock_service_class()
+    ms3 = mock_service_class()
 
     ms3.last_result = None
 
@@ -315,17 +325,14 @@ def test_deploy_abort_all(deployer, mock_service):
     assert not called
 
 
-def test_hooks(deployer, mock_service):
+def test_hooks(deployer, mock_sg_service):
     """
     Empty service group should anyway
     have the "start" and "end" hooks called
     """
 
-    service_groups.clear()
-    sg = service_groups.create("sg")
-    sg.append(mock_service)
-
-    deployer.deploy("sg")
+    sg = mock_sg_service
+    deployer.deploy(sg)
 
     assert deployer.history_hooks == [
         "start_deploy",
@@ -333,3 +340,21 @@ def test_hooks(deployer, mock_service):
         "after_deploy",
         "end_deploy"
     ], print(deployer.history_hooks)
+
+
+def test_links(deployer, mock_sg_service):
+
+    sg = mock_sg_service
+    deployer.deploy(sg)
+
+    first_service = sg[0]
+
+    assert first_service is not None
+    assert first_service.spec is not None
+
+    link = first_service.spec.selfLink
+
+    assert link is not None
+    assert link in Links
+
+    assert 'mock_link' in link, print(link)

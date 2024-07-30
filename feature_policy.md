@@ -26,7 +26,7 @@ For a comprehensive list of policing strategies, see **TODO**
 # How it works
 
 * Policies can be evaluated followed, or not, by the deployment phase
-* Policies can be evaluated after a deployment phase in order to access to more information
+* Policies can be evaluated after a deployment phase with the benefit of having access to more information
 * Policies can be evaluated in `dry run` or `production` mode
   * In `dry run`, policy exception(s) are logged without exiting
   * In `production`, the first policy exception exists the process
@@ -85,9 +85,15 @@ All policies are derived from the `Policy` based class.
     Policer.police()
 ```
 
-## Post-Deployment Policing
+# Post-Deployment Policing
 
 It is possible to evaluate policies after the deployment too. The policies marked `REQUIRES_SERVICE_SPEC` are intended for this purpose and are skipped when the `spec` is not available on a service instance.
+
+## Project Level Policing
+
+`pygcloud` offers partial deployments through the use of `ServiceGroup`. When a deployment task does not include all the services, this means that the Policer will not have (by default) access to all the specifications of the services currently deployed in the target project.
+
+**TODO** expand on this topic and provide example(s)
 
 # Additional Considerations
 

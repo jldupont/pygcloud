@@ -116,6 +116,7 @@ Below is the list of the major components of this package:
 * Service Groups
 * Deployer
 * Policer
+* Linker
 * Grapher
 
 Service Groups hold much of the state necessary for the proper functionning of the core capabilities of this package.
@@ -136,12 +137,19 @@ stateDiagram-v2
     PA --> G
 ```
 
+The architecture relies internally on `hooks` (aka `callbacks`) in order to operate with an additional level of decoupling between components.  The internal `hooks` are setup the `__init__` phase of `pygcloud`.
+
 ## Policing
 
 Each policy defined (as derived class from `Policy`) gets automatically added to the list of policers in scope for evaluation.
 
 When the `Policer.police` classmethod is invoked, each policy is evaluated against each service declared in the service groups.
 
+## Linker
+
+After a deployment, more information is available because the service specification are often returned by default by GCP.
+
+The Linker executes automatically and collects this additional information set.
 
 # About GCP Labels (**being re-assessed**)
 
