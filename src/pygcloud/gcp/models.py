@@ -34,6 +34,14 @@ class LinksMap(UserDict):
         raise ValueError(f"Single key cannot be removed: {key}")
 
 
+class LinkProcMixin:
+    """
+    Processes the 'usedBy', 'users', 'target' and 'group' attributes
+    """
+    def __post_init_ex__(self):
+        ...
+
+
 @dataclass
 class ProjectDescription(Spec):
     name: str
@@ -235,7 +243,9 @@ class BackendGroup(Spec):
 
 @dataclass
 class BackendServiceSpec(Spec):
-
+    """
+    https://cloud.google.com/compute/docs/reference/rest/v1/backendServices
+    """
     name: str
     port: int
     portName: str

@@ -27,6 +27,10 @@ class Spec:
 
         projects/PROJECT/locations/LOCATION/RESOURCE/id
         """
+        fnc = getattr(self, "__post_init_ex__", None)
+        if fnc is not None:
+            fnc()
+
         if not getattr(self, "name", False):
             return
 

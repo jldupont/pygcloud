@@ -68,12 +68,70 @@ The service specification defines the following fields as "edges":
 * `users`: a list of nodes
 * `usedBy`: a list of nodes
 * `group`: sometimes used to hold links e.g. NEGs
+* 'pubsubTarget': reference to a `topicName`
+
+The `usedBy` attribute sometimes contains a list of dict with key 'reference'.
+
+## Mapping to an internal model
+
+| gcp      | pygcloud |
+| --       | --       |
+| selfLink | selfLink |
+| target   | uses     |
+| users    | used_by  |
+| usedBy   | used_by  |
+| group    |   |
+
 
 # API in support of graphing
 
 A generator based API is provided.
 
 # Examples
+
+```mermaid
+ C4Context
+      title Cloud Run backend exposed through IAP
+
+      Boundary(lb, "Load Balancer") {
+        System(IPAddress, "IP Address", "IP Address")
+        System(FwdRule, "Forwarding Rule", "Forwarding Rule")
+        System(Proxy, "HTTPS Proxy", "HTTPS Proxy")
+        System(URLMap, "URL Map", "URL mapping service")
+        System(BackendService, "Backend Service", "Backend service")
+        System(Certificate, "SSL Certificate", "")        
+      }
+
+      System_Boundary(NEG, "Serverless NEG", "Serverless NEG") {
+        Boundary(Region, "Region", "Region") {
+          System(CloudRun, "Cloud Run")
+        }
+      }
+
+      Rel(FwdRule, Proxy, "uses", "")
+      Rel(Proxy, URLMap, "uses", "")
+      Rel(URLMap, Proxy, "used_by", "")
+      Rel(URLMap, BackendService, "uses", "")
+      Rel(Proxy, Certificate, "uses", "")
+      Rel(IPAddress, FwdRule, "used_by", "")
+      Rel(BackendService, CloudRun, "uses")
+
+      System_Boundary(Common, "Common Services", "") {
+        System(CloudScheduler, "Cloud Scheduler", "")
+        System(PubsubTopic, "Pubsub Topic", "")
+        System(TaskQueue, "Task Queue", "")
+      }
+
+      Rel(CloudScheduler, PubsubTopic, "uses", "")
+
+
+    System_Boundary(DB, "Database", "") {
+      System(Firestore, "Firestore", "")
+
+    }
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="3")       
+```
 
 TODO
 

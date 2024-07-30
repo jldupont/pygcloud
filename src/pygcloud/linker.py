@@ -17,10 +17,10 @@ class _Linker:
         Hooks.register_callback("after_deploy", self.after_deploy)
         Hooks.register_callback("end_deploy", self.end_deploy)
 
-    def after_deploy(self, deployer, service: GCPService):
+    def after_deploy(self, _deployer, service: GCPService):
         """
         * Collects `selfLink`
-        
+
         NOTE LinksMap silently ignore None keys and respects idempotency
         """
         if service.spec is not None:

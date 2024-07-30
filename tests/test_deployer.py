@@ -343,7 +343,9 @@ def test_hooks(deployer, mock_sg_service):
 
 
 def test_links(deployer, mock_sg_service):
-
+    """
+    SelfLink links are collected after deployment
+    """
     sg = mock_sg_service
     deployer.deploy(sg)
 

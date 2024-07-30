@@ -308,6 +308,9 @@ CLOUD_RUN_REVISION_SPEC = """
 }
 """  # NOQA
 
+#
+# https://cloud.google.com/compute/docs/reference/rest/v1/backendServices
+#
 BACKEND_SERVICE = """
 {
   "affinityCookieTtlSec": 0,

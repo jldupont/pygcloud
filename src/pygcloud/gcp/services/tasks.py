@@ -3,6 +3,15 @@ Cloud Tasks
 
 https://cloud.google.com/sdk/gcloud/reference/tasks
 
+NOTE A queue can be created with service account details
+     (see https://cloud.google.com/sdk/gcloud/reference/tasks/queues/create).
+     This provides the necessary default configuration for pushing
+     HTTP tasks to endpoints such as Cloud Run.
+
+NOTE For Cloud Run, an OIDC token works.
+
+NOTE HTTP tasks can be individually configured to push to targets.
+
 @author: jldupont
 """
 
