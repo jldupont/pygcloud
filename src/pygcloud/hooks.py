@@ -109,8 +109,16 @@ class Hooks(_Hooks):
 
     @classmethod
     def register_callback(cls, name: str, callback: Callable):
+        """Registration is idempotent"""
         callbacks: List[set] = cls._map.get(name, set())
         callbacks.add(callback)
+        cls._map[name] = callbacks
+        return cls
+
+    @classmethod
+    def unregister_callback(cls, name: str, callback: Callable):
+        callbacks: List[set] = cls._map.get(name, set())
+        callbacks.remove(callback)
         cls._map[name] = callbacks
         return cls
 

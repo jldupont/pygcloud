@@ -5,7 +5,7 @@
   channel = "stable-23.11"; # or "unstable"
   # Use https://search.nixos.org/packages to find packages
   packages = [
-    pkgs.python312Full
+    #pkgs.python312Full
     pkgs.python39Full
     pkgs.python39Packages.pip
     pkgs.openssh

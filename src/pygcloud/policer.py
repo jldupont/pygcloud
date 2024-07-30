@@ -12,6 +12,7 @@ from .models import service_groups, ServiceGroup, GCPService
 from .constants import PolicerMode
 from .policies import *  # NOQA
 from .events import start_policer, end_policer, before_police, after_police
+from .hooks import Hooks
 
 debug = logging.debug
 info = logging.info
@@ -23,9 +24,33 @@ MaybePolicies = Union[List[Policy], None]
 
 class _Policer:
 
+    __instance = None
+
     def __init__(self):
-        self._disabled: List[Policy] = []
-        self._mode: PolicerMode = PolicerMode.RUN
+        if self.__instance is not None:
+            raise Exception("Singleton only")
+        self.__instance = self
+        self.clear()
+        Hooks.register_callback("end_deploy", self.hook_end_deploy)
+
+    def clear(self):
+        self._disabled = []
+        self._mode = PolicerMode.RUN
+        self._ran_after_deployment = False
+        self._ran_before_deployment = False
+        self._deployment_occured = False
+
+    @property
+    def ran_before_deployment(self):
+        return self._ran_before_deployment
+
+    @property
+    def ran_after_deployment(self):
+        return self._ran_after_deployment
+
+    @property
+    def deployment_occured(self):
+        return self._deployment_occured
 
     def disable(self, policy: Policy):
         assert isinstance(policy, Policy)
@@ -167,9 +192,21 @@ class _Policer:
         else:
             info(f"> Policer: outcome: {outcome}")
 
+        if self.deployment_occured:
+            self._ran_after_deployment = True
+        else:
+            self._ran_before_deployment = True
+
         final_results = PolicingResults(outcome=outcome, results=results)
         end_policer(final_results)
+
         return final_results
+
+    def hook_end_deploy(self, *_p, **kw):
+        self._deployment_occured = True
+
+    def __repr__(self):
+        return f"Policer(deployment_occured={self.deployment_occured})"
 
 
 # Singleton instance

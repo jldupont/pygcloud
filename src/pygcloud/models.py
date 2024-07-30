@@ -615,6 +615,14 @@ class ServiceGroup(list):
         if self._name is None:
             raise Exception(f"Expecting a valid name, got: {name}")
 
+    def clear(self):
+        self._all.clear()
+        super().clear()
+
+    @property
+    def all(self):
+        return self._all
+
     def append(self, what: Union[GCPService, Callable]):
         assert isinstance(what, GCPService) or callable(what)
         if what in self._all:
@@ -624,6 +632,10 @@ class ServiceGroup(list):
 
     add = append
     __add__ = append
+
+    def __repr__(self):
+        count = len(self._all)
+        return f"ServiceGroup(name={self.name}, count={count})"
 
 
 class ServiceGroups(list):

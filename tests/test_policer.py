@@ -80,3 +80,30 @@ def test_policy_requires_spec(mock_sg, mock_service):
     results = Policer.police(policies=policies)
     first_result = results.results[0]
     assert first_result.skipped
+
+
+def test_policer_hook_after_deploy(deployer, mock_sg, mock_service):
+
+    Policer.clear()
+
+    mock_sg.clear()
+    mock_sg + mock_service
+
+    assert not Policer.ran_before_deployment
+    assert not Policer.ran_after_deployment
+    assert not Policer.deployment_occured
+
+    deployer.deploy(mock_sg)
+
+    assert len(deployer.history_hooks) > 0
+
+    assert not Policer.ran_before_deployment
+    assert not Policer.ran_after_deployment
+
+    assert Policer.deployment_occured
+
+    Policer.mode = PolicerMode.DRY_RUN
+    Policer.police()
+
+    assert not Policer.ran_before_deployment
+    assert Policer.ran_after_deployment

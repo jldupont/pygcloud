@@ -15,8 +15,6 @@ def test_hooks_count():
 
 def test_hooks_callback():
 
-    Hooks.clear_callbacks()
-
     called = False
 
     def callback():
@@ -27,3 +25,17 @@ def test_hooks_callback():
     Hooks.execute("test")
 
     assert called
+
+    Hooks.unregister_callback("test", callback)
+
+
+def test_hook_registration_idempotence():
+
+    def callback(): ...
+
+    Hooks.register_callback("test", callback)
+    Hooks.register_callback("test", callback)
+
+    assert len(Hooks.get_callbacks("test")) == 1
+
+    Hooks.unregister_callback("test", callback)
