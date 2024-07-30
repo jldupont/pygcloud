@@ -183,6 +183,8 @@ This package supports entrypoints. They are defined in the package's `pyproject.
 * Implement simple retry policy to help manage spurious errors
 * Redo ServiceAccountIAM class
 * Policy: check for cross-project service accounts
+* Task Queue: accepts Service Account
+* Pubsub Subscription: push and pull models
 
 # Links
 
