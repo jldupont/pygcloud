@@ -3,7 +3,7 @@ Data models related to GCP services
 
 @author: jldupont
 """
-
+import re
 from typing import List, Dict, Union, Any
 from dataclasses import dataclass, field
 from collections import UserDict
@@ -12,6 +12,55 @@ from pygcloud.models import Spec
 
 
 Str = Union[str, None]
+
+EXCEPT_SLASH = "([^/]+)"
+
+PROJECT = f"/projects/(?P<project>{EXCEPT_SLASH}+)"
+REGION = f"/regions/(?P<region>{EXCEPT_SLASH})"
+GLOBAL = "/(?P<region>global)"
+SERVICE_TYPE_NAME = \
+    f"/(?:(?P<service_type>{EXCEPT_SLASH}))/(?P<name>{EXCEPT_SLASH})"
+
+#
+# The order is important: longest first
+#
+PATTERNS = [
+    re.compile(PROJECT+REGION+SERVICE_TYPE_NAME),
+    re.compile(PROJECT+GLOBAL+SERVICE_TYPE_NAME),
+    re.compile(PROJECT+GLOBAL),
+    re.compile(PROJECT+REGION)
+]
+
+
+@dataclass
+class Ref:
+
+    project: str
+    region: str
+    service_type: Str = field(default_factory=str)
+    name: Str = field(default_factory=str)
+
+    @classmethod
+    def match(cls, input):
+
+        result = None
+        for pattern in PATTERNS:
+            result = pattern.search(input)
+            if result is not None:
+                break
+
+        if result is None:
+            raise Exception(f"Unsupported ref found: {input}")
+
+        return result.groupdict()
+
+    @classmethod
+    def from_link(cls, link: str):
+        assert isinstance(link, str)
+
+        result = cls.match(link)
+
+        return cls(**result)
 
 
 class LinksMap(UserDict):

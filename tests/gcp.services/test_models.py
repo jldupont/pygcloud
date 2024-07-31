@@ -2,11 +2,24 @@
 @author: jldupont
 """
 import pytest
-from pygcloud.gcp.models import LinksMap, IPAddress, CloudRunRevisionSpec, \
+from pygcloud.gcp.models import Ref, LinksMap, IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
     HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
     FirestoreDb, ProjectDescription, TaskQueue, UrlMap, \
     ServiceAccountSpec, IAMPolicy, IAMBinding
+
+
+@pytest.mark.parametrize("input,expected", [
+    ("https://www.googleapis.com/compute/beta/projects/PROJECT/regions/northamerica-northeast1",
+        Ref(region="northamerica-northeast1", project="PROJECT")),
+    ("https://www.googleapis.com/compute/v1/projects/PROJECT/global/addresses/ingress-proxy-ip",
+        Ref(region="global", project="PROJECT", service_type="addresses", name="ingress-proxy-ip")),
+    ("https://www.googleapis.com/compute/v1/projects/PROJECT/regions/na1/networkEndpointGroups/backend-neg",
+        Ref(region="na1", project="PROJECT", service_type="networkEndpointGroups", name="backend-neg"))
+])
+def test_ref(input, expected):
+    result = Ref.from_link(input)
+    assert result == expected, print(result)
 
 
 def test_links_single_set():

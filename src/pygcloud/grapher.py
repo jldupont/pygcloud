@@ -13,6 +13,9 @@ from .hooks import Hooks
 class _Grapher:
     """
     Responsible for generating the service graph
+
+    Nodes and Edges are automatically collected in their
+    respective classes thanks to the BaseType metaclass
     """
     __instance = None
 
@@ -20,21 +23,21 @@ class _Grapher:
         if self.__instance is not None:
             raise Exception("Singleton class")
         self.__instance = self
-        self._edges: Set[Edge] = set()
-        self._nodes: Set[Node] = set()
         Hooks.register_callback("after_deploy", self.after_deploy)
 
     def _process_for_selflink(self, service: GCPService):
+
         if service.spec is not None:
             selfLink = getattr(service.spec, "selfLink", None)
-            node = Node.create_or_get(name=selfLink,
-                                      kind=service.__class__,
-                                      obj=service)
-            self._nodes.add(node)
+
+            if selfLink is not None:
+                Node.create_or_get(name=selfLink,
+                                   kind=service.__class__,
+                                   obj=service)
 
     def after_deploy(self, _deployer, service: GCPService):
-        ...
-        # self._process_for_selflink(service)
+        """Called after the deployment of a single service"""
+        self._process_for_selflink(service)
 
 
 Grapher = _Grapher()
