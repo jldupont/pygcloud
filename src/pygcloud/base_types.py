@@ -24,6 +24,10 @@ class BaseType(type):
     are ignored: this helps with unit-testing.
 
     The base class itself is also not collected.
+
+    NOTE: Any "__post_init__" method declared on derived
+          classes will be ignored. Declare the method
+          'after_init' to access the same capability.
     """
 
     __all_classes__: Set[Type[T]] = set()
@@ -65,10 +69,6 @@ class BaseType(type):
                         f"The classmethod 'create_or_get' was not used on:"
                         f" {this.__class__.__name__}")
 
-            _super = super(type(this), this)
-            if hasattr(_super, "_post_init_"):
-                super(type(this), this)._post_init_()
-
         attrs["__post_init__"] = post_init
 
         new_class = super().__new__(cls, name, bases, attrs)
@@ -101,12 +101,24 @@ class BaseType(type):
         name = _instance.name
         cls.__in_creation__ = False
 
+        #
+        # Return the original whilst discarding
+        # the one used to test idempotency
+        #
         instance = cls.get_by_name(name)
         if instance is not None:
             return instance
 
         cls.__all_instances__[_instance.name] = _instance
+
+        #
+        # The actual flag used during the "__post_init__" check
+        #
         setattr(_instance, "__idempotency_check__", True)
+
+        if hasattr(_instance, "after_init"):
+            _instance.after_init()
+
         return _instance
 
     @classmethod

@@ -1,6 +1,11 @@
 """
 # Graph module
 
+NOTE: the usual "__post_init__" is replaced with "after_init"
+      in order to support the implementation of idempotency check.
+
+      See "BaseType" class type declaration for more details.
+
 @author: jldupont
 """
 
@@ -46,7 +51,8 @@ class Node(metaclass=BaseType):
     kind: Type[ServiceNode]
     obj: ServiceNode = field(default=None)
 
-    def _post_init_(self):
+    def after_init(self):
+        assert isinstance(self.name, str)
         assert issubclass(self.kind, ServiceNode)
 
     def __hash__(self):
@@ -79,7 +85,7 @@ class Group(metaclass=BaseType):
     name: Str
     members: Set[Node] = field(default_factory=set)
 
-    def _post_init_(self):
+    def after_init(self):
         assert isinstance(self.name, str)
 
     def add(self, member: Node):
@@ -123,7 +129,7 @@ class Edge(metaclass=BaseType):
     source: Union[Node, Group]
     target: Union[Node, Group]
 
-    def _post_init_(self):
+    def after_init(self):
         assert isinstance(self.source, (Node, Group))
         assert isinstance(self.target, (Node, Group))
         assert isinstance(self.relation, Relation)

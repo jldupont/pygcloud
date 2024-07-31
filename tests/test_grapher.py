@@ -2,21 +2,56 @@
 @author: jldupont
 """
 import pytest  # NOQA
+from dataclasses import dataclass, field
 from pygcloud.graph_models import Group, Node, Edge, Relation
 from pygcloud.models import ServiceNode
 from pygcloud.base_types import BaseType, BypassConstructor
 
 
+@dataclass
 class MockGroup(Group):
-    ...
+
+    def __hash__(self):
+        return hash(
+            f"{self.name}--{self.__class__.__name__}"
+        )
 
 
 class MockServiceNode(ServiceNode):
     ...
 
 
+@dataclass
 class MockNode(Node):
-    ...
+    """
+    Inherits IDEMPOTENCY_ENABLED
+    """
+    mock: bool = field(default=True)
+
+    def __post_init__(self):
+        raise Exception("This should not be called")
+
+    def after_init(self):
+        setattr(self, "__after_init_called__", True)
+
+    def __hash__(self):
+        return hash(
+            f"{self.name}-{self.__class__.__name__}"
+        )
+
+
+def test_node_invalid_name():
+    """
+    If the 'after_init' method was properly invoked
+    """
+    with pytest.raises(AssertionError):
+        Node.create_or_get(name=..., kind=MockServiceNode)
+
+
+def test_after_init_called():
+
+    node = MockNode.create_or_get(name="node", kind=MockServiceNode)
+    assert node.__after_init_called__
 
 
 def test_node_idempotent():
