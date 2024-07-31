@@ -85,3 +85,9 @@ def end_policer(results: PolicingResults):
     When the Policer has finished execution
     """
     Hooks.execute("end_policer", results)
+
+
+def ref():
+    """
+    When `refs` are parsed
+    """

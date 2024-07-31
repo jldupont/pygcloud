@@ -5,7 +5,6 @@ from pygcloud.models import Result, Param, EnvValue, \
     GCPServiceSingletonImmutable, GCPServiceRevisionBased, \
     GCPServiceUpdatable, \
     service_groups
-from pygcloud.linker import Links
 
 
 @pytest.fixture
@@ -340,23 +339,3 @@ def test_hooks(deployer, mock_sg_service):
         "after_deploy",
         "end_deploy"
     ], print(deployer.history_hooks)
-
-
-def test_links(deployer, mock_sg_service):
-    """
-    SelfLink links are collected after deployment
-    """
-    sg = mock_sg_service
-    deployer.deploy(sg)
-
-    first_service = sg[0]
-
-    assert first_service is not None
-    assert first_service.spec is not None
-
-    link = first_service.spec.selfLink
-
-    assert link is not None
-    assert link in Links
-
-    assert 'mock_link' in link, print(link)

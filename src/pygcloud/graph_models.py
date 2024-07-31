@@ -4,10 +4,10 @@
 @author: jldupont
 """
 
-from typing import Union, Set, Type, Dict
+from typing import Union, Set, Type, ClassVar
 from enum import Enum
 from dataclasses import dataclass, field
-from .models import ServiceNode, service_groups, ServiceGroup
+from .models import ServiceNode
 from .base_types import BaseType
 
 
@@ -26,10 +26,11 @@ class Relation(Enum):
     USED_BY = "used_by"
     PARENT_IS = "parent_is"
     HAS_ACCESS = "has_access"
+    MEMBER_OF = "member_of"
 
 
 @dataclass
-class Node:
+class Node(metaclass=BaseType):
     """
     Node type
 
@@ -39,19 +40,30 @@ class Node:
     outright, it will be difficult to course correct without
     introducing breaking changes.
     """
+    IDEMPOTENCY_ENABLED: ClassVar[bool] = True
 
     name: str
     kind: Type[ServiceNode]
+    obj: ServiceNode = field(default=None)
 
-    def __post_init__(self):
+    def _post_init_(self):
         assert issubclass(self.kind, ServiceNode)
 
     def __hash__(self):
         """This cannot be moved to base class"""
-        return hash(self.name)
+        vector = f"{self.name}-{self.kind.__name__}"
+        return hash(vector)
 
     def __repr__(self):
         return f"Node({self.name})"
+
+    @classmethod
+    def create_or_get(cls, **kw):
+        """
+        The class' constructore should be avoided
+        in favor of this constructor
+        """
+        return cls._create_or_get(**kw)
 
 
 @dataclass
@@ -62,13 +74,13 @@ class Group(metaclass=BaseType):
     Derived class declarations will be collected automatically
     and available using 'Group.derived_classes' attribute
     """
+    IDEMPOTENCY_ENABLED: ClassVar[bool] = True
 
     name: Str
     members: Set[Node] = field(default_factory=set)
 
-    def __post_init__(self):
+    def _post_init_(self):
         assert isinstance(self.name, str)
-        self.__class__._process_instance(self)
 
     def add(self, member: Node):
         assert isinstance(member, Node), print(f"Got: {member}")
@@ -91,22 +103,30 @@ class Group(metaclass=BaseType):
     def __hash__(self):
         return hash(self.name)
 
+    @classmethod
+    def create_or_get(cls, **kw):
+        """
+        The class' constructore should be avoided
+        in favor of this constructor
+        """
+        return cls._create_or_get(**kw)
+
 
 @dataclass
 class Edge(metaclass=BaseType):
     """
-    An edge between two nodes
+    An edge between two nodes or two groups
     """
+    IDEMPOTENCY_ENABLED: ClassVar[bool] = True
 
     relation: Relation
     source: Union[Node, Group]
     target: Union[Node, Group]
 
-    def __post_init__(self):
+    def _post_init_(self):
         assert isinstance(self.source, (Node, Group))
         assert isinstance(self.target, (Node, Group))
         assert isinstance(self.relation, Relation)
-        self.__class__._process_instance(self)
 
     @property
     def name(self):
@@ -118,37 +138,10 @@ class Edge(metaclass=BaseType):
     def __repr__(self):
         return f"Edge({self.source.name}, {self.relation.value}, {self.target.name})"
 
-
-def generate():
-    """
-    Generator for the graph of all services defined in the
-    deployment `service_groups` as well as any other groups
-
-    The generator yields Groups first and Edges last.
-
-    A service instance can be part of multiple groups.
-    """
-
-    nodes: Dict = dict()
-    service: ServiceNode
-    service_group: ServiceGroup
-    group: Group
-
-    #
-    # Start with the groups
-    #
-    for service_group in service_groups:
-
-        group = Group(name=service_group.name)
-
-        for service in service_group:
-
-            service_class: Type[ServiceNode] = service.__class__
-            node = Node(name=service.name, kind=service_class)
-
-            # If it's already in there, then idempotence protects it
-            unique_id = (node.name, node.kind)
-            nodes[unique_id] = node
-            group.add(node)
-
-        yield group
+    @classmethod
+    def create_or_get(cls, **kw):
+        """
+        The class' constructore should be avoided
+        in favor of this constructor
+        """
+        return cls._create_or_get(**kw)

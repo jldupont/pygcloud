@@ -8,6 +8,6 @@ from .models import (    # NOQA
 from .models import ServiceGroup, ServiceGroups, service_groups  # NOQA
 from .core import CommandLine, GCloud, gcloud  # NOQA
 from .hooks import Hooks  # NOQA
-from .linker import Linker  # NOQA
+from .grapher import Grapher  # NOQA
 from .deployer import Deployer  # NOQA
 from .policer import Policer  # NOQA

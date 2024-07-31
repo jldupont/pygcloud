@@ -2,10 +2,17 @@
 @author: jldupont
 """
 
-from typing import Set, TypeVar, Type
+from typing import Set, TypeVar, Type, Dict
 
 
 T = TypeVar("T")
+
+
+class BypassConstructor(Exception):
+    """
+    Exception raised if the proper 'create_or_get'
+    constructor isn't used
+    """
 
 
 class BaseType(type):
@@ -20,8 +27,9 @@ class BaseType(type):
     """
 
     __all_classes__: Set[Type[T]] = set()
-    __all_instances__: Set[T] = set()
-    __all_names__: Set[str] = set()
+    __all_instances__: Dict[str, T] = dict()
+
+    __in_creation__: bool = False
 
     @classmethod
     @property
@@ -43,35 +51,76 @@ class BaseType(type):
     def __new__(cls, name, bases, attrs):
         """
         This tracks the creation of new derived classes
+        and also the bypassing of the `create_or_get` constructor
         """
+
+        def post_init(this):
+            if this.__class__.__in_creation__:
+                # We are just testing idempotency
+                return
+
+            if getattr(this.__class__, "IDEMPOTENCY_ENABLED", False):
+                if not getattr(this, "__idempotency_check__", False):
+                    raise BypassConstructor(
+                        f"The classmethod 'create_or_get' was not used on:"
+                        f" {this.__class__.__name__}")
+
+            _super = super(type(this), this)
+            if hasattr(_super, "_post_init_"):
+                super(type(this), this)._post_init_()
+
+        attrs["__post_init__"] = post_init
+
         new_class = super().__new__(cls, name, bases, attrs)
 
         # Skip the base class
         if len(bases) > 0:
             cls.only_add_pertinent_class(new_class)
 
+        #
+        # Inject the classmethod which supports idemptency
+        #
+        from functools import partial
+        fnc = partial(cls.__create_or_get, new_class)
+        setattr(new_class, "_create_or_get", fnc)
+
         return new_class
 
+    def __create_or_get(cls, **kw):
+        """
+        Idempotent way of managing Node instance
+        """
+
+        #
+        # We need to create an instance
+        # in order to get its name since
+        # it is proper to each class
+        #
+        cls.__in_creation__ = True
+        _instance = cls(**kw)
+        name = _instance.name
+        cls.__in_creation__ = False
+
+        instance = cls.get_by_name(name)
+        if instance is not None:
+            return instance
+
+        cls.__all_instances__[_instance.name] = _instance
+        setattr(_instance, "__idempotency_check__", True)
+        return _instance
+
     @classmethod
-    def _process_instance(cls, instance):
-        if not hasattr(instance, "name"):
-            raise Exception(f"Instance '{instance}' has no 'name' attribute")
-
-        if instance.name in cls.__all_names__:
-            raise Exception(f"{cls.__name__} already has an instance of name: {instance.name}")
-
-        cls.__all_instances__.add(instance)
-        cls.__all_names__.add(instance.name)
+    def get_by_name(cls, name: str):
+        return cls.__all_instances__.get(name, None)
 
     @classmethod
     def all(cls):
-        return cls.__all_instances__
+        return set(cls.__all_instances__.values())
 
     def __iter__(self):
         """This allows iterating over the class"""
-        return iter(self.__all_instances__)
+        return iter(set(self.__all_instances__.values()))
 
     @classmethod
     def clear(cls):
         cls.__all_instances__.clear()
-        cls.__all_names__.clear()
