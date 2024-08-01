@@ -7,8 +7,8 @@ Catalog facility for the supported GCP services
 from typing import List, Type
 from functools import cache
 from pygcloud.gcp.services import *  # NOQA
-from pygcloud.gcp.models import ServiceDescription, Ref, UnknownSpecType
-from pygcloud.models import ServiceNode, GCPService, Spec, GCPUnknownService
+from pygcloud.gcp.models import ServiceDescription, Ref
+from pygcloud.models import ServiceNode, GCPService, GCPUnknownService
 
 
 @cache
@@ -61,11 +61,11 @@ def lookup_service_class_from_ref(ref: Ref) -> Type[GCPService]:
 
     for service_class in service_classes:
 
-        spec_class = getattr(service_class, "SPEC_CLASS", None)
+        spec_class: Type[GCPService] = getattr(service_class, "SPEC_CLASS", None)
         if spec_class is None:
             continue
 
-        ref_name = getattr(spec_class, "REF_NAME", None)
+        ref_name: str = getattr(spec_class, "REF_NAME", None)
         if ref_name is None:
             continue
 

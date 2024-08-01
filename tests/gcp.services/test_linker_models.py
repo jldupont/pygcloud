@@ -2,7 +2,7 @@
 @author: jldupont
 """
 import pytest  # NOQA
-from pygcloud.graph_models import Node, Edge
+from pygcloud.graph_models import Node  # , Edge
 from pygcloud.gcp.services.fwd_rules import FwdRuleHTTPSProxyService
 from pygcloud.gcp.linker_models import process_refs
 

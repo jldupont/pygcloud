@@ -2,7 +2,7 @@
 @author: jldupont
 """
 from pygcloud.models import GCPService, GCPUnknownService
-from pygcloud.gcp.models import ServiceDescription, Ref, IPAddress, UnknownSpecType
+from pygcloud.gcp.models import ServiceDescription, Ref
 from pygcloud.gcp.services.addresses import ServicesAddress
 from pygcloud.gcp.catalog import ServiceNode, lookup, \
     get_listable_services, get_service_classes_from_services_list, \
