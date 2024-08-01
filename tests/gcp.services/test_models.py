@@ -2,11 +2,16 @@
 @author: jldupont
 """
 import pytest
+from pygcloud.models import Spec
 from pygcloud.gcp.models import Ref, LinksMap, IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
     HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
     FirestoreDb, ProjectDescription, TaskQueue, UrlMap, \
     ServiceAccountSpec, IAMPolicy, IAMBinding
+
+
+def test_spec_contains_derived_class_types():
+    assert len(Spec.derived_class_types) >= 21, print(Spec.derived_class_types)
 
 
 @pytest.mark.parametrize("input,expected", [

@@ -45,6 +45,7 @@ class Node(metaclass=BaseType):
     outright, it will be difficult to course correct without
     introducing breaking changes.
     """
+
     IDEMPOTENCY_ENABLED: ClassVar[bool] = True
 
     name: str
@@ -80,6 +81,7 @@ class Group(metaclass=BaseType):
     Derived class declarations will be collected automatically
     and available using 'Group.derived_classes' attribute
     """
+
     IDEMPOTENCY_ENABLED: ClassVar[bool] = True
 
     name: Str
@@ -123,6 +125,7 @@ class Edge(metaclass=BaseType):
     """
     An edge between two nodes or two groups
     """
+
     IDEMPOTENCY_ENABLED: ClassVar[bool] = True
 
     relation: Relation

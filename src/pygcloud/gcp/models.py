@@ -1,34 +1,45 @@
 """
 Data models related to GCP services
 
+NOTE The classvar `REF_NAME` contains the string
+     used to reference the service in various links
+     such as 'users', 'target', "selfLink' etc.
+
 @author: jldupont
 """
+
 import re
-from typing import List, Dict, Union, Any
+from typing import List, Dict, Union, Any, ClassVar
 from dataclasses import dataclass, field
 from collections import UserDict
 from pygcloud.utils import JsonObject
-from pygcloud.models import Spec
+from pygcloud.models import Spec, spec
+
+
+class UnknownRef(Exception):
+    """
+    Used to signal unknown
+    or (yet) unsupported reference
+    """
 
 
 Str = Union[str, None]
 
 EXCEPT_SLASH = "([^/]+)"
 
-PROJECT = f"/projects/(?P<project>{EXCEPT_SLASH}+)"
+PROJECT = f"/projects/(?P<project>{EXCEPT_SLASH})"
 REGION = f"/regions/(?P<region>{EXCEPT_SLASH})"
 GLOBAL = "/(?P<region>global)"
-SERVICE_TYPE_NAME = \
-    f"/(?:(?P<service_type>{EXCEPT_SLASH}))/(?P<name>{EXCEPT_SLASH})"
+SERVICE_TYPE_NAME = f"/(?:(?P<service_type>{EXCEPT_SLASH}))/(?P<name>{EXCEPT_SLASH})"
 
 #
 # The order is important: longest first
 #
 PATTERNS = [
-    re.compile(PROJECT+REGION+SERVICE_TYPE_NAME),
-    re.compile(PROJECT+GLOBAL+SERVICE_TYPE_NAME),
-    re.compile(PROJECT+GLOBAL),
-    re.compile(PROJECT+REGION)
+    re.compile(PROJECT + REGION + SERVICE_TYPE_NAME),
+    re.compile(PROJECT + GLOBAL + SERVICE_TYPE_NAME),
+    re.compile(PROJECT + GLOBAL),
+    re.compile(PROJECT + REGION),
 ]
 
 
@@ -50,16 +61,14 @@ class Ref:
                 break
 
         if result is None:
-            raise Exception(f"Unsupported ref found: {input}")
+            raise UnknownRef(repr(input))
 
         return result.groupdict()
 
     @classmethod
     def from_link(cls, link: str):
         assert isinstance(link, str)
-
         result = cls.match(link)
-
         return cls(**result)
 
 
@@ -70,6 +79,7 @@ class LinksMap(UserDict):
     Once set, (key:value) mappings cannot be changed
     but LinksMap silently observes idempotency
     """
+
     def __setitem__(self, key, value):
         if key is None:
             return
@@ -83,14 +93,7 @@ class LinksMap(UserDict):
         raise ValueError(f"Single key cannot be removed: {key}")
 
 
-class LinkProcMixin:
-    """
-    Processes the 'usedBy', 'users', 'target' and 'group' attributes
-    """
-    def __post_init_ex__(self):
-        ...
-
-
+@spec
 @dataclass
 class ProjectDescription(Spec):
     name: str
@@ -100,6 +103,7 @@ class ProjectDescription(Spec):
     parent: dict
 
 
+@spec
 @dataclass
 class ServiceDescription(Spec):
     """
@@ -118,7 +122,7 @@ class ServiceDescription(Spec):
         self.project_number = parts[1]
         self.api = parts[-1]
 
-
+@spec
 @dataclass
 class IAMBinding(Spec):
     """
@@ -152,6 +156,7 @@ class IAMBinding(Spec):
 
 
 class _IAMMember:
+
     @classmethod
     def from_obj(cls, obj):
 
@@ -169,6 +174,7 @@ class _IAMMember:
         return cls(ns=ns, email=email)
 
 
+@spec
 @dataclass
 class IAMMember(_IAMMember, Spec):
     """
@@ -185,6 +191,7 @@ class IAMMember(_IAMMember, Spec):
         return f"{self.ns}:{self.email}"
 
 
+@spec
 @dataclass
 class IAMBindings(Spec):
 
@@ -192,6 +199,7 @@ class IAMBindings(Spec):
     role: str
 
 
+@spec
 @dataclass
 class IAMPolicy(Spec):
 
@@ -215,22 +223,21 @@ class IAMPolicy(Spec):
         # scan through all bindings looking
         # for all entries pertaining to the target member
         for _binding in self.bindings:
-            # print(f"> processing binding: {_binding}")
-
             if member in _binding.members:
-                # print(f"Found member: {member}")
-
                 if binding.role == _binding.role:
                     return True
 
         return False
 
 
+@spec
 @dataclass
 class IPAddress(Spec):
     """
     Compute Engine IP address
     """
+
+    REF_NAME: ClassVar[str] = "addresses"
 
     name: str
     address: str
@@ -240,6 +247,7 @@ class IPAddress(Spec):
     users: List[str] = field(default_factory=list)
 
 
+@spec
 @dataclass
 class CloudRunRevisionSpec(Spec):
     """
@@ -280,21 +288,25 @@ class CloudRunRevisionSpec(Spec):
         return entries
 
 
+@spec
 @dataclass
 class BackendGroup(Spec):
     """
     group: e.g. can contain a link to a NEG
     """
+
     balancingMode: str
     group: str
     capacityScaler: int
 
 
+@spec
 @dataclass
 class BackendServiceSpec(Spec):
     """
     https://cloud.google.com/compute/docs/reference/rest/v1/backendServices
     """
+
     name: str
     port: int
     portName: str
@@ -305,9 +317,12 @@ class BackendServiceSpec(Spec):
     usedBy: List[Any] = field(default_factory=list)
 
 
+@spec
 @dataclass
 class FwdRule(Spec):
     """Attribute names come directly from gcloud describe"""
+
+    REF_NAME: ClassVar[str] = "forwardingRules"
 
     name: str
     IPAddress: str
@@ -319,6 +334,7 @@ class FwdRule(Spec):
     target: str
 
 
+@spec
 @dataclass
 class GCSBucket(Spec):
     name: str
@@ -330,6 +346,7 @@ class GCSBucket(Spec):
     uniform_bucket_level_access: str
 
 
+@spec
 @dataclass
 class SSLCertificate(Spec):
     """
@@ -342,17 +359,20 @@ class SSLCertificate(Spec):
     managed: dict = field(default_factory=dict)
 
 
+@spec
 @dataclass
 class HTTPSProxy(Spec):
     """
     sslCertificates: list of links
     """
+
     name: str
     selfLink: str
     sslCertificates: List[str] = field(default_factory=list)
     urlMap: str = field(default_factory=str)
 
 
+@spec
 @dataclass
 class SchedulerJob(Spec):
     name: str
@@ -364,6 +384,7 @@ class SchedulerJob(Spec):
     pubsubTarget: dict = field(default_factory=dict)
 
 
+@spec
 @dataclass
 class PubsubTopic(Spec):
     name: str
@@ -373,6 +394,7 @@ class PubsubTopic(Spec):
         self.name = parts[-1]
 
 
+@spec
 @dataclass
 class FirestoreDb(Spec):
     name: str
@@ -386,6 +408,7 @@ class FirestoreDb(Spec):
         self.name = parts[-1]
 
 
+@spec
 @dataclass
 class CloudRunNegSpec(Spec):
 
@@ -396,6 +419,7 @@ class CloudRunNegSpec(Spec):
     cloudRun: dict = field(default_factory=dict)
 
 
+@spec
 @dataclass
 class TaskQueue(Spec):
 
@@ -406,6 +430,7 @@ class TaskQueue(Spec):
     retryConfig: dict = field(default_factory=dict)
 
 
+@spec
 @dataclass
 class UrlMap(Spec):
     """
@@ -418,6 +443,7 @@ class UrlMap(Spec):
     defaultService: str = field(default_factory=str)
 
 
+@spec
 @dataclass
 class ServiceAccountSpec(Spec):
     name: str

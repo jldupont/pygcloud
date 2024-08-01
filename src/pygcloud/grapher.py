@@ -17,6 +17,7 @@ class _Grapher:
     Nodes and Edges are automatically collected in their
     respective classes thanks to the BaseType metaclass
     """
+
     __instance = None
 
     def __init__(self):
@@ -25,19 +26,8 @@ class _Grapher:
         self.__instance = self
         Hooks.register_callback("after_deploy", self.after_deploy)
 
-    def _process_for_selflink(self, service: GCPService):
-
-        if service.spec is not None:
-            selfLink = getattr(service.spec, "selfLink", None)
-
-            if selfLink is not None:
-                Node.create_or_get(name=selfLink,
-                                   kind=service.__class__,
-                                   obj=service)
-
     def after_deploy(self, _deployer, service: GCPService):
         """Called after the deployment of a single service"""
-        self._process_for_selflink(service)
 
 
 Grapher = _Grapher()

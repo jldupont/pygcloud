@@ -3,6 +3,7 @@ Support for standard Python EntryPoints and internal events
 
 @author: jldupont
 """
+
 import logging
 from typing import List, Dict, Tuple, Set
 from collections.abc import Callable

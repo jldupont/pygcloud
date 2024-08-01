@@ -6,7 +6,7 @@ import os
 import logging
 from functools import cache
 from collections import UserList
-from typing import List, Tuple, Union, Any, Type
+from typing import List, Tuple, Union, Any, Type, Set, ClassVar
 from collections.abc import Callable
 from abc import abstractmethod
 from dataclasses import dataclass, field
@@ -18,8 +18,15 @@ from .utils import FlexJSONEncoder
 Str = Union[str, None]
 Bool = Union[bool, None]
 
+Specs = set()
+
 
 class Spec:
+
+    @classmethod
+    @property
+    def derived_class_types(cls):
+        return Specs
 
     def __post_init__(self):
         """
@@ -154,6 +161,27 @@ class Spec:
         import json
 
         return json.dumps(self.to_dict(), cls=FlexJSONEncoder)
+
+
+def spec(cls):
+    """
+    Class decorator to collect all definitions of
+    Spec derived classes. This is required for the catalog.
+
+    TODO use python's MethodType to retrieve unbound
+         class methods from Spec and inject them into
+         the target class type. This way, we could avoid
+         forcing subsclassing from Spec.
+
+    NOTE Attempting to "lift" the class methods directly
+         from Spec and 'setattr' them into the class
+         being defined does not work: the '__annotations__'
+         and other class level definitions pertinent to
+         `dataclass` would not be accessible.
+    """
+    global Specs
+    Specs.add(cls)
+    return cls
 
 
 class OptionalParam(UserList):
@@ -488,6 +516,10 @@ class GCPService(ServiceNode):
     @property
     def spec(self) -> Union["Spec", None]:
         return self._spec
+
+    @spec.setter
+    def spec(self, spec):
+        self._spec = spec
 
     @property
     def just_describe(self) -> bool:
@@ -844,6 +876,7 @@ class Policy(metaclass=BaseType):
     of the service specification for it to be effective. This is
     particularily pertinent for the "after deployment use-cases".
     """
+
     REQUIRES_SERVICE_SPEC: bool = False
 
     _allowed: List[GCPService] = []

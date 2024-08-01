@@ -1,6 +1,6 @@
 from .constants import ServiceCategory  # NOQA
 from .models import EnvValue, Param, EnvParam, Params, Label, GroupName, Result  # NOQA
-from .models import (    # NOQA
+from .models import (  # NOQA
     GCPServiceRevisionBased,
     GCPServiceSingletonImmutable,
     GCPServiceUpdatable,

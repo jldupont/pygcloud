@@ -81,9 +81,7 @@ class _Policer:
             maybe_spec = getattr(service, "spec", None)
             if maybe_spec is None:
                 debug(f"Policy '{policy}' on '{service}' because no spec")
-                return PolicingResult(
-                    service=service, policy=policy, skipped=True
-                )
+                return PolicingResult(service=service, policy=policy, skipped=True)
 
         try:
             policy.evaluate(service_groups, service)

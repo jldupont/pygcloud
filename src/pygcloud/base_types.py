@@ -67,7 +67,8 @@ class BaseType(type):
                 if not getattr(this, "__idempotency_check__", False):
                     raise BypassConstructor(
                         f"The classmethod 'create_or_get' was not used on:"
-                        f" {this.__class__.__name__}")
+                        f" {this.__class__.__name__}"
+                    )
 
         attrs["__post_init__"] = post_init
 
@@ -81,6 +82,7 @@ class BaseType(type):
         # Inject the classmethod which supports idemptency
         #
         from functools import partial
+
         fnc = partial(cls.__create_or_get, new_class)
         setattr(new_class, "_create_or_get", fnc)
 

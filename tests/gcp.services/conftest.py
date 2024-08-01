@@ -4,13 +4,14 @@
 import pytest
 from pygcloud.gcp.labels import LabelGenerator
 from pygcloud.models import GCPService, Result
-from pygcloud.gcp.models import IAMBinding
+from pygcloud.gcp.models import IAMBinding, IPAddress
 from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC, \
     BACKEND_SERVICE, FWD_RULE, STORAGE_BUCKET, SSL_CERTIFICATE, HTTPS_PROXY, \
     SCHEDULER_JOB, PUBSUB_TOPIC, SERVICES_LIST, FIRESTORE_DB, \
     CLOUDRUN_NEG_SPEC, PROJECT_DESC, TASK_QUEUE_SPEC, URL_MAP_SPEC, SERVICE_ACCOUNT_SPEC, \
     BUCKET_IAM_BINDINGS_SPEC, SAMPLE_EMPTY_BINDINGS
 # from pygcloud.gcp.services.iam import ServiceAccountIAM
+from pygcloud.gcp.services.addresses import ServicesAddress
 
 
 @pytest.fixture
@@ -208,3 +209,15 @@ def sample_bucket_iam_policy():
 @pytest.fixture
 def sample_empty_bindings():
     return SAMPLE_EMPTY_BINDINGS
+
+
+@pytest.fixture
+def mock_ip_address(sample_ip_json):
+    return IPAddress.from_string(sample_ip_json)
+
+
+@pytest.fixture
+def mock_services_address(mock_ip_address):
+    mock = ServicesAddress(name="mock_ip_address")
+    mock.spec = mock_ip_address
+    return mock

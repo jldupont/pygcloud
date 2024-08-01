@@ -175,6 +175,12 @@ The gcloud command line is currently built for Python 3.9. The accompanied Docke
 
 This package supports entrypoints. They are defined in the package's `pyproject.toml` file. The prototypes of the callables can be found in the `pygcloud.events` module.
 
+# Adding support for other services
+
+* Add data model to `pygcloud.gcp.models`
+* Add servoce class in a module in `pygcloud.gcp.services`
+* Add support for graphing in `pygcloud.gcp.linker`
+
 # TODO
 
 * Explain why "delete" operations are not supported
