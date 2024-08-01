@@ -2,6 +2,12 @@
 Support for the management of diverse references
 occuring in service specifications
 
+NOTE Cloud Run Revision Spec has a selfLink format
+     very different from the rest of the service types.
+     It is located under "metadata".
+     E.g. "/apis/serving.knative.dev/v1/namespaces/$project_number/services/$service_name"
+
+
 @author: jldupont
 """
 
@@ -24,11 +30,16 @@ def process_refs(service: GCPService) -> GraphEntities:
     if spec is None:
         return entities
 
+    #
+    # selfLinks are very common in service specs
+    #
     batch = _process_selflinks(service, spec)
     entities.extend(batch)
 
     batch = _process_users(service, spec)
     entities.extend(batch)
+
+    # process 'group'
 
     return entities
 

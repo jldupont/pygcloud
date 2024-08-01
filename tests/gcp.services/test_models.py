@@ -7,7 +7,7 @@ from pygcloud.gcp.models import Ref, LinksMap, IPAddress, CloudRunRevisionSpec, 
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
     HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
     FirestoreDb, ProjectDescription, TaskQueue, UrlMap, \
-    ServiceAccountSpec, IAMPolicy, IAMBinding
+    ServiceAccountSpec, IAMPolicy, IAMBinding, GCSBucket, ACL
 
 
 def test_spec_contains_derived_class_types():
@@ -157,6 +157,7 @@ def test_scheduler_job(sample_scheduler_job):
     assert 'topics/test' in j.pubsubTarget["topicName"]
     assert j.name == "test-job"
     assert j.location == "northamerica-northeast1"
+    assert j.topicName == "projects/PROJECT/topics/test"
 
 
 def test_pubsub_topic(sample_pubsub_topic):
@@ -264,3 +265,10 @@ def test_iam_policy_empty_bindings2(sample_empty_bindings):
     p = IAMPolicy.from_string(sample_empty_bindings)
 
     assert len(p.bindings) == 0
+
+
+def test_gcs_bucket(sample_gcs_bucket):
+    b = GCSBucket.from_string(sample_gcs_bucket)
+
+    assert b.acl is not None
+    assert isinstance(b.acl[0], ACL), print(b.acl)

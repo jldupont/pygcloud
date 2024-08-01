@@ -6,7 +6,7 @@ import os
 import logging
 from functools import cache
 from collections import UserList
-from typing import List, Tuple, Union, Any, Type, Set, ClassVar
+from typing import List, Tuple, Union, Any, Type, Set
 from collections.abc import Callable
 from abc import abstractmethod
 from dataclasses import dataclass, field
@@ -18,7 +18,9 @@ from .utils import FlexJSONEncoder
 Str = Union[str, None]
 Bool = Union[bool, None]
 
-Specs = set()
+# We cannot put this object as "class var"
+# in Spec because of the treatment in dataclass
+Specs: Set = set()
 
 
 class Spec:

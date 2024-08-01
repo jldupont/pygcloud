@@ -122,6 +122,7 @@ class ServiceDescription(Spec):
         self.project_number = parts[1]
         self.api = parts[-1]
 
+
 @spec
 @dataclass
 class IAMBinding(Spec):
@@ -252,12 +253,16 @@ class IPAddress(Spec):
 class CloudRunRevisionSpec(Spec):
     """
     Cloud Run Revision Specification (flattened)
+
+    NOTE the selfLink format:
+         "/apis/serving.knative.dev/v1/namespaces/$project_number/services/$name"
     """
 
     name: str
     url: str
     labels: Dict
     service_account: str
+    selfLink: str
 
     @classmethod
     def from_obj(cls, obj):
@@ -266,6 +271,7 @@ class CloudRunRevisionSpec(Spec):
             "labels": obj["spec.template.metadata.labels"],
             "name": obj["metadata.name"],
             "service_account": obj["spec.template.spec.serviceAccountName"],
+            "selfLink": obj["metadata.selfLink"],
         }
 
         return cls(**d)
@@ -292,7 +298,10 @@ class CloudRunRevisionSpec(Spec):
 @dataclass
 class BackendGroup(Spec):
     """
-    group: e.g. can contain a link to a NEG
+    This model is contained, AFAIK, only within
+    the BackendServiceSpec
+
+    NOTE group: can contain a link ref to a NEG
     """
 
     balancingMode: str
@@ -305,7 +314,13 @@ class BackendGroup(Spec):
 class BackendServiceSpec(Spec):
     """
     https://cloud.google.com/compute/docs/reference/rest/v1/backendServices
+
+    NOTE selfLink e.g.
+    "https://www.googleapis.com/compute/v1/projects/$project
+        /global/backendServices/$name",
     """
+
+    REF_NAME: ClassVar[str] = "backendServices"
 
     name: str
     port: int
@@ -320,7 +335,15 @@ class BackendServiceSpec(Spec):
 @spec
 @dataclass
 class FwdRule(Spec):
-    """Attribute names come directly from gcloud describe"""
+    """
+    NOTE selfLink e.g.
+        https://www.googleapis.com/compute/v1/projects/$project
+            /global/forwardingRules/$name
+
+        target e.g.:
+        https://www.googleapis.com/compute/v1/projects/$project
+            /global/targetHttpsProxies/$name
+    """
 
     REF_NAME: ClassVar[str] = "forwardingRules"
 
@@ -336,7 +359,18 @@ class FwdRule(Spec):
 
 @spec
 @dataclass
+class ACL(Spec):
+    entity: str
+    role: str
+
+
+@spec
+@dataclass
 class GCSBucket(Spec):
+    """
+    NOTE 'name' is without the leading "gs://"
+    """
+
     name: str
     location: str
     default_storage_class: str
@@ -344,6 +378,8 @@ class GCSBucket(Spec):
     metageneration: int
     public_access_prevention: str
     uniform_bucket_level_access: str
+    acl: List[ACL] = field(default=list)
+    default_acl: List[ACL] = field(default=list)
 
 
 @spec
@@ -351,7 +387,13 @@ class GCSBucket(Spec):
 class SSLCertificate(Spec):
     """
     CAUTION: sensitive information in the 'certificate' field
+
+    NOTE selfLink e.g.
+        "https://www.googleapis.com/compute/v1/projects/$project
+            /global/sslCertificates/$name"
     """
+
+    REF_NAME: ClassVar[str] = "sslCertificates"
 
     name: str
     type: str
@@ -363,8 +405,11 @@ class SSLCertificate(Spec):
 @dataclass
 class HTTPSProxy(Spec):
     """
-    sslCertificates: list of links
+    sslCertificates: list of link refs
+    urlMap: link ref
     """
+
+    REF_NAME: ClassVar[str] = "targetHttpsProxies"
 
     name: str
     selfLink: str
@@ -375,6 +420,11 @@ class HTTPSProxy(Spec):
 @spec
 @dataclass
 class SchedulerJob(Spec):
+    """
+    NOTE topicName e.g.
+            "projects/$project/topics/$name"
+    """
+
     name: str
     retryConfig: dict
     schedule: str
@@ -382,11 +432,19 @@ class SchedulerJob(Spec):
     timeZone: str
     location: str = "???"
     pubsubTarget: dict = field(default_factory=dict)
+    topicName: str = field(default_factory=str)
+
+    def __post_init_ex__(self):
+        self.topicName = self.pubsubTarget.get("topicName", None)
 
 
 @spec
 @dataclass
 class PubsubTopic(Spec):
+    """
+    NOTE name e.g.
+            "projects/$project/topics/$name"
+    """
     name: str
 
     def __post_init__(self):
@@ -397,6 +455,11 @@ class PubsubTopic(Spec):
 @spec
 @dataclass
 class FirestoreDb(Spec):
+    """
+    NOTE name format:
+            projects/$PROJECT/databases/$db_name
+    """
+
     name: str
     type: str
     locationId: str
@@ -411,6 +474,17 @@ class FirestoreDb(Spec):
 @spec
 @dataclass
 class CloudRunNegSpec(Spec):
+    """
+    NOTE region e.g.
+            https://www.googleapis.com/compute/beta/projects/$project
+                /regions/$region
+
+        selfLink e.g.:
+            https://www.googleapis.com/compute/beta/projects/$project
+                /regions/$region/networkEndpointGroups/$name
+    """
+
+    REF_NAME: ClassVar[str] = "networkEndpointGroups"
 
     name: str
     networkEndpointType: str
@@ -422,6 +496,10 @@ class CloudRunNegSpec(Spec):
 @spec
 @dataclass
 class TaskQueue(Spec):
+    """
+    NOTE name e.g.
+            projects/$project/locations/$location/queues/$name
+    """
 
     name: str
     state: str
@@ -434,8 +512,16 @@ class TaskQueue(Spec):
 @dataclass
 class UrlMap(Spec):
     """
-    defaultService: a link to a service
+    NOTE defaultService e.g.
+            https://www.googleapis.com/compute/v1/projects/$project
+                /global/backendServices/$name
+
+    NOTE selfLink e.g.
+            https://www.googleapis.com/compute/v1/projects/$project
+                /global/urlMaps/$name
     """
+
+    REF_NAME: ClassVar[str] = "urlMaps"
 
     selfLink: str
     id: str = field(default_factory=str)
@@ -446,6 +532,12 @@ class UrlMap(Spec):
 @spec
 @dataclass
 class ServiceAccountSpec(Spec):
+    """
+    "name":
+        "projects/$project/serviceAccounts/
+            $project_number-compute@developer.gserviceaccount.com"
+    """
+
     name: str
     email: str
     projectId: str
