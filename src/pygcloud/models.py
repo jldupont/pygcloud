@@ -692,6 +692,12 @@ class GCPService(ServiceNode):
         """Called by Deployer"""
 
 
+class GCPUnknownService(GCPService):
+    """
+    Placeholder for an unknown / unsupported service
+    """
+
+
 class GCPServiceSingletonImmutable(GCPService):
     """
     Base class for GCP services that can only be created once.

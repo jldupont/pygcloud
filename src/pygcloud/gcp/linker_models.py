@@ -12,9 +12,10 @@ NOTE Cloud Run Revision Spec has a selfLink format
 """
 
 from typing import List, Union
-from pygcloud.models import GCPService, Spec
-from pygcloud.gcp.models import Ref
+from pygcloud.models import GCPService, Spec, GCPUnknownService
+from pygcloud.gcp.models import Ref, UnknownSpecType
 from pygcloud.graph_models import Node, Edge, Relation, Group
+from pygcloud.gcp.catalog import lookup_service_class_from_ref
 
 
 GraphEntities = List[Union[Node, Edge, Group]]
@@ -60,6 +61,8 @@ def _process_selflinks(service: GCPService, spec: Spec) -> GraphEntities:
 
 def _process_users(service: GCPService, spec: Spec) -> GraphEntities:
     """
+    The 'users' ref link type translates internally to "USED_BY"
+
     Supports:
     * IPAddress
     """
@@ -69,5 +72,14 @@ def _process_users(service: GCPService, spec: Spec) -> GraphEntities:
 
     for user_string_ref in users:
         ref = Ref.from_link(user_string_ref)
+
+        service_class: GCPService = lookup_service_class_from_ref(ref)
+
+        node = Node.create_or_get(
+            name=ref.name,
+            kind=service_class,
+            obj=service
+        )
+        nodes.append(node)
 
     return nodes

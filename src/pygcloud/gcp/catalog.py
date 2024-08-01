@@ -4,11 +4,11 @@ Catalog facility for the supported GCP services
 @author: jldupont
 """
 
-from typing import List
+from typing import List, Type
 from functools import cache
 from pygcloud.gcp.services import *  # NOQA
-from pygcloud.gcp.models import ServiceDescription
-from pygcloud.models import ServiceNode, GCPService
+from pygcloud.gcp.models import ServiceDescription, Ref, UnknownSpecType
+from pygcloud.models import ServiceNode, GCPService, Spec, GCPUnknownService
 
 
 @cache
@@ -22,7 +22,8 @@ def lookup(class_name: str):
 
 @cache
 def get_listable_services():
-    return [classe for classe in ServiceNode.__all_classes__ if classe.LISTING_CAPABLE]
+    return [classe for classe in ServiceNode.__all_classes__
+            if classe.LISTING_CAPABLE]
 
 
 def get_service_classes_from_services_list(
@@ -47,3 +48,28 @@ def get_service_classes_from_services_list(
             enabled.append(service)
 
     return enabled
+
+
+@cache
+def lookup_service_class_from_ref(ref: Ref) -> Type[GCPService]:
+    """
+    Lookup a Spec class from a name used by GCP
+    to refer to a service type
+    """
+
+    service_classes: List[GCPService] = get_listable_services()
+
+    for service_class in service_classes:
+
+        spec_class = getattr(service_class, "SPEC_CLASS", None)
+        if spec_class is None:
+            continue
+
+        ref_name = getattr(spec_class, "REF_NAME", None)
+        if ref_name is None:
+            continue
+
+        if ref.service_type == ref_name:
+            return service_class
+
+    return GCPUnknownService

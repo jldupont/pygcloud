@@ -71,6 +71,15 @@ class Ref:
         result = cls.match(link)
         return cls(**result)
 
+    def _vector(self):
+        return f"{self.project}/{self.region}/{self.service_type}/{self.name}"
+
+    def __repr__(self):
+        return self._vector()
+
+    def __hash__(self):
+        return hash(self._vector())
+
 
 class LinksMap(UserDict):
     """
@@ -91,6 +100,13 @@ class LinksMap(UserDict):
 
     def __delitem__(self, key: str):
         raise ValueError(f"Single key cannot be removed: {key}")
+
+
+@dataclass
+class UnknownSpecType(Spec):
+    """
+    Placeholder for unknown / unsupported spec types
+    """
 
 
 @spec
@@ -445,6 +461,7 @@ class PubsubTopic(Spec):
     NOTE name e.g.
             "projects/$project/topics/$name"
     """
+
     name: str
 
     def __post_init__(self):
