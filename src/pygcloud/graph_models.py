@@ -166,9 +166,9 @@ class Edge(metaclass=BaseType):
         return f"Edge({self.source.name}, {self.relation.value}, {self.target.name})"
 
     @classmethod
-    def create_or_get(cls, **kw):
+    def create_or_get(cls, relation: Relation, source: Node, target: Node):
         """
         The class' constructore should be avoided
         in favor of this constructor
         """
-        return cls._create_or_get(**kw)
+        return cls._create_or_get(relation=relation, source=source, target=target)

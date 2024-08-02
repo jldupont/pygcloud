@@ -1,7 +1,7 @@
 """
 @author: jldupont
 """
-from pygcloud.models import GCPService, GCPUnknownService
+from pygcloud.models import GCPService, GCPServiceUnknown
 from pygcloud.gcp.models import ServiceDescription, Ref
 from pygcloud.gcp.services.addresses import ServicesAddress
 from pygcloud.gcp.catalog import ServiceNode, lookup, \
@@ -66,4 +66,4 @@ def test_catalog_lookup_service_class_from_ref_unknown():
     )
 
     result: GCPService = lookup_service_class_from_ref(r)
-    assert result == GCPUnknownService
+    assert result == GCPServiceUnknown

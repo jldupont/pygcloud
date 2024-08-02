@@ -8,7 +8,7 @@ from typing import List, Type
 from functools import cache
 from pygcloud.gcp.services import *  # NOQA
 from pygcloud.gcp.models import ServiceDescription, Ref
-from pygcloud.models import ServiceNode, GCPService, GCPUnknownService
+from pygcloud.models import ServiceNode, GCPService, GCPServiceUnknown
 
 
 @cache
@@ -71,4 +71,4 @@ def lookup_service_class_from_ref(ref: Ref) -> Type[GCPService]:
         if ref.service_type == ref_name:
             return service_class
 
-    return GCPUnknownService
+    return GCPServiceUnknown

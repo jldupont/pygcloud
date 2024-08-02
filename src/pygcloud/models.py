@@ -598,9 +598,16 @@ class GCPService(ServiceNode):
         """Called by Deployer"""
 
 
-class GCPUnknownService(GCPService):
+class GCPServiceUnknown(GCPService):
     """
     Placeholder for an unknown / unsupported service
+    """
+
+
+class GCPServiceInstanceNotAvailable(GCPService):
+    """
+    A placeholder for situations where the GCPService
+    instance isn't available
     """
 
 
