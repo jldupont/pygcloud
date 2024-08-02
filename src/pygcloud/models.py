@@ -309,6 +309,9 @@ class ServiceMeta(type):
     def only_add_real_service_class(cls, classe):
         new_class_name = classe.__name__.lower()
 
+        if "servicenodeunknown" in new_class_name:
+            return
+
         if "mock" in new_class_name:
             return
 
@@ -328,6 +331,17 @@ class ServiceMeta(type):
         new_class = super().__new__(cls, name, bases, attrs)
         cls.only_add_real_service_class(new_class)
         return new_class
+
+    def __getattribute__(cls, name):
+        """
+        Address the challenge of getting the derived class'
+        __class__ attribute to work properly when using a metaclass
+
+        "mro" : Method Resolution Order
+        """
+        if name == "__class__":
+            return cls.__mro__[0]  # Get the first class in the MRO
+        return super().__getattribute__(name)
 
 
 class ServiceNode(metaclass=ServiceMeta):

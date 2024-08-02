@@ -19,6 +19,21 @@ from .base_types import BaseType
 Str = Union[str, None]
 
 
+class ServiceNodeUnknown(ServiceNode):
+
+    def __init__(self, name: str, ns: str = "unknown"):
+        self._name = name
+        self._ns = ns
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def ns(self):
+        return self._ns
+
+
 class Relation(Enum):
     """
     USES: when it is explicit that a node uses another node
@@ -54,23 +69,26 @@ class Node(metaclass=BaseType):
 
     def after_init(self):
         assert isinstance(self.name, str)
-        assert issubclass(self.kind, ServiceNode)
+        assert issubclass(self.kind, ServiceNode), print(self.kind)
 
     def __hash__(self):
-        """This cannot be moved to base class"""
+        """This cannot be moved to base type class"""
         vector = f"{self.name}-{self.kind.__name__}"
         return hash(vector)
 
     def __repr__(self):
-        return f"Node({self.name})"
+        return f"Node({self.name}, {self.kind.__name__})"
 
     @classmethod
-    def create_or_get(cls, **kw):
+    def create_or_get(cls,
+                      name: str,
+                      kind: Type[ServiceNode],
+                      obj: ServiceNode = None):
         """
         The class' constructore should be avoided
         in favor of this constructor
         """
-        return cls._create_or_get(**kw)
+        return cls._create_or_get(name=name, kind=kind, obj=obj)
 
 
 @dataclass

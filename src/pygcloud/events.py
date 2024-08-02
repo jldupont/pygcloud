@@ -49,7 +49,7 @@ def after_deploy(deployer_instance, service: GCPService):
 
 def end_deploy(
     deployer_instance,
-    what: Union[GCPService, ServiceGroup, GroupName],
+    what: Union[ServiceGroup, GroupName],
     result: Union[Result, Instruction],
 ):
     """

@@ -25,17 +25,20 @@ Str = Union[str, None]
 
 
 @dataclass
+@_hash
 class Ref(_Ref):
+    """
+    A reference from the `origin_service` to another service instance
 
+    service_type: directly from the service spec
+    name: the actual given to the service by the user without the URI prefix
+    origin_service: the GCP service instance where this ref comes from
+    """
     project: str
     region: str
     service_type: Str = field(default_factory=str)
     name: Str = field(default_factory=str)
     origin_service: GCPService = field(default=None)
-
-    def __hash__(self):
-        """NOTE this cannot be moved to _Ref"""
-        return hash(self._vector())
 
 
 @dataclass
