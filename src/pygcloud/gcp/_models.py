@@ -58,7 +58,7 @@ class _Ref:
 
     @classmethod
     @property
-    def all_instances(cls):
+    def all(cls):
         return cls.__all_instances__
 
     def __post_init__(self):

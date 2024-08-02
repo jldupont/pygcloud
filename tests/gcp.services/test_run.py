@@ -119,7 +119,7 @@ def test_cloudrun_neg(sample_cloudrun_neg):
     n = CloudRunNegSpec.from_string(sample_cloudrun_neg)
 
     assert n.name == "backend-neg"
-    assert len(Ref.all_instances) == 1, print(Ref.all_instances)
+    assert len(Ref.all) == 1, print(Ref.all)
 
-    selfRef = Ref.all_instances[0]
+    selfRef = Ref.all[0]
     assert isinstance(selfRef, RefSelfLink)

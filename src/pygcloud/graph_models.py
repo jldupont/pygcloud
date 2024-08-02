@@ -15,7 +15,6 @@ from dataclasses import dataclass, field
 from .models import ServiceNode
 from .base_types import BaseType
 
-
 Str = Union[str, None]
 
 
@@ -90,6 +89,12 @@ class Node(metaclass=BaseType):
         """
         return cls._create_or_get(name=name, kind=kind, obj=obj)
 
+    @classmethod
+    @property
+    def all(cls):
+        """Returns only Node instances"""
+        return cls._all(cls)
+
 
 @dataclass
 class Group(metaclass=BaseType):
@@ -137,6 +142,12 @@ class Group(metaclass=BaseType):
         """
         return cls._create_or_get(**kw)
 
+    @classmethod
+    @property
+    def all(cls):
+        """Returns only Node instances"""
+        return cls._all(cls)
+
 
 @dataclass
 class Edge(metaclass=BaseType):
@@ -172,3 +183,9 @@ class Edge(metaclass=BaseType):
         in favor of this constructor
         """
         return cls._create_or_get(relation=relation, source=source, target=target)
+
+    @classmethod
+    @property
+    def all(cls):
+        """Returns only Node instances"""
+        return cls._all(cls)

@@ -49,8 +49,8 @@ def test_service_address(sample_ip_json):
 def test_refs(sample_ip_json):
     Ref.clear()
     ip = IPAddress.from_string(sample_ip_json)
-    assert len(Ref.all_instances) == 2, print(Ref.all_instances)
-    ref0 = Ref.all_instances[0]
+    assert len(Ref.all) == 2, print(Ref.all)
+    ref0 = Ref.all[0]
     assert isinstance(ref0, RefSelfLink), print(ref0)
     assert ref0.name == ip.name
 

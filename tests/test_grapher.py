@@ -95,13 +95,9 @@ def test_group_iterate_instances():
     g1 = MockGroup.create_or_get(name="g1")
     g2 = MockGroup.create_or_get(name="g2")
 
-    s = set({g1, g2})
+    s = [g1, g2]
 
-    assert Group.all() == s
-
-    a = set(list(Group))
-
-    assert a == s
+    assert Group.all == s
 
 
 def test_group_user_defined_group():
@@ -126,14 +122,14 @@ def test_edge_basic():
     Node.clear()
     Edge.clear()
 
-    assert len(Edge.all()) == 0
+    assert len(Edge.all) == 0
 
     n1 = MockNode.create_or_get(name="n1", kind=MockServiceNode)
     n2 = MockNode.create_or_get(name="n2", kind=MockServiceNode)
 
     e12 = Edge.create_or_get(relation=Relation.HAS_ACCESS, source=n1, target=n2)
 
-    assert e12 in Edge.all()
+    assert e12 in Edge.all
 
 
 def test_edge_idempotent_operation():
@@ -163,10 +159,10 @@ def test_edge_set_nodes():
     e12 = Edge.create_or_get(relation=Relation.HAS_ACCESS, source=n1, target=n2)
     e13 = Edge.create_or_get(relation=Relation.PARENT_IS, source=n1, target=n3)
 
-    edges = set()
+    edges = []
 
-    edges.add(e12)
-    edges.add(e13)
+    edges.append(e12)
+    edges.append(e13)
 
     assert len(edges) == 2
 
@@ -184,15 +180,21 @@ def test_edge_set_groups():
     Edge.create_or_get(relation=Relation.HAS_ACCESS, source=g1, target=g2)
     Edge.create_or_get(relation=Relation.HAS_ACCESS, source=g2, target=g1)
 
-    edges = set()
+    edges = []
     for edge in Edge:
-        edges.add(edge)
+        edges.append(edge)
 
-    assert Edge.all() == edges
+    #
+    # Only edges
+    #
+    assert set(Edge.all) == set(edges)
+
+    assert len(Group.all) == 2, print(Group.all)
 
 
 def test_group_idempotence():
 
+    Edge.clear()
     Node.clear()
     Group.clear()
     g1a = MockGroup.create_or_get(name="mock_group")

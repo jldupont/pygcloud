@@ -217,7 +217,24 @@ def mock_ip_address(sample_ip_json):
 
 
 @pytest.fixture
-def mock_services_address(mock_ip_address):
-    mock = ServicesAddress(name="mock_ip_address")
-    mock.spec = mock_ip_address
-    return mock
+def mock_ip_address_gen(sample_ip_json):
+    def gen():
+        return IPAddress.from_string(sample_ip_json)
+    return gen
+
+
+@pytest.fixture
+def mock_services_address_gen(sample_ip_json):
+    """Affords us some time to perform resets"""
+    def gen():
+        # NOTE important ! MUST USE THE SAME NAME AS IN THE SAMPLE!
+        mock = ServicesAddress(name="ingress-proxy-ip")
+        ip = IPAddress.from_string(sample_ip_json, mock)
+        mock.spec = ip
+        return mock
+    return gen
+
+
+@pytest.fixture
+def mock_services_address(mock_services_address_gen):
+    return mock_services_address_gen()

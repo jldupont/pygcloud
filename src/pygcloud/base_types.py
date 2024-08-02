@@ -2,7 +2,7 @@
 @author: jldupont
 """
 
-from typing import Set, TypeVar, Type, Dict
+from typing import Set, TypeVar, Type, Dict, List
 
 
 T = TypeVar("T")
@@ -128,12 +128,21 @@ class BaseType(type):
         return cls.__all_instances__.get(name, None)
 
     @classmethod
-    def all(cls):
-        return set(cls.__all_instances__.values())
+    @property
+    def all(cls) -> List:
+        return list(cls.__all_instances__.values())
+
+    @classmethod
+    def _all(cls, base: Type):
+        liste = [
+            item for item in cls.__all_instances__.values()
+            if issubclass(item.__class__, base)
+        ]
+        return liste
 
     def __iter__(self):
         """This allows iterating over the class"""
-        return iter(set(self.__all_instances__.values()))
+        return iter(set(self.all))
 
     @classmethod
     def clear(cls):

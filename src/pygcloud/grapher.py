@@ -4,7 +4,7 @@
 @author: jldupont
 """
 
-from typing import Set, Type, Dict
+from typing import Type, Dict
 from .models import ServiceNode, service_groups, ServiceGroup, GCPService
 from .graph_models import Relation, Edge, Node, Group
 from .hooks import Hooks

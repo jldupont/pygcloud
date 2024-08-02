@@ -52,7 +52,7 @@ def get_service_classes_from_services_list(
 @cache
 def lookup_service_class_from_ref(ref: Ref) -> Type[GCPService]:
     """
-    Lookup a Spec class from a name used by GCP
+    Lookup a service class from a name used by GCP
     to refer to a service type
     """
 

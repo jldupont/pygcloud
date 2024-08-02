@@ -223,7 +223,7 @@ class IPAddress(Spec):
     addressType: str
     ipVersion: str
     selfLink: RefSelfLink
-    users: List[RefUses] = field(default_factory=list)
+    users: List[RefUsedBy] = field(default_factory=list)
 
 
 @dataclass
