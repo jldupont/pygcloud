@@ -2,6 +2,9 @@
 Support for the management of diverse references
 occuring in service specifications
 
+The basic strategy is to support the most common ref types in this module
+so that we are minimizing the burden on the individual service types.
+
 NOTE Cloud Run Revision Spec has a selfLink format
      very different from the rest of the service types.
      It is located under "metadata".
@@ -11,11 +14,13 @@ NOTE Cloud Run Revision Spec has a selfLink format
 @author: jldupont
 """
 
-from typing import List, Union
+from typing import List, Union, Set, Tuple
+from collections.abc import Callable
 from pygcloud.models import GCPService, Spec, GCPUnknownService
 from pygcloud.gcp.models import Ref, UnknownSpecType
 from pygcloud.graph_models import Node, Edge, Relation, Group
 from pygcloud.gcp.catalog import lookup_service_class_from_ref
+from pygcloud.gcp.services.certificate import SSLCertificateService
 
 
 GraphEntities = List[Union[Node, Edge, Group]]
@@ -34,11 +39,11 @@ def process_refs(service: GCPService) -> GraphEntities:
     #
     # selfLinks are very common in service specs
     #
-    batch = _process_selflinks(service, spec)
-    entities.extend(batch)
+    # batch = _process_selflinks(service, spec)
+    # entities.extend(batch)
 
-    batch = _process_users(service, spec)
-    entities.extend(batch)
+    # batch = _process_users(service, spec)
+    # entities.extend(batch)
 
     # process 'group'
 
@@ -75,11 +80,10 @@ def _process_users(service: GCPService, spec: Spec) -> GraphEntities:
 
         service_class: GCPService = lookup_service_class_from_ref(ref)
 
-        node = Node.create_or_get(
-            name=ref.name,
-            kind=service_class,
-            obj=service
-        )
+        node = Node.create_or_get(name=ref.name, kind=service_class, obj=service)
         nodes.append(node)
 
     return nodes
+
+
+def _process_common_refs(service: GCPService, spec: Spec) -> GraphEntities: ...

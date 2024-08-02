@@ -22,8 +22,7 @@ def lookup(class_name: str):
 
 @cache
 def get_listable_services():
-    return [classe for classe in ServiceNode.__all_classes__
-            if classe.LISTING_CAPABLE]
+    return [classe for classe in ServiceNode.__all_classes__ if classe.LISTING_CAPABLE]
 
 
 def get_service_classes_from_services_list(

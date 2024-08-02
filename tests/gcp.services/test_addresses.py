@@ -3,7 +3,7 @@
 """
 from pygcloud.models import Result
 from pygcloud.gcp.services.addresses import ServicesAddress
-from pygcloud.gcp.models import IPAddress
+from pygcloud.gcp.models import IPAddress, Ref
 from samples import IP_ADDRESS
 
 
@@ -20,6 +20,10 @@ class MockServicesAddress(ServicesAddress):
 
 
 def test_services_address_create(deployer, mock_sg):
+    """
+    Also does Ref level testing
+    """
+    Ref.clear()
 
     srv = MockServicesAddress("ip_address")
     mock_sg.append(srv)
@@ -27,3 +31,11 @@ def test_services_address_create(deployer, mock_sg):
     deployer.deploy(mock_sg)
 
     assert isinstance(srv.spec, IPAddress), print(srv.spec)
+
+    ip: IPAddress = srv.spec
+
+    assert isinstance(ip.users, list), print(ip)
+
+    ip0 = ip.users[0]
+    assert isinstance(ip0, Ref), print(ip0)
+    assert ip0.origin_service == srv

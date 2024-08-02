@@ -4,6 +4,7 @@
 
 import os
 import logging
+import typing
 from functools import cache
 from collections import UserList
 from typing import List, Tuple, Union, Any, Type, Set
@@ -29,6 +30,21 @@ class Spec:
     @property
     def derived_class_types(cls):
         return Specs
+
+    def value_from_path(self, path: str, default=None):
+        assert isinstance(path, str)
+
+        parts = path.split(".")
+        result = self
+
+        while parts:
+            key = parts.pop(0)
+            if isinstance(result, dict):
+                result = result.get(key, default)
+            else:
+                result = getattr(result, key, default)
+
+        return result
 
     def __post_init__(self):
         """
@@ -63,22 +79,15 @@ class Spec:
         return json_obj
 
     @classmethod
-    def from_obj(cls, obj):
+    def from_obj(cls, obj, origin_service: Union[Any, None] = None):
         """
         This recursively builds a class instance
         based on the annotations
         """
-
         if isinstance(obj, list):
-            return [cls.from_obj(item) for item in obj]
-
-        if not isinstance(obj, dict):
-            return obj
-
-        import typing
+            return [cls.from_obj(item, origin_service=origin_service) for item in obj]
 
         fields = cls.__annotations__
-
         result: dict = {}  # type: ignore
 
         for key, value in obj.items():
@@ -88,6 +97,15 @@ class Spec:
                 continue
 
             origin = typing.get_origin(_field)
+
+            if hasattr(_field, "from_obj"):
+                try:
+                    new_value = _field.from_obj(value, origin_service=origin_service)
+                except:  # NOQA
+                    new_value = _field.from_obj(value)
+
+                result[key] = new_value
+                continue
 
             if origin != list:
                 result[key] = value
@@ -101,10 +119,14 @@ class Spec:
             # List[Union[...]]
             classe = typing.get_args(_field)[0]
 
-            # print(f"Key = {key}, origin={origin}, classe={classe.__name__}, value={value}")
+            if classe is None:
+                raise Exception(f"Expecting a class: {_field}")
 
             if hasattr(classe, "from_obj"):
-                entries = classe.from_obj(value)
+                try:
+                    entries = classe.from_obj(value, origin_service=origin_service)
+                except:  # NOQA
+                    entries = classe.from_obj(value)
             else:
                 entries = value
 
@@ -113,17 +135,17 @@ class Spec:
         return cls(**result)
 
     @classmethod
-    def from_string(cls, json_str: str):
+    def from_string(cls, json_str: str, origin_service=None):
         """
         Create a dataclass from a JSON string
         Make sure to only include fields declare
         in the dataclass
         """
         obj = cls.parse_json(json_str)
-        return cls.from_obj(obj)
+        return cls.from_obj(obj, origin_service=origin_service)
 
     @classmethod
-    def from_json_list(cls, json_str: str, path: Str = None):
+    def from_json_list(cls, json_str: str, path: Str = None, origin_service=None):
         """
         Excepts to parse a JSON list from the specified string.
         An optional 'path' can be specified i.e. key to reach list.
@@ -142,7 +164,7 @@ class Spec:
 
         assert isinstance(json_list, list)
 
-        return [cls.from_obj(obj) for obj in json_list]
+        return [cls.from_obj(obj, origin_service=origin_service) for obj in json_list]
 
     def to_dict(self):
         result = {}
@@ -663,7 +685,9 @@ class GCPService(ServiceNode):
         if result.success:
             self.already_exists = True
             if self.SPEC_CLASS is not None:
-                self._spec = self.SPEC_CLASS.from_string(result.message)
+                self._spec = self.SPEC_CLASS.from_string(
+                    result.message, origin_service=self
+                )
 
         return result
 
@@ -676,7 +700,9 @@ class GCPService(ServiceNode):
         if result.success:
             self.already_exists = False
             if self.SPEC_CLASS is not None:
-                self._spec = self.SPEC_CLASS.from_string(result.message)
+                self._spec = self.SPEC_CLASS.from_string(
+                    result.message, origin_service=self
+                )
 
         return result
 

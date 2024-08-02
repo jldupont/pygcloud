@@ -5,6 +5,7 @@ import pytest
 from pygcloud.models import Result, Param
 from pygcloud.gcp.services.run import CloudRun
 from pygcloud.gcp.models import CloudRunRevisionSpec, CloudRunNegSpec
+from pygcloud.gcp.models import Ref, RefSelfLink
 from pygcloud.gcp.services.iam import ServiceAccountCapableMixin
 from samples import CLOUD_RUN_REVISION_SPEC
 
@@ -114,6 +115,11 @@ def test_cloud_run_neg(deployer):
 
 def test_cloudrun_neg(sample_cloudrun_neg):
 
+    Ref.clear()
     n = CloudRunNegSpec.from_string(sample_cloudrun_neg)
 
     assert n.name == "backend-neg"
+    assert len(Ref.all_instances) == 1, print(Ref.all_instances)
+
+    selfRef = Ref.all_instances[0]
+    assert isinstance(selfRef, RefSelfLink)

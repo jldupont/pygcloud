@@ -26,7 +26,7 @@ class _Linker:
 
     def after_deploy(self, _deployer, service: GCPService):
         """Called after the deployment of a single service"""
-        self._process_for_selflink(service)
+        # self._process_for_selflink(service)
 
 
 Linker = _Linker()

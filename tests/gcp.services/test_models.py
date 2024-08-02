@@ -3,6 +3,7 @@
 """
 import pytest
 from pygcloud.models import Spec
+from pygcloud.gcp.models import RefUses, RefSelfLink
 from pygcloud.gcp.models import Ref, LinksMap, IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
     HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
@@ -25,6 +26,7 @@ def test_spec_contains_derived_class_types():
 def test_ref(input, expected):
     result = Ref.from_link(input)
     assert result == expected, print(result)
+    assert result.origin_service is None
 
 
 def test_links_single_set():
@@ -52,6 +54,19 @@ def test_service_address(sample_ip_json):
     ip = IPAddress.from_string(sample_ip_json)
     assert ip.name == "ingress-proxy-ip"
     assert ip.address == "34.144.203.24"
+    assert len(ip.users) == 1
+
+    user = ip.users[0]
+    assert user.service_type == "forwardingRules"
+
+
+def test_refs(sample_ip_json):
+    Ref.clear()
+    ip = IPAddress.from_string(sample_ip_json)
+    assert len(Ref.all_instances) == 2, print(Ref.all_instances)
+    ref0 = Ref.all_instances[0]
+    assert isinstance(ref0, RefSelfLink), print(ref0)
+    assert ref0.name == ip.name
 
 
 def test_cloud_run_revision_spec(sample_cloud_run_revision_spec):
@@ -60,8 +75,8 @@ def test_cloud_run_revision_spec(sample_cloud_run_revision_spec):
         CloudRunRevisionSpec.from_string(sample_cloud_run_revision_spec)
 
     assert crr.name == "SERVICE"
-    assert crr.url == "https://SERVICE-4ro7a33l3a-nn.a.run.app"
-    assert crr.service_account == "215695389495-compute@developer.gserviceaccount.com"
+    assert crr.status.url == "https://SERVICE-4ro7a33l3a-nn.a.run.app"
+    assert crr.spec.template.spec.serviceAccountName == "215695389495-compute@developer.gserviceaccount.com"
 
 
 def test_cloud_run_revision_spec_list(sample_cloud_run_revision_spec):
@@ -76,7 +91,7 @@ def test_cloud_run_revision_spec_list(sample_cloud_run_revision_spec):
     crr = liste[0]
 
     assert crr.name == "SERVICE"
-    assert crr.url == "https://SERVICE-4ro7a33l3a-nn.a.run.app"
+    assert crr.status.url == "https://SERVICE-4ro7a33l3a-nn.a.run.app"
 
 
 def test_backend_service(sample_backend_service):
@@ -88,26 +103,13 @@ def test_backend_service(sample_backend_service):
 
     groups = bes.backends
 
-    """
-    import typing
-
-    t = bes.__annotations__["backends"]
-
-    origin = typing.get_origin(t)
-    assert origin == list
-
-    args = typing.get_args(t)
-    arg0 = args[0]
-    print(args)
-    assert arg0 == BackendGroup
-    """
-
     assert len(groups) == 1
 
     group = groups[0]
     assert isinstance(group, BackendGroup)
 
     assert group.capacityScaler == 1.0
+    assert isinstance(group.group, RefUses), print(group.group)
 
 
 @pytest.fixture
@@ -157,7 +159,7 @@ def test_scheduler_job(sample_scheduler_job):
     assert 'topics/test' in j.pubsubTarget["topicName"]
     assert j.name == "test-job"
     assert j.location == "northamerica-northeast1"
-    assert j.topicName == "projects/PROJECT/topics/test"
+    assert j.topicName_ == "projects/PROJECT/topics/test"
 
 
 def test_pubsub_topic(sample_pubsub_topic):
@@ -272,3 +274,11 @@ def test_gcs_bucket(sample_gcs_bucket):
 
     assert b.acl is not None
     assert isinstance(b.acl[0], ACL), print(b.acl)
+
+
+def test_value_from_path(sample_task_queue):
+
+    q = TaskQueue.from_string(sample_task_queue)
+
+    result = q.value_from_path("rateLimits.maxBurstSize")
+    assert result == 10, print(result)

@@ -9,11 +9,10 @@ NOTE The classvar `REF_NAME` contains the string
 """
 
 import re
-from typing import List, Dict, Union, Any, ClassVar
+from typing import List, Dict, Union, ClassVar
 from dataclasses import dataclass, field
 from collections import UserDict
-from pygcloud.utils import JsonObject
-from pygcloud.models import Spec, spec
+from pygcloud.models import Spec, spec, GCPService
 
 
 class UnknownRef(Exception):
@@ -26,6 +25,9 @@ class UnknownRef(Exception):
 Str = Union[str, None]
 
 EXCEPT_SLASH = "([^/]+)"
+
+# CloudRun example...
+# /apis/serving.knative.dev/v1/namespaces/215695389495/services/SERVICE'
 
 PROJECT = f"/projects/(?P<project>{EXCEPT_SLASH})"
 REGION = f"/regions/(?P<region>{EXCEPT_SLASH})"
@@ -43,13 +45,30 @@ PATTERNS = [
 ]
 
 
-@dataclass
-class Ref:
+class _Ref:
+    """Private methods"""
 
-    project: str
-    region: str
-    service_type: Str = field(default_factory=str)
-    name: Str = field(default_factory=str)
+    __all_instances__: ClassVar[List] = []
+
+    @classmethod
+    def add(cls, instance):
+        assert isinstance(instance, cls), print({instance})
+        cls.__all_instances__.append(instance)
+
+    append = add
+    __add__ = add
+
+    @classmethod
+    def clear(cls):
+        cls.__all_instances__.clear()
+
+    @classmethod
+    @property
+    def all_instances(cls):
+        return cls.__all_instances__
+
+    def __post_init__(self):
+        self.add(self)
 
     @classmethod
     def match(cls, input):
@@ -66,10 +85,49 @@ class Ref:
         return result.groupdict()
 
     @classmethod
-    def from_link(cls, link: str):
-        assert isinstance(link, str)
+    def from_link(cls, link: str, origin_service: GCPService = None):
+        assert isinstance(link, str), print(link)
         result = cls.match(link)
-        return cls(**result)
+        return cls(**result, origin_service=origin_service)
+
+    def to_json_string(self):
+        import json
+        from .utils import FlexJSONEncoder
+
+        return json.dumps(self.to_dict(), cls=FlexJSONEncoder)
+
+    def to_dict(self):
+        result = {}
+        fields = self.__annotations__
+
+        for _field in fields:
+            value = getattr(self, _field)
+
+            if hasattr(value, "to_dict"):
+                value = value.to_dict()
+
+            result[_field] = value
+
+        return result
+
+    @classmethod
+    def from_obj(cls, obj: Union[str, Dict, List], origin_service: GCPService = None):
+
+        if isinstance(obj, List):
+            return [cls.from_obj(item, origin_service=origin_service) for item in obj]
+
+        assert isinstance(obj, (str, dict)), print(obj)
+
+        if isinstance(obj, str):
+            name = obj
+
+        if isinstance(obj, dict):
+            name = obj.get("reference", None)
+
+        if name is None:
+            raise Exception(f"Unexpected None whilst processing obj= {repr(obj)}")
+
+        return cls.from_link(name, origin_service)
 
     def _vector(self):
         return f"{self.project}/{self.region}/{self.service_type}/{self.name}"
@@ -77,7 +135,45 @@ class Ref:
     def __repr__(self):
         return self._vector()
 
+
+@dataclass
+class Ref(_Ref):
+
+    project: str
+    region: str
+    service_type: Str = field(default_factory=str)
+    name: Str = field(default_factory=str)
+    origin_service: GCPService = field(default=None)
+
     def __hash__(self):
+        """NOTE this cannot be moved to _Ref"""
+        return hash(self._vector())
+
+
+@dataclass
+class RefSelfLink(Ref):
+    """selfLink"""
+
+    def __hash__(self):
+        """NOTE this cannot be moved to _Ref"""
+        return hash(self._vector())
+
+
+@dataclass
+class RefUses(Ref):
+    """uses"""
+
+    def __hash__(self):
+        """NOTE this cannot be moved to _Ref"""
+        return hash(self._vector())
+
+
+@dataclass
+class RefUsedBy(Ref):
+    """usedBy"""
+
+    def __hash__(self):
+        """NOTE this cannot be moved to _Ref"""
         return hash(self._vector())
 
 
@@ -87,6 +183,8 @@ class LinksMap(UserDict):
 
     Once set, (key:value) mappings cannot be changed
     but LinksMap silently observes idempotency
+
+    NOTE Not used at the moment
     """
 
     def __setitem__(self, key, value):
@@ -223,8 +321,10 @@ class IAMPolicy(Spec):
     bindings: List[IAMBindings]
 
     @classmethod
-    def from_json_list(cls, json_str: str, path: Str = None):
-        bindings = IAMBindings.from_json_list(json_str, path="bindings")
+    def from_json_list(cls, json_str: str, path: Str = None, origin_service=None):
+        bindings = IAMBindings.from_json_list(
+            json_str, path="bindings", origin_service=origin_service
+        )
         return cls(bindings=bindings)
 
     from_string = from_json_list
@@ -260,8 +360,36 @@ class IPAddress(Spec):
     address: str
     addressType: str
     ipVersion: str
-    selfLink: str
-    users: List[str] = field(default_factory=list)
+    selfLink: RefSelfLink
+    users: List[RefUses] = field(default_factory=list)
+
+
+@dataclass
+class CloudRunMetadata(Spec):
+
+    name: str
+    annotations: dict
+    selfLink: str  # RefSelfLink
+
+
+@dataclass
+class CloudRunTemplateSpec(Spec):
+    serviceAccountName: str = field(default=None)
+
+
+@dataclass
+class CloudRunTemplate(Spec):
+    spec: CloudRunTemplateSpec
+
+
+@dataclass
+class CloudRunSpec(Spec):
+    template: CloudRunTemplate = field(default=None)
+
+
+@dataclass
+class CloudRunStatus(Spec):
+    url: str
 
 
 @spec
@@ -274,40 +402,13 @@ class CloudRunRevisionSpec(Spec):
          "/apis/serving.knative.dev/v1/namespaces/$project_number/services/$name"
     """
 
-    name: str
-    url: str
-    labels: Dict
-    service_account: str
-    selfLink: str
+    spec: CloudRunSpec
+    status: CloudRunStatus
+    metadata: CloudRunMetadata
+    name: str = field(default=None)
 
-    @classmethod
-    def from_obj(cls, obj):
-        d = {
-            "url": obj["status.url"],
-            "labels": obj["spec.template.metadata.labels"],
-            "name": obj["metadata.name"],
-            "service_account": obj["spec.template.spec.serviceAccountName"],
-            "selfLink": obj["metadata.selfLink"],
-        }
-
-        return cls(**d)
-
-    @classmethod
-    def from_string(cls, json_str: str):
-        obj = JsonObject.from_string(json_str)
-        return cls.from_obj(obj)
-
-    @classmethod
-    def from_json_list(cls, json_list, path: str = None):
-        liste: List = cls.parse_json(json_list)  # type: ignore
-
-        entries = []
-        for obj_dict in liste:
-            jso = JsonObject(obj_dict)
-            obj = cls.from_obj(jso)
-            entries.append(obj)
-
-        return entries
+    def __post_init_ex__(self):
+        self.name = self.metadata.name
 
 
 @spec
@@ -321,7 +422,7 @@ class BackendGroup(Spec):
     """
 
     balancingMode: str
-    group: str
+    group: RefUses
     capacityScaler: int
 
 
@@ -342,10 +443,10 @@ class BackendServiceSpec(Spec):
     port: int
     portName: str
     protocol: str
-    selfLink: str
+    selfLink: RefSelfLink
     backends: List[BackendGroup]
     iap: Dict = field(default_factory=dict)
-    usedBy: List[Any] = field(default_factory=list)
+    usedBy: List[RefUsedBy] = field(default_factory=list)
 
 
 @spec
@@ -369,8 +470,8 @@ class FwdRule(Spec):
     loadBalancingScheme: str
     networkTier: str
     portRange: str
-    selfLink: str
-    target: str
+    selfLink: RefSelfLink
+    target: RefUses
 
 
 @spec
@@ -413,7 +514,7 @@ class SSLCertificate(Spec):
 
     name: str
     type: str
-    selfLink: str
+    selfLink: RefSelfLink
     managed: dict = field(default_factory=dict)
 
 
@@ -428,8 +529,8 @@ class HTTPSProxy(Spec):
     REF_NAME: ClassVar[str] = "targetHttpsProxies"
 
     name: str
-    selfLink: str
-    sslCertificates: List[str] = field(default_factory=list)
+    selfLink: RefSelfLink
+    sslCertificates: List[RefUses] = field(default_factory=list)
     urlMap: str = field(default_factory=str)
 
 
@@ -448,10 +549,10 @@ class SchedulerJob(Spec):
     timeZone: str
     location: str = "???"
     pubsubTarget: dict = field(default_factory=dict)
-    topicName: str = field(default_factory=str)
+    topicName_: str = field(default_factory=str)
 
     def __post_init_ex__(self):
-        self.topicName = self.pubsubTarget.get("topicName", None)
+        self.topicName_ = self.pubsubTarget.get("topicName", None)
 
 
 @spec
@@ -505,7 +606,7 @@ class CloudRunNegSpec(Spec):
 
     name: str
     networkEndpointType: str
-    selfLink: str
+    selfLink: RefSelfLink
     region: str = field(default_factory=str)
     cloudRun: dict = field(default_factory=dict)
 

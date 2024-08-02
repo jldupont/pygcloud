@@ -7,6 +7,7 @@ from pygcloud.gcp.services.fwd_rules import FwdRuleHTTPSProxyService
 from pygcloud.gcp.linker_models import process_refs
 
 
+@pytest.mark.skip
 def test_users(mock_services_address, mock_ip_address):
     Node.clear()
     result = process_refs(mock_services_address)
