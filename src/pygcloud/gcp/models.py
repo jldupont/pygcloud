@@ -79,6 +79,9 @@ class ServiceDescription(Spec):
     """
     A service description as retrieved through
     `gcloud services list --enabled`
+
+    e.g. name:
+        projects/215695389495/services/storage.googleapis.com
     """
 
     name: str
