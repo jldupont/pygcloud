@@ -4,7 +4,7 @@
 import pytest
 from pygcloud.models import Spec
 from pygcloud.gcp.models import RefUses, RefSelfLink
-from pygcloud.gcp.models import Ref, LinksMap, IPAddress, CloudRunRevisionSpec, \
+from pygcloud.gcp.models import Ref, IPAddress, CloudRunRevisionSpec, \
     BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
     HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
     FirestoreDb, ProjectDescription, TaskQueue, UrlMap, \
@@ -27,20 +27,6 @@ def test_ref(input, expected):
     result = Ref.from_link(input)
     assert result == expected, print(result)
     assert result.origin_service is None
-
-
-def test_links_single_set():
-
-    links = LinksMap()
-    links["key"] = "value"
-
-    with pytest.raises(ValueError):
-        links["key"] = 666
-
-    assert "key" in links
-
-    with pytest.raises(ValueError):
-        del links['key']
 
 
 def test_project_desc(sample_project_desc):
