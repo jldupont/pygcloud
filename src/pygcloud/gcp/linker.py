@@ -3,6 +3,7 @@
 """
 
 from typing import Union, Type
+from pygcloud import events
 from pygcloud.hooks import Hooks
 from pygcloud.models import (
     GCPService,
@@ -161,6 +162,7 @@ class _Linker:
     ):
         """Called after the deployment of all services"""
         self._build_nodes()
+        Hooks.queue("end_linker", events.end_linker)
 
     def hook_after_deploy(self, _deployer, service: GCPService):
         self.add(service)

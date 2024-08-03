@@ -34,4 +34,4 @@ before_police = "pygcloud.events:dummy"
 after_police = "pygcloud.events:dummy"
 
 # Linker related
-ref = "pygcloud.events:dummy"
+end_linker = "pygcloud.events:dummy"

@@ -110,7 +110,12 @@ class _Hooks:
     def _execute_queue(cls):
         entry: Tuple[str, Callable, Any, Dict]
 
-        for entry in cls._queue:
+        while True:
+            try:
+                entry = cls._queue.pop()
+            except IndexError:
+                break
+
             name, callback, p, kw = entry
             cls._execute_callback(callback, *p, **kw)
 
@@ -151,6 +156,8 @@ class Hooks(_Hooks):
 
         This avoid having the chain a callbacks
         interrupted during processing
+
+        Queued callbacks are executed and discarded afterwards
         """
         cls._queue.append((name, callback, p, kw))
 

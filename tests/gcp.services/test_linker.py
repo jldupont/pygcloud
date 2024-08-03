@@ -4,6 +4,7 @@
 
 import pytest
 from pygcloud import events
+from pygcloud.hooks import Hooks
 from pygcloud.models import (
     Result,
     GCPServiceInstanceNotAvailable,
@@ -163,3 +164,18 @@ def test_linker_unknown_ref():
 
     with pytest.raises(UnknownRef):
         Ref.from_link(invalid_link)
+
+
+def test_hook_end_linker(mock_service, mock_deployer, result_success):
+
+    called = False
+
+    def end_linker():
+        nonlocal called
+        called = True
+
+    Hooks.register_callback("end_linker", end_linker)
+    events.end_deploy(mock_deployer, "mock", result_success)
+    Hooks.unregister_callback("end_linker", end_linker)
+
+    assert called

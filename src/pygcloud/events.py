@@ -87,7 +87,9 @@ def end_policer(results: PolicingResults):
     Hooks.execute("end_policer", results)
 
 
-def ref():
+def end_linker():
     """
-    When `refs` are parsed
+    When the Linker is done generating
+    Nodes, Edges and Groups
     """
+    Hooks.execute("end_linker")
