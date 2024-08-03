@@ -13,7 +13,7 @@ from typing import Union, Set, Type, ClassVar
 from enum import Enum
 from dataclasses import dataclass, field
 from .models import ServiceNode
-from .base_types import BaseType
+from .base_types import Base, idempotent
 
 Str = Union[str, None]
 
@@ -48,8 +48,9 @@ class Relation(Enum):
     MEMBER_OF = "member_of"
 
 
+@idempotent
 @dataclass
-class Node(metaclass=BaseType):
+class Node(Base):
     """
     Node type
 
@@ -66,7 +67,7 @@ class Node(metaclass=BaseType):
     kind: Type[ServiceNode]
     obj: ServiceNode = field(default=None)
 
-    def after_init(self):
+    def __post_init__(self):
         assert isinstance(self.name, str)
         assert issubclass(self.kind, ServiceNode), print(self.kind)
 
@@ -78,26 +79,10 @@ class Node(metaclass=BaseType):
     def __repr__(self):
         return f"Node({self.name}, {self.kind.__name__})"
 
-    @classmethod
-    def create_or_get(cls,
-                      name: str,
-                      kind: Type[ServiceNode],
-                      obj: ServiceNode = None):
-        """
-        The class' constructore should be avoided
-        in favor of this constructor
-        """
-        return cls._create_or_get(name=name, kind=kind, obj=obj)
 
-    @classmethod
-    @property
-    def all(cls):
-        """Returns only Node instances"""
-        return cls._all(cls)
-
-
+@idempotent
 @dataclass
-class Group(metaclass=BaseType):
+class Group(Base):
     """
     A bare minimum definition of the group type
 
@@ -110,7 +95,7 @@ class Group(metaclass=BaseType):
     name: Str
     members: Set[Node] = field(default_factory=set)
 
-    def after_init(self):
+    def __post_init__(self):
         assert isinstance(self.name, str)
 
     def add(self, member: Node):
@@ -134,23 +119,10 @@ class Group(metaclass=BaseType):
     def __hash__(self):
         return hash(self.name)
 
-    @classmethod
-    def create_or_get(cls, **kw):
-        """
-        The class' constructore should be avoided
-        in favor of this constructor
-        """
-        return cls._create_or_get(**kw)
 
-    @classmethod
-    @property
-    def all(cls):
-        """Returns only Node instances"""
-        return cls._all(cls)
-
-
+@idempotent
 @dataclass
-class Edge(metaclass=BaseType):
+class Edge(Base):
     """
     An edge between two nodes or two groups
     """
@@ -161,7 +133,7 @@ class Edge(metaclass=BaseType):
     source: Union[Node, Group]
     target: Union[Node, Group]
 
-    def after_init(self):
+    def __post_init__(self):
         assert isinstance(self.source, (Node, Group))
         assert isinstance(self.target, (Node, Group))
         assert isinstance(self.relation, Relation)
@@ -175,17 +147,3 @@ class Edge(metaclass=BaseType):
 
     def __repr__(self):
         return f"Edge({self.source.name}, {self.relation.value}, {self.target.name})"
-
-    @classmethod
-    def create_or_get(cls, relation: Relation, source: Node, target: Node):
-        """
-        The class' constructore should be avoided
-        in favor of this constructor
-        """
-        return cls._create_or_get(relation=relation, source=source, target=target)
-
-    @classmethod
-    @property
-    def all(cls):
-        """Returns only Node instances"""
-        return cls._all(cls)

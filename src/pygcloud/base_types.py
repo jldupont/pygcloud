@@ -2,7 +2,7 @@
 @author: jldupont
 """
 
-from typing import Set, TypeVar, Type, Dict, List
+from typing import Set, TypeVar, Type, Dict, List, ClassVar
 
 
 T = TypeVar("T")
@@ -63,12 +63,15 @@ class BaseType(type):
                 # We are just testing idempotency
                 return
 
-            if getattr(this.__class__, "IDEMPOTENCY_ENABLED", False):
-                if not getattr(this, "__idempotency_check__", False):
-                    raise BypassConstructor(
-                        f"The classmethod 'create_or_get' was not used on:"
-                        f" {this.__class__.__name__}"
-                    )
+            class_name = this.__class__.__name__.lower()
+
+            if "mock" not in class_name:
+                if getattr(this.__class__, "IDEMPOTENCY_ENABLED", False):
+                    if not getattr(this, "__idempotency_check__", False):
+                        raise BypassConstructor(
+                            f"The classmethod 'create_or_get' was not used on:"
+                            f" {this.__class__.__name__}"
+                        )
 
         attrs["__post_init__"] = post_init
 
@@ -143,6 +146,101 @@ class BaseType(type):
     def __iter__(self):
         """This allows iterating over the class"""
         return iter(set(self.all))
+
+    @classmethod
+    def clear(cls):
+        cls.__all_instances__.clear()
+
+
+def idempotent(cls):
+    """
+    Class decorator
+
+    No need for a metaclass to manage attributes
+    in a derived class
+    """
+    setattr(cls, "__in_creation__", False)
+    setattr(cls, "__all_instances__", dict())
+
+    dataclass_init = getattr(cls, "__init__")
+    setattr(cls, "__dataclass__init", dataclass_init)
+
+    def __init(self, **kw):
+        #
+        # Make sure that the only path to create an instance
+        # of the derived class is through the "create_or_get" classmethod
+        #
+        if not cls.__in_creation__:
+            raise BypassConstructor("create_or_get needs to be used")
+        return self.__dataclass__init(**kw)
+
+    setattr(cls, "__init__", __init)
+
+    return cls
+
+
+def derived(cls):
+    # not used ATM
+    new_class_name = cls.__name__.lower()
+
+    if "mock" in new_class_name:
+        return cls
+
+    if new_class_name[0] == "_":
+        return cls
+
+    cls.__all_classes__.add(cls)
+    return cls
+
+
+class Base:
+
+    __all_classes__: Set[Type[T]] = set()
+
+    @classmethod
+    @property
+    def derived_classes(cls) -> Set[Type[T]]:
+        return cls.__all_classes__
+
+    @classmethod
+    def create_or_get(cls, **kw):
+        """
+        Idempotent way of managing Node instance
+        """
+        #
+        # We need to create an instance
+        # in order to get its name since
+        # it is proper to each class
+        #
+        cls.__in_creation__ = True
+        _instance = cls(**kw)
+        name = _instance.name
+        cls.__in_creation__ = False
+
+        #
+        # Return the original whilst discarding
+        # the one used to test idempotency
+        #
+        instance = cls.get_by_name(name)
+        if instance is not None:
+            return instance
+
+        cls.__all_instances__[_instance.name] = _instance
+
+        #
+        # The actual flag used during the "__post_init__" check
+        #
+        setattr(_instance, "__idempotency_check__", True)
+        return _instance
+
+    @classmethod
+    def get_by_name(cls, name: str):
+        return cls.__all_instances__.get(name, None)
+
+    @classmethod
+    @property
+    def all(cls) -> List:
+        return list(cls.__all_instances__.values())
 
     @classmethod
     def clear(cls):

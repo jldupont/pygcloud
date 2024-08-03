@@ -393,7 +393,7 @@ class HTTPSProxy(Spec):
     name: str
     selfLink: RefSelfLink
     sslCertificates: List[RefUses] = field(default_factory=list)
-    urlMap: str = field(default_factory=str)
+    urlMap: RefUses = field(default_factory=str)
 
 
 @spec

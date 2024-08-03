@@ -4,7 +4,7 @@
 import pytest
 from pygcloud.gcp.labels import LabelGenerator
 from pygcloud.models import GCPService, Result
-from pygcloud.gcp.models import IAMBinding, IPAddress
+from pygcloud.gcp.models import IAMBinding, IPAddress, HTTPSProxy
 from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC, \
     BACKEND_SERVICE, FWD_RULE, STORAGE_BUCKET, SSL_CERTIFICATE, HTTPS_PROXY, \
     SCHEDULER_JOB, PUBSUB_TOPIC, SERVICES_LIST, FIRESTORE_DB, \
@@ -12,6 +12,7 @@ from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC, \
     BUCKET_IAM_BINDINGS_SPEC, SAMPLE_EMPTY_BINDINGS
 # from pygcloud.gcp.services.iam import ServiceAccountIAM
 from pygcloud.gcp.services.addresses import ServicesAddress
+from pygcloud.gcp.services.proxies import HTTPSProxyService
 
 
 @pytest.fixture
@@ -238,3 +239,17 @@ def mock_services_address_gen(sample_ip_json):
 @pytest.fixture
 def mock_services_address(mock_services_address_gen):
     return mock_services_address_gen()
+
+
+@pytest.fixture
+def mock_https_proxy_gen(sample_https_proxy):
+    def gen():
+        # name must be synchronized with the ServicesAddress above
+        # and the sample
+        mock = HTTPSProxyService("proxy-service",
+                                 "proxy-certificate",
+                                 "urlmap-backend-service")
+        spec = HTTPSProxy.from_string(sample_https_proxy, mock)
+        mock.spec = spec
+        return mock
+    return gen

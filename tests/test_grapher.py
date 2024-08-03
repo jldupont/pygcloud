@@ -5,7 +5,7 @@ import pytest  # NOQA
 from dataclasses import dataclass, field
 from pygcloud.graph_models import Group, Node, Edge, Relation
 from pygcloud.models import ServiceNode
-from pygcloud.base_types import BaseType, BypassConstructor
+from pygcloud.base_types import Base, BypassConstructor
 
 
 @dataclass
@@ -28,12 +28,6 @@ class MockNode(Node):
     """
     mock: bool = field(default=True)
 
-    def __post_init__(self):
-        raise Exception("This should not be called")
-
-    def after_init(self):
-        setattr(self, "__after_init_called__", True)
-
     def __hash__(self):
         return hash(
             f"{self.name}-{self.__class__.__name__}"
@@ -46,12 +40,6 @@ def test_node_invalid_name():
     """
     with pytest.raises(AssertionError):
         Node.create_or_get(name=..., kind=MockServiceNode)
-
-
-def test_after_init_called():
-
-    node = MockNode.create_or_get(name="node", kind=MockServiceNode)
-    assert node.__after_init_called__
 
 
 def test_node_idempotent():
@@ -74,18 +62,8 @@ def test_bypass_create_or_get_constructor():
 def test_group_base_type():
 
     assert isinstance(Group, type)
-    assert not issubclass(Group, BaseType), print(Group.__class__)
-    assert Group.__class__ == BaseType
-
+    assert issubclass(Group, Base), print(Group.__class__)
     assert issubclass(MockGroup, Group)
-
-
-def test_group_base_class_ignored():
-    assert 'Group' not in Group.derived_classes
-
-
-def test_group_mock_ignored():
-    assert 'MockGroup' not in Group.derived_classes
 
 
 def test_group_iterate_instances():
@@ -181,14 +159,13 @@ def test_edge_set_groups():
     Edge.create_or_get(relation=Relation.HAS_ACCESS, source=g2, target=g1)
 
     edges = []
-    for edge in Edge:
+    for edge in Edge.all:
         edges.append(edge)
 
     #
     # Only edges
     #
     assert set(Edge.all) == set(edges)
-
     assert len(Group.all) == 2, print(Group.all)
 
 

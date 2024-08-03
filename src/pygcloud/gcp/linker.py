@@ -29,6 +29,7 @@ class _Linker:
             raise Exception("Singleton class")
         self.__instance = self
         self.__all_service_instances = {}
+
         Hooks.register_callback("start_deploy", self.start_deploy)
         Hooks.register_callback("end_deploy", self.end_deploy)
         Hooks.register_callback("after_deploy", self.after_deploy)
@@ -63,7 +64,7 @@ class _Linker:
         Ref.clear()
         Node.clear()
         Edge.clear()
-        self.__all_service_instances.clear()
+        self.clear()
 
     def _build_self(self, ref: Ref, service: GCPService):
         """
@@ -80,9 +81,9 @@ class _Linker:
         target_node = None
         if target_type == GCPServiceUnknown:
             # ref.service_type is unknown
-            un = ServiceNodeUnknown(name=ref.service_type)
+            obj = ServiceNodeUnknown(name=ref.service_type)
             target_node = \
-                Node.create_or_get(name=ref.name, kind=ServiceNodeUnknown, obj=un)
+                Node.create_or_get(name=ref.name, kind=ServiceNodeUnknown, obj=obj)
 
         if target_node is None:
 
@@ -123,7 +124,7 @@ class _Linker:
             # ref.origin_service: GCPService
             #  is the service instance to get the information
             #  to build the source end of the Edge, but first
-            #  we need to 'create or get' this Node 
+            #  we need to 'create or get' this Node
             #
             if ref.origin_service is None:
                 raise Exception("A non selfLink reference without "

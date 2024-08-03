@@ -5,6 +5,7 @@ from pygcloud.deployer import Deployer
 from pygcloud.core import CommandLine
 from pygcloud.models import GCPService, LazyEnvValue, service_groups, Spec, Result
 from pygcloud.constants import ServiceCategory
+from pygcloud.gcp.models import RefSelfLink
 
 
 @pytest.fixture
@@ -29,7 +30,7 @@ def lazy_env_value(env_first_key):
 
 @dataclass
 class MockSpec(Spec):
-    selfLink: str
+    selfLink: RefSelfLink
 
 
 class MockGCPService(GCPService):
@@ -63,7 +64,9 @@ class MockGCPService(GCPService):
 
         import json
         spec = {
-            "selfLink": f"mock_link_{self.name}_{count}"
+            "selfLink": "/projects/mock_project"
+                        "/regions/mock_region"
+                        f"/mock_service_type/mock_{self.name}_{count}"
         }
 
         result = Result(
