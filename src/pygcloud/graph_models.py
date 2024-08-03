@@ -90,8 +90,6 @@ class Group(Base):
     and available using 'Group.derived_classes' attribute
     """
 
-    IDEMPOTENCY_ENABLED: ClassVar[bool] = True
-
     name: Str
     members: Set[Node] = field(default_factory=set)
 
@@ -126,8 +124,6 @@ class Edge(Base):
     """
     An edge between two nodes or two groups
     """
-
-    IDEMPOTENCY_ENABLED: ClassVar[bool] = True
 
     relation: Relation
     source: Union[Node, Group]

@@ -238,9 +238,7 @@ class BaseForDerived:
 
 def derived(cls):
     """
-    Collects derived classes
-
-    Works for the first level only
+    Class decorator for collecting derived classes
 
     NOTE: must be used with 'BaseForDerived'
     """
