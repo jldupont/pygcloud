@@ -5,13 +5,15 @@ Support for standard Python EntryPoints and internal events
 """
 
 import logging
-from typing import List, Dict, Tuple, Set
+from typing import List, Dict, Tuple, Set, ClassVar, Any
 from collections.abc import Callable
 from functools import cache
 from importlib.metadata import entry_points, EntryPoint
 
 
 class _Hooks:
+
+    _queue: ClassVar[List[Tuple[str, Callable, Any, Dict]]] = []
 
     @classmethod
     @cache
@@ -80,45 +82,59 @@ class _Hooks:
                 raise e
 
     @classmethod
+    def _execute_callback(cls, callback: Callable, *p, **kw):
+
+        try:
+            name = callback.__name__
+        except:  # NOQA
+            name = repr(callback)
+
+        if name.startswith("dummy"):
+            return
+
+        try:
+            callback(*p, **kw)
+        except Exception as e:
+            logging.error(f"pygcloud: callback '{name}' failed: {e}")
+            raise e
+
+    @classmethod
     def _execute_callbacks(cls, name: str, *p, **kw):
 
         callbacks: List[Callable] = cls.get_callbacks(name)
 
         for callback in callbacks:
-            try:
-                name = callback.__name__
-            except:  # NOQA
-                name = repr(callback)
+            cls._execute_callback(callback, *p, **kw)
 
-            if name.startswith("dummy"):
-                continue
+    @classmethod
+    def _execute_queue(cls):
+        entry: Tuple[str, Callable, Any, Dict]
 
-            try:
-                callback(*p, **kw)
-            except Exception as e:
-                logging.error(f"pygcloud: callback '{name}' failed: {e}")
-                raise e
+        for entry in cls._queue:
+            name, callback, p, kw = entry
+            cls._execute_callback(callback, *p, **kw)
 
 
 class Hooks(_Hooks):
 
-    _map: Dict[str, set] = dict()
+    _map: ClassVar[Dict[str, set]] = dict()
 
     @classmethod
     def clear_callbacks(cls):
         cls._map.clear()
+        cls._queue.clear()
 
     @classmethod
     def register_callback(cls, name: str, callback: Callable):
         """Registration is idempotent"""
-        callbacks: List[set] = cls._map.get(name, set())
+        callbacks: Set[Callable] = cls._map.get(name, set())
         callbacks.add(callback)
         cls._map[name] = callbacks
         return cls
 
     @classmethod
     def unregister_callback(cls, name: str, callback: Callable):
-        callbacks: List[set] = cls._map.get(name, set())
+        callbacks: Set[Callable] = cls._map.get(name, set())
         callbacks.remove(callback)
         cls._map[name] = callbacks
         return cls
@@ -128,11 +144,23 @@ class Hooks(_Hooks):
         return cls._map.get(name, set())
 
     @classmethod
+    def queue(cls, name: str, callback: Callable, *p, **kw):
+        """
+        Add a callback to a queue that will be serviced
+        after the callback stack is processed
+
+        This avoid having the chain a callbacks
+        interrupted during processing
+        """
+        cls._queue.append((name, callback, p, kw))
+
+    @classmethod
     def execute(cls, name: str, *p, **kw):
         assert isinstance(name, str)
 
         cls._execute_callbacks(name, *p, **kw)
         cls._execute_entrypoints(name, *p, **kw)
+        cls._execute_queue()
 
     @classmethod
     def get_points(cls) -> List[EntryPoint]:

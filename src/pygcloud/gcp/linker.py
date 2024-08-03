@@ -37,9 +37,9 @@ class _Linker:
         self.__instance = self
         self.__all_service_instances = {}
 
-        Hooks.register_callback("start_deploy", self.start_deploy)
-        Hooks.register_callback("end_deploy", self.end_deploy)
-        Hooks.register_callback("after_deploy", self.after_deploy)
+        Hooks.register_callback("start_deploy", self.hook_start_deploy)
+        Hooks.register_callback("end_deploy", self.hook_end_deploy)
+        Hooks.register_callback("after_deploy", self.hook_after_deploy)
 
     @property
     def all(self):
@@ -63,15 +63,6 @@ class _Linker:
 
     def clear(self):
         self.__all_service_instances.clear()
-
-    def after_deploy(self, _deployer, service: GCPService):
-        self.add(service)
-
-    def start_deploy(self, *p):
-        Ref.clear()
-        Node.clear()
-        Edge.clear()
-        self.clear()
 
     def _build_self(self, ref: Ref, service: GCPService):
         """
@@ -159,11 +150,20 @@ class _Linker:
 
         Edge.create_or_get(relation=relation, source=node_src, target=node_target)
 
-    def end_deploy(
+    def hook_start_deploy(self, *p):
+        Ref.clear()
+        Node.clear()
+        Edge.clear()
+        self.clear()
+
+    def hook_end_deploy(
         self, _deployer, _what: Union[ServiceGroup, GroupName], _result: Result
     ):
         """Called after the deployment of all services"""
         self._build_nodes()
+
+    def hook_after_deploy(self, _deployer, service: GCPService):
+        self.add(service)
 
 
 Linker = _Linker()

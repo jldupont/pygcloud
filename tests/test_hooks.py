@@ -40,3 +40,21 @@ def test_hook_registration_idempotence():
     assert len(Hooks.get_callbacks("test")) == 1
 
     Hooks.unregister_callback("test", callback)
+
+
+def test_queue():
+
+    queued_called = False
+
+    def queued():
+        nonlocal queued_called
+        queued_called = True
+
+    def callback():
+        Hooks.queue("queued", queued)
+
+    Hooks.register_callback("test", callback)
+    Hooks.execute("test")
+    Hooks.unregister_callback("test", callback)
+
+    assert queued_called
