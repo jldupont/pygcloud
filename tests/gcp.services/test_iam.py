@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 import pytest
 from pygcloud.models import Result
 from pygcloud.gcp.models import IAMBinding, IAMBindings, IAMPolicy, IAMMember
@@ -12,32 +13,20 @@ from samples import PROJECT_BINDINGS
 
 @pytest.fixture
 def mock_bidon_binding():
-    return IAMBinding(
-        email="ns:whatever_email",
-        role="whatever_role"
-    )
+    return IAMBinding(email="ns:whatever_email", role="whatever_role")
 
 
-class MockCR(CloudRun):
-    ...
+class MockCR(CloudRun): ...
 
 
 class MockProjectIAMBindingService(ProjectIAMBindingService):
 
     def after_describe(self, result: Result):
-        new_result = Result(
-            success=True,
-            message=PROJECT_BINDINGS,
-            code=0
-        )
+        new_result = Result(success=True, message=PROJECT_BINDINGS, code=0)
         return super().after_describe(new_result)
 
     def after_create(self, result: Result):
-        new_result = Result(
-            success=True,
-            message=PROJECT_BINDINGS,
-            code=0
-        )
+        new_result = Result(success=True, message=PROJECT_BINDINGS, code=0)
         return super().after_create(new_result)
 
 
@@ -56,19 +45,11 @@ class MockIAMBindingService(IAMBindingService):
         return params
 
     def after_describe(self, result: Result):
-        new_result = Result(
-            success=True,
-            message=PROJECT_BINDINGS,
-            code=0
-        )
+        new_result = Result(success=True, message=PROJECT_BINDINGS, code=0)
         return super().after_describe(new_result)
 
     def after_create(self, result: Result):
-        new_result = Result(
-            success=True,
-            message=PROJECT_BINDINGS,
-            code=0
-        )
+        new_result = Result(success=True, message=PROJECT_BINDINGS, code=0)
         return super().after_create(new_result)
 
 
@@ -93,9 +74,7 @@ def test_project_bindings_already_exists(deployer, mock_sg):
     first_member: IAMMember = first_binding.members[0]
 
     b = IAMBinding(
-        ns=first_member.ns,
-        email=first_member.email,
-        role=first_binding.role
+        ns=first_member.ns, email=first_member.email, role=first_binding.role
     )
 
     service = MockProjectIAMBindingService(b, "project_id")
@@ -122,17 +101,27 @@ def test_iam_binding_service(deployer, mock_sg, mock_bidon_binding):
     assert not srv.already_exists
 
     assert srv.captured_describe_params == [
-        ['beta', 'run'], ['services'],
-        'get-iam-policy', 'cr_srv',
-        '--format', 'json',
-        ['--region', 'some_region'], []
+        ["beta", "run"],
+        ["services"],
+        "get-iam-policy",
+        "cr_srv",
+        "--format",
+        "json",
+        ["--region", "some_region"],
+        [],
     ], print(srv.captured_describe_params)
 
     assert srv.captured_create_params == [
-        ['beta', 'run'], ['services'],
-        'add-iam-policy-binding', 'cr_srv',
-        '--member', 'ns:whatever_email',
-        '--role', 'whatever_role',
-        '--format', 'json',
-        ['--region', 'some_region'], []
+        ["beta", "run"],
+        ["services"],
+        "add-iam-policy-binding",
+        "cr_srv",
+        "--member",
+        "ns:whatever_email",
+        "--role",
+        "whatever_role",
+        "--format",
+        "json",
+        ["--region", "some_region"],
+        [],
     ], print(srv.captured_create_params)

@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 from pygcloud.gcp.services.storage import StorageBucket
 from pygcloud.models import Result
 from samples import STORAGE_BUCKET
@@ -23,8 +24,13 @@ def test_gcs(deployer, mock_sg, sample_gcs_bucket):
     # "update" because the "describe" stage will succeed
 
     assert deployer.cmd.last_command_args == [
-        "echo", "storage", "buckets", "update", "gs://bucket",
-        "--format", "json"
+        "echo",
+        "storage",
+        "buckets",
+        "update",
+        "gs://bucket",
+        "--format",
+        "json",
     ]
 
     assert b.spec.name == "bucket"

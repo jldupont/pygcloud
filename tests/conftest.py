@@ -45,6 +45,7 @@ class MockGCPService(GCPService):
         we are getting in the way of the Linker
         """
         import uuid
+
         uid = str(uuid.uuid4())
 
         name = f"mock_name_{uid}"
@@ -53,9 +54,7 @@ class MockGCPService(GCPService):
         super().__init__(name, ns=ns)
 
     def params_describe(self):
-        return [
-            "describe"
-        ]
+        return ["describe"]
 
     def after_describe(self, result: Result):
 
@@ -63,28 +62,21 @@ class MockGCPService(GCPService):
         self._COUNTER += 1
 
         import json
+
         spec = {
             "selfLink": "/projects/mock_project"
-                        "/regions/mock_region"
-                        f"/mock_service_type/mock_{self.name}_{count}"
+            "/regions/mock_region"
+            f"/mock_service_type/mock_{self.name}_{count}"
         }
 
-        result = Result(
-            success=True,
-            message=json.dumps(spec),
-            code=0
-        )
+        result = Result(success=True, message=json.dumps(spec), code=0)
         return super().after_describe(result)
 
     def params_create(self):
-        return [
-            "create"
-        ]
+        return ["create"]
 
     def params_update(self):
-        return [
-            "update"
-        ]
+        return ["update"]
 
     def after_create(self, result):
         super().after_create(result)

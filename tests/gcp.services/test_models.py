@@ -1,28 +1,65 @@
 """
 @author: jldupont
 """
+
 import pytest
 from pygcloud.models import Spec
 from pygcloud.gcp.models import RefUses, RefSelfLink
-from pygcloud.gcp.models import Ref, IPAddress, CloudRunRevisionSpec, \
-    BackendServiceSpec, BackendGroup, FwdRule, SSLCertificate, \
-    HTTPSProxy, SchedulerJob, PubsubTopic, ServiceDescription, \
-    FirestoreDb, ProjectDescription, TaskQueue, UrlMap, \
-    ServiceAccountSpec, IAMPolicy, IAMBinding, GCSBucket, ACL
+from pygcloud.gcp.models import (
+    Ref,
+    IPAddress,
+    CloudRunRevisionSpec,
+    BackendServiceSpec,
+    BackendGroup,
+    FwdRule,
+    SSLCertificate,
+    HTTPSProxy,
+    SchedulerJob,
+    PubsubTopic,
+    ServiceDescription,
+    FirestoreDb,
+    ProjectDescription,
+    TaskQueue,
+    UrlMap,
+    ServiceAccountSpec,
+    IAMPolicy,
+    IAMBinding,
+    GCSBucket,
+    ACL,
+)
 
 
 def test_spec_contains_derived_class_types():
     assert len(Spec.derived_class_types) >= 21, print(Spec.derived_class_types)
 
 
-@pytest.mark.parametrize("input,expected", [
-    ("https://www.googleapis.com/compute/beta/projects/PROJECT/regions/northamerica-northeast1",
-        Ref(region="northamerica-northeast1", project="PROJECT")),
-    ("https://www.googleapis.com/compute/v1/projects/PROJECT/global/addresses/ingress-proxy-ip",
-        Ref(region="global", project="PROJECT", service_type="addresses", name="ingress-proxy-ip")),
-    ("https://www.googleapis.com/compute/v1/projects/PROJECT/regions/na1/networkEndpointGroups/backend-neg",
-        Ref(region="na1", project="PROJECT", service_type="networkEndpointGroups", name="backend-neg"))
-])
+@pytest.mark.parametrize(
+    "input,expected",
+    [
+        (
+            "https://www.googleapis.com/compute/beta/projects/PROJECT/regions/northamerica-northeast1",
+            Ref(region="northamerica-northeast1", project="PROJECT"),
+        ),
+        (
+            "https://www.googleapis.com/compute/v1/projects/PROJECT/global/addresses/ingress-proxy-ip",
+            Ref(
+                region="global",
+                project="PROJECT",
+                service_type="addresses",
+                name="ingress-proxy-ip",
+            ),
+        ),
+        (
+            "https://www.googleapis.com/compute/v1/projects/PROJECT/regions/na1/networkEndpointGroups/backend-neg",
+            Ref(
+                region="na1",
+                project="PROJECT",
+                service_type="networkEndpointGroups",
+                name="backend-neg",
+            ),
+        ),
+    ],
+)
 def test_ref(input, expected):
     result = Ref.from_link(input)
     assert result == expected, print(result)
@@ -57,20 +94,21 @@ def test_refs(sample_ip_json):
 
 def test_cloud_run_revision_spec(sample_cloud_run_revision_spec):
 
-    crr = \
-        CloudRunRevisionSpec.from_string(sample_cloud_run_revision_spec)
+    crr = CloudRunRevisionSpec.from_string(sample_cloud_run_revision_spec)
 
     assert crr.name == "SERVICE"
     assert crr.status.url == "https://SERVICE-4ro7a33l3a-nn.a.run.app"
-    assert crr.spec.template.spec.serviceAccountName == "215695389495-compute@developer.gserviceaccount.com"
+    assert (
+        crr.spec.template.spec.serviceAccountName
+        == "215695389495-compute@developer.gserviceaccount.com"
+    )
 
 
 def test_cloud_run_revision_spec_list(sample_cloud_run_revision_spec):
 
     liste = f"[{sample_cloud_run_revision_spec}]"
 
-    liste = \
-        CloudRunRevisionSpec.from_json_list(liste)
+    liste = CloudRunRevisionSpec.from_json_list(liste)
 
     assert len(liste) == 1
 
@@ -142,7 +180,7 @@ def test_https_proxy(sample_https_proxy):
 def test_scheduler_job(sample_scheduler_job):
 
     j = SchedulerJob.from_string(sample_scheduler_job)
-    assert 'topics/test' in j.pubsubTarget["topicName"]
+    assert "topics/test" in j.pubsubTarget["topicName"]
     assert j.name == "test-job"
     assert j.location == "northamerica-northeast1"
     assert j.topicName_ == "projects/PROJECT/topics/test"
@@ -182,13 +220,13 @@ def test_to_dict(sample_task_queue):
     q = TaskQueue.from_string(sample_task_queue)
     d = q.to_dict()
 
-    assert d['retryConfig']['maxAttempts'] == 1
+    assert d["retryConfig"]["maxAttempts"] == 1
 
     import json
 
     j = json.dumps(d)
 
-    assert 'RUNNING' in j
+    assert "RUNNING" in j
 
 
 def test_backend_service_to_json(sample_backend_service):
@@ -202,6 +240,7 @@ def test_backend_service_to_json(sample_backend_service):
     assert isinstance(js, str), print(js)
 
     import json
+
     jso = json.loads(js)
     assert isinstance(jso, dict)
 
@@ -233,10 +272,8 @@ def test_iam_policy(sample_bucket_iam_policy):
     assert m0.email == "PROJECT", print(m0)
 
     tb = IAMBinding(
-        ns="projectViewer",
-        email="PROJECT",
-        role="roles/storage.legacyObjectReader"
-        )
+        ns="projectViewer", email="PROJECT", role="roles/storage.legacyObjectReader"
+    )
 
     assert p.contains(tb)
 

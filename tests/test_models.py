@@ -1,14 +1,25 @@
 """@author: jldupont"""
+
 import pytest
 from dataclasses import dataclass
 
-from pygcloud.models import Param, EnvParam, Result, EnvValue, \
-    ServiceGroup, service_groups, LazyValue, LazyEnvValue, LazyAttrValue, \
-    OptionalParamFromAttribute
+from pygcloud.models import (
+    Param,
+    EnvParam,
+    Result,
+    EnvValue,
+    ServiceGroup,
+    service_groups,
+    LazyValue,
+    LazyEnvValue,
+    LazyAttrValue,
+    OptionalParamFromAttribute,
+)
 
 
 def test_env_can_be_modified():
     import os
+
     os.environ["$$__$$"] = "test"
     assert os.environ["$$__$$"] == "test"
 
@@ -30,7 +41,7 @@ def test_lazy_env_value():
     os.environ["$$_$$"] = "test"
 
     # __eq__ operator
-    assert lv == 'test', print(lv)
+    assert lv == "test", print(lv)
 
     # __ne__ operator
     assert (lv != "test") == False, print(lv)  # NOQA
@@ -107,8 +118,7 @@ def test_env_value(env_first_key, env_first_value):
 
     v = EnvValue(env_first_key)
 
-    assert v == env_first_value, \
-        print(f"key={env_first_key} , value={env_first_value}")
+    assert v == env_first_value, print(f"key={env_first_key} , value={env_first_value}")
 
 
 def test_result_repr():
@@ -116,11 +126,9 @@ def test_result_repr():
     r = Result(success=True, message="msg", code=0)
     expected = """Result(success=True, message='msg', code=0)"""
 
-    assert repr(r) == expected, \
-        print(r)
+    assert repr(r) == expected, print(r)
 
-    assert str(r) == expected, \
-        print(str(r))
+    assert str(r) == expected, print(str(r))
 
 
 def test_service_group_1(env_first_key, env_first_value, mock_service):
@@ -147,8 +155,7 @@ def test_service_groups():
     sg2 = service_groups.create("sg2")
 
     # idempotence
-    assert sg2 == service_groups.create("sg2"), \
-        print(service_groups.all)
+    assert sg2 == service_groups.create("sg2"), print(service_groups.all)
 
     # behaves like a list
     assert len(service_groups) == 2
@@ -168,12 +175,15 @@ class Data:
 data = Data(d={"k": "v", "k2": {"k3": "v3"}}, e="666", f=666)
 
 
-@pytest.mark.parametrize("obj, path, expected", [
-    (data, "d.k",  "v"),
-    (data, "e",    "666"),
-    (data, "f",    666),
-    (data, "d.k2", {"k3": "v3"})
-])
+@pytest.mark.parametrize(
+    "obj, path, expected",
+    [
+        (data, "d.k", "v"),
+        (data, "e", "666"),
+        (data, "f", 666),
+        (data, "d.k2", {"k3": "v3"}),
+    ],
+)
 def test_lazy_attr_value(obj, path, expected):
 
     lv = LazyAttrValue(obj, path)

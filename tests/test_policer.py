@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 import pytest
 from typing import List
 from pygcloud.models import Policy, ServiceGroup, GCPService, PolicyViolation
@@ -13,12 +14,10 @@ from pygcloud.constants import PolicerMode
 class MockPolicy(Policy):
 
     @classmethod
-    def evaluate(cls, groups: List[ServiceGroup], service: GCPService):
-        ...
+    def evaluate(cls, groups: List[ServiceGroup], service: GCPService): ...
 
 
-class MockServiceSupportingServiceAccount(GCPService, ServiceAccountCapableMixin):
-    ...
+class MockServiceSupportingServiceAccount(GCPService, ServiceAccountCapableMixin): ...
 
 
 class MockPolicyRequiresSpec(Policy):
@@ -32,8 +31,7 @@ def mock_policy():
 
 def test_policy_derived_classes(mock_policy):
 
-    assert isinstance(Policy.derived_classes, set), \
-        print(Policy.derived_classes)
+    assert isinstance(Policy.derived_classes, set), print(Policy.derived_classes)
 
     assert PolicyServiceAccount in Policy.derived_classes
     assert Policy not in Policy.derived_classes
@@ -61,8 +59,7 @@ def test_policy_should_have_service_account(mock_sg):
     policy_violated_result: PolicingResult = results.outcome
     policy_class_violated: Policy = policy_violated_result.policy
 
-    assert policy_class_violated is PolicyServiceAccount, \
-        print(results)
+    assert policy_class_violated is PolicyServiceAccount, print(results)
 
     Policer.mode = PolicerMode.RUN
 
@@ -72,7 +69,9 @@ def test_policy_should_have_service_account(mock_sg):
 
 def test_policy_requires_spec(mock_sg, mock_service):
 
-    policies: List[Policy] = [MockPolicyRequiresSpec,]
+    policies: List[Policy] = [
+        MockPolicyRequiresSpec,
+    ]
 
     mock_sg.clear()
     mock_sg + mock_service

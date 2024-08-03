@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 from pygcloud.models import Result
 from pygcloud.gcp.services.addresses import ServicesAddress
 from pygcloud.gcp.models import IPAddress, Ref

@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 import pytest
 from pygcloud.models import Result, Param
 from pygcloud.gcp.services.run import CloudRun
@@ -14,18 +15,12 @@ class MockCloudRun(CloudRun, ServiceAccountCapableMixin):
 
     def after_describe(self, result):
 
-        new_result = Result(success=True,
-                            message=CLOUD_RUN_REVISION_SPEC,
-                            code=0
-                            )
+        new_result = Result(success=True, message=CLOUD_RUN_REVISION_SPEC, code=0)
 
         return super().after_describe(new_result)
 
     def after_create(self, _):
-        new_result = Result(success=True,
-                            message=CLOUD_RUN_REVISION_SPEC,
-                            code=0
-                            )
+        new_result = Result(success=True, message=CLOUD_RUN_REVISION_SPEC, code=0)
         return super().after_create(new_result)
 
     def params_create(self):
@@ -41,9 +36,7 @@ def cr():
 
 def test_run_deploy(deployer, mock_sg, cr):
 
-    common_params = [
-        Param("--project", "my-project")
-    ]
+    common_params = [Param("--project", "my-project")]
 
     deployer.add_common_params(common_params)
 
@@ -51,15 +44,22 @@ def test_run_deploy(deployer, mock_sg, cr):
 
     deployer.deploy(mock_sg)
 
-    assert deployer.cmd.last_command_args == \
-        [
-            "echo", "beta", "run", "deploy",
-            "my-service", "--clear-labels",
-            "--region", "region",
-            "--format", "json",
-            "--p1", "v1",
-            "--project", "my-project",
-        ], print(deployer.cmd.last_command_args)
+    assert deployer.cmd.last_command_args == [
+        "echo",
+        "beta",
+        "run",
+        "deploy",
+        "my-service",
+        "--clear-labels",
+        "--region",
+        "region",
+        "--format",
+        "json",
+        "--p1",
+        "v1",
+        "--project",
+        "my-project",
+    ], print(deployer.cmd.last_command_args)
 
 
 def test_run_with_use(deployer, mock_sg, cr, sn1):
@@ -69,15 +69,22 @@ def test_run_with_use(deployer, mock_sg, cr, sn1):
 
     deployer.deploy(mock_sg)
 
-    assert deployer.cmd.last_command_args == \
-        [
-            "echo", "beta", "run", "deploy",
-            "my-service", "--clear-labels",
-            "--region", "region",
-            "--format", "json",
-            "--p1", "v1",
-            "--labels", "pygcloud-use-0=ns1--name1",
-        ], print(deployer.cmd.last_command_args)
+    assert deployer.cmd.last_command_args == [
+        "echo",
+        "beta",
+        "run",
+        "deploy",
+        "my-service",
+        "--clear-labels",
+        "--region",
+        "region",
+        "--format",
+        "json",
+        "--p1",
+        "v1",
+        "--labels",
+        "pygcloud-use-0=ns1--name1",
+    ], print(deployer.cmd.last_command_args)
 
 
 def test_cloud_run_just_describe(deployer, mock_sg, cr):
@@ -94,7 +101,7 @@ def test_cloud_run_just_describe(deployer, mock_sg, cr):
     assert isinstance(cr.spec, CloudRunRevisionSpec)
 
 
-'''
+"""
 TODO: just build a proper mock
 @pytest.mark.skip
 def test_cloud_run_neg(deployer):
@@ -110,7 +117,7 @@ def test_cloud_run_neg(deployer):
             "describe", "neg",
             "--region", "region",
         ], print(deployer.cmd.last_command_args)
-'''
+"""
 
 
 def test_cloudrun_neg(sample_cloudrun_neg):

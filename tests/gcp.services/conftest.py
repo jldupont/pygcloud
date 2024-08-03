@@ -1,15 +1,33 @@
 """
 @author: jldupont
 """
+
 import pytest
 from pygcloud.gcp.labels import LabelGenerator
 from pygcloud.models import GCPService, Result
 from pygcloud.gcp.models import IAMBinding, IPAddress, HTTPSProxy
-from samples import PROJECT_BINDINGS, IP_ADDRESS, CLOUD_RUN_REVISION_SPEC, \
-    BACKEND_SERVICE, FWD_RULE, STORAGE_BUCKET, SSL_CERTIFICATE, HTTPS_PROXY, \
-    SCHEDULER_JOB, PUBSUB_TOPIC, SERVICES_LIST, FIRESTORE_DB, \
-    CLOUDRUN_NEG_SPEC, PROJECT_DESC, TASK_QUEUE_SPEC, URL_MAP_SPEC, SERVICE_ACCOUNT_SPEC, \
-    BUCKET_IAM_BINDINGS_SPEC, SAMPLE_EMPTY_BINDINGS
+from samples import (
+    PROJECT_BINDINGS,
+    IP_ADDRESS,
+    CLOUD_RUN_REVISION_SPEC,
+    BACKEND_SERVICE,
+    FWD_RULE,
+    STORAGE_BUCKET,
+    SSL_CERTIFICATE,
+    HTTPS_PROXY,
+    SCHEDULER_JOB,
+    PUBSUB_TOPIC,
+    SERVICES_LIST,
+    FIRESTORE_DB,
+    CLOUDRUN_NEG_SPEC,
+    PROJECT_DESC,
+    TASK_QUEUE_SPEC,
+    URL_MAP_SPEC,
+    SERVICE_ACCOUNT_SPEC,
+    BUCKET_IAM_BINDINGS_SPEC,
+    SAMPLE_EMPTY_BINDINGS,
+)
+
 # from pygcloud.gcp.services.iam import ServiceAccountIAM
 from pygcloud.gcp.services.addresses import ServicesAddress
 from pygcloud.gcp.services.proxies import HTTPSProxyService
@@ -25,11 +43,11 @@ def sample_project_desc():
     return PROJECT_DESC
 
 
-'''
+"""
 @pytest.fixture
 def project_bindings():
     return ProjectIAMBindings(PROJECT_BINDINGS)
-'''
+"""
 
 
 @pytest.fixture
@@ -38,22 +56,17 @@ def sample_binding():
     return IAMBinding(
         email="280761648870@cloudbuild.gserviceaccount.com",
         role="roles/editor",
-        ns="serviceAccount"
+        ns="serviceAccount",
     )
 
 
 @pytest.fixture
 def sample_fake_binding():
     """Does not exist in the samples"""
-    return IAMBinding(
-        email="some_email",
-        role="roles/editor",
-        ns="user"
-    )
+    return IAMBinding(email="some_email", role="roles/editor", ns="user")
 
 
-class MockServiceNode(GCPService, LabelGenerator):
-    ...
+class MockServiceNode(GCPService, LabelGenerator): ...
 
 
 @pytest.fixture
@@ -96,7 +109,7 @@ def sn3():
     return MockSn("name3", "ns3")
 
 
-'''
+"""
 @pytest.fixture
 def mock_service_account_iam_class():
     class MockServiceAccountIAM(ServiceAccountIAM):
@@ -119,7 +132,7 @@ def mock_service_account_iam_class():
             return result
 
     return MockServiceAccountIAM
-'''
+"""
 
 
 @pytest.fixture
@@ -221,18 +234,21 @@ def mock_ip_address(sample_ip_json):
 def mock_ip_address_gen(sample_ip_json):
     def gen():
         return IPAddress.from_string(sample_ip_json)
+
     return gen
 
 
 @pytest.fixture
 def mock_services_address_gen(sample_ip_json):
     """Affords us some time to perform resets"""
+
     def gen():
         # NOTE important ! MUST USE THE SAME NAME AS IN THE SAMPLE!
         mock = ServicesAddress(name="ingress-proxy-ip")
         ip = IPAddress.from_string(sample_ip_json, mock)
         mock.spec = ip
         return mock
+
     return gen
 
 
@@ -246,10 +262,11 @@ def mock_https_proxy_gen(sample_https_proxy):
     def gen():
         # name must be synchronized with the ServicesAddress above
         # and the sample
-        mock = HTTPSProxyService("proxy-service",
-                                 "proxy-certificate",
-                                 "urlmap-backend-service")
+        mock = HTTPSProxyService(
+            "proxy-service", "proxy-certificate", "urlmap-backend-service"
+        )
         spec = HTTPSProxy.from_string(sample_https_proxy, mock)
         mock.spec = spec
         return mock
+
     return gen

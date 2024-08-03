@@ -1,10 +1,16 @@
 """@author: jldupont"""
+
 import pytest
 from pygcloud.constants import Instruction
-from pygcloud.models import Result, Param, EnvValue, \
-    GCPServiceSingletonImmutable, GCPServiceRevisionBased, \
-    GCPServiceUpdatable, \
-    service_groups
+from pygcloud.models import (
+    Result,
+    Param,
+    EnvValue,
+    GCPServiceSingletonImmutable,
+    GCPServiceRevisionBased,
+    GCPServiceUpdatable,
+    service_groups,
+)
 
 #  pytest.skip("NEED TO REENABLE", allow_module_level=True)
 
@@ -75,8 +81,13 @@ def test_deployer_already_exists(deployer, mock_sg):
     with pytest.raises(AttributeError):
         assert s.created is None
 
-    assert deployer.cmd.last_command_args == \
-        ["echo", "update", "param_update", "--param", "value"]
+    assert deployer.cmd.last_command_args == [
+        "echo",
+        "update",
+        "param_update",
+        "--param",
+        "value",
+    ]
 
 
 def test_deployer_needs_creation(deployer, mock_sg):
@@ -92,8 +103,13 @@ def test_deployer_needs_creation(deployer, mock_sg):
     with pytest.raises(AttributeError):
         assert s.updated is not None
 
-    assert deployer.cmd.last_command_args == \
-        ["echo", "create", "param_create", "--param", "value"]
+    assert deployer.cmd.last_command_args == [
+        "echo",
+        "create",
+        "param_create",
+        "--param",
+        "value",
+    ]
 
 
 def test_deployer_with_common_params(deployer, mock_sg, common_params):
@@ -104,10 +120,16 @@ def test_deployer_with_common_params(deployer, mock_sg, common_params):
     mock_sg + s
     deployer.deploy(mock_sg)
 
-    assert deployer.cmd.last_command_args == \
-        [
-            "echo", "update", "param_update", "--param", "value",
-            "--common", "value"]
+    assert deployer.cmd.last_command_args == [
+        "echo",
+        "update",
+        "param_update",
+        "--param",
+        "value",
+        "--common",
+        "value",
+    ]
+
 
 # ==============================================================
 
@@ -134,8 +156,9 @@ class MockServiceSingletonImmutable(GCPServiceSingletonImmutable):
 
     def after_create(self, result: Result) -> Result:
         if self.state_exists:
-            result = Result(success=False,
-                            message="bla bla ALREADY_EXISTS bla bla", code=1)
+            result = Result(
+                success=False, message="bla bla ALREADY_EXISTS bla bla", code=1
+            )
         else:
             result = Result(success=True, message="Whatever", code=0)
         return super().after_create(result)
@@ -164,6 +187,7 @@ def test_singleton_already_exists(deployer, mock_sg, common_params):
     assert s.last_result.success
     assert s.already_exists
 
+
 # ==============================================================
 
 
@@ -182,6 +206,7 @@ def test_revision_based_normal(deployer, mock_sg):
 
 
 # ==============================================================
+
 
 class MockServiceNotDeployable(GCPServiceRevisionBased):
 
@@ -225,8 +250,9 @@ def test_service_group_idempotence(mock_service):
         sg.add(mock_service)
 
 
-def test_deploy_service_groups_retrieve_by_name(deployer, env_first_key,
-                                                mock_service_class):
+def test_deploy_service_groups_retrieve_by_name(
+    deployer, env_first_key, mock_service_class
+):
 
     service_groups.clear()
     ms1 = mock_service_class()
@@ -339,5 +365,5 @@ def test_hooks(deployer, mock_sg_service):
         "start_deploy",
         "before_deploy",
         "after_deploy",
-        "end_deploy"
+        "end_deploy",
     ], print(deployer.history_hooks)

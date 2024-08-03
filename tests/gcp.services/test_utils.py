@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 import pytest
 import re
 from pygcloud.gcp.utils import Codec
@@ -9,13 +10,16 @@ from pygcloud.gcp.utils import Codec
 REGEX = re.compile(r"^[a-zA-Z0-9\-\_]*$")
 
 
-@pytest.mark.parametrize("input", [
-    "_",
-    "--",
-    "abc",  # YWJj
-    "bonjour",  # Ym9uam91cg==
-    "allo",  # YWxsbw==
-])
+@pytest.mark.parametrize(
+    "input",
+    [
+        "_",
+        "--",
+        "abc",  # YWJj
+        "bonjour",  # Ym9uam91cg==
+        "allo",  # YWxsbw==
+    ],
+)
 def test_codec(input):
     """
     Make sure to include test cases that generate

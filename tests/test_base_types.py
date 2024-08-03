@@ -1,6 +1,7 @@
 """
 @author: jldupont
 """
+
 import pytest
 from dataclasses import dataclass
 from pygcloud.base_types import BaseForDerived, derived
@@ -97,4 +98,5 @@ def test_derived():
 
     @derived
     class X4(OtherBase, BaseForDerived): ...  # NOQA
+
     assert len(BaseForDerived.derived_classes) == 4
