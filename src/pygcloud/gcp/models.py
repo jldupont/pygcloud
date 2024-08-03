@@ -34,6 +34,7 @@ class Ref(_Ref):
     name: the actual given to the service by the user without the URI prefix
     origin_service: the GCP service instance where this ref comes from
     """
+
     project: str
     region: str
     service_type: Str = field(default_factory=str)

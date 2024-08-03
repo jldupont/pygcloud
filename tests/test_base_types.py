@@ -3,6 +3,7 @@
 """
 import pytest
 from dataclasses import dataclass
+from pygcloud.base_types import BaseForDerived, derived
 from pygcloud.base_types import Base, idempotent, BypassConstructor
 
 
@@ -69,3 +70,31 @@ def test_base_iteration():
 
     liste = list(MockDerivedBase.all)
     assert len(liste) == 2
+
+
+def test_derived():
+
+    @derived
+    class X1(BaseForDerived): ...  # NOQA
+
+    @derived
+    class X2(BaseForDerived): ...  # NOQA
+
+    assert len(BaseForDerived.derived_classes) == 2
+
+    classes = list(BaseForDerived.derived_classes)
+
+    assert X1 in classes
+    assert X2 in classes
+
+    class OtherBase: ...  # NOQA
+
+    @derived
+    class X3(BaseForDerived, OtherBase): ...  # NOQA
+
+    print(BaseForDerived.derived_classes)
+    assert len(BaseForDerived.derived_classes) == 3
+
+    @derived
+    class X4(OtherBase, BaseForDerived): ...  # NOQA
+    assert len(BaseForDerived.derived_classes) == 4

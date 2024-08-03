@@ -2,7 +2,7 @@
 @author: jldupont
 """
 
-from typing import Set, TypeVar, Type, Dict, List, ClassVar
+from typing import Set, TypeVar, Type, Dict, List
 
 
 T = TypeVar("T")
@@ -138,7 +138,8 @@ class BaseType(type):
     @classmethod
     def _all(cls, base: Type):
         liste = [
-            item for item in cls.__all_instances__.values()
+            item
+            for item in cls.__all_instances__.values()
             if issubclass(item.__class__, base)
         ]
         return liste
@@ -179,28 +180,7 @@ def idempotent(cls):
     return cls
 
 
-def derived(cls):
-    # not used ATM
-    new_class_name = cls.__name__.lower()
-
-    if "mock" in new_class_name:
-        return cls
-
-    if new_class_name[0] == "_":
-        return cls
-
-    cls.__all_classes__.add(cls)
-    return cls
-
-
 class Base:
-
-    __all_classes__: Set[Type[T]] = set()
-
-    @classmethod
-    @property
-    def derived_classes(cls) -> Set[Type[T]]:
-        return cls.__all_classes__
 
     @classmethod
     def create_or_get(cls, **kw):
@@ -245,3 +225,30 @@ class Base:
     @classmethod
     def clear(cls):
         cls.__all_instances__.clear()
+
+
+class BaseForDerived:
+    __all_classes__ = set()
+
+    @classmethod
+    @property
+    def derived_classes(cls) -> Set[Type[T]]:
+        return cls.__all_classes__
+
+
+def derived(cls):
+    """
+    Collects derived classes
+
+    Works for the first level only
+
+    NOTE: must be used with 'BaseForDerived'
+    """
+    new_class_name = cls.__name__.lower()
+
+    if "mock" in new_class_name or new_class_name[0] == "_":
+        return cls
+
+    BaseForDerived.__all_classes__.add(cls)
+
+    return cls

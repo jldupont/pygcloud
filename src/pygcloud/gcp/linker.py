@@ -4,8 +4,14 @@
 
 from typing import Union, Type
 from pygcloud.hooks import Hooks
-from pygcloud.models import GCPService, ServiceGroup, GroupName, Result, \
-    GCPServiceUnknown, GCPServiceInstanceNotAvailable
+from pygcloud.models import (
+    GCPService,
+    ServiceGroup,
+    GroupName,
+    Result,
+    GCPServiceUnknown,
+    GCPServiceInstanceNotAvailable,
+)
 from pygcloud.gcp.models import Ref, RefUses, RefUsedBy, RefSelfLink
 from pygcloud.graph_models import Node, Relation, Edge, ServiceNodeUnknown
 from pygcloud.gcp.catalog import lookup_service_class_from_ref
@@ -22,6 +28,7 @@ class _Linker:
 
     NOTE The Node, Edge and Group classes collect their instances automatically
     """
+
     __instance = None
 
     def __init__(self):
@@ -70,11 +77,7 @@ class _Linker:
         """
         Build a selfLink node
         """
-        Node.create_or_get(
-            name=ref.name,
-            kind=service.__class__,
-            obj=service
-        )
+        Node.create_or_get(name=ref.name, kind=service.__class__, obj=service)
 
     def _build_link(self, ref: Ref, source: Node, target_type: Type[GCPService]):
 
@@ -82,8 +85,9 @@ class _Linker:
         if target_type == GCPServiceUnknown:
             # ref.service_type is unknown
             obj = ServiceNodeUnknown(name=ref.service_type)
-            target_node = \
-                Node.create_or_get(name=ref.name, kind=ServiceNodeUnknown, obj=obj)
+            target_node = Node.create_or_get(
+                name=ref.name, kind=ServiceNodeUnknown, obj=obj
+            )
 
         if target_node is None:
 
@@ -94,11 +98,7 @@ class _Linker:
                 # because it is deployed / described
                 obj = GCPServiceInstanceNotAvailable(ref.name, ns="n/a")
 
-        dest: None = Node.create_or_get(
-            name=ref.name,
-            kind=target_type,
-            obj=obj
-        )
+        dest: None = Node.create_or_get(name=ref.name, kind=target_type, obj=obj)
 
         self._build_edge(ref, source, dest)
 
@@ -127,13 +127,15 @@ class _Linker:
             #  we need to 'create or get' this Node
             #
             if ref.origin_service is None:
-                raise Exception("A non selfLink reference without "
-                                f"a service instance is invalid: {ref}")
+                raise Exception(
+                    "A non selfLink reference without "
+                    f"a service instance is invalid: {ref}"
+                )
 
             source: Node = Node.create_or_get(
                 name=ref.origin_service.name,
                 kind=ref.origin_service.__class__,
-                obj=ref.origin_service
+                obj=ref.origin_service,
             )
 
             self._build_link(ref, source, target_type)
@@ -155,15 +157,11 @@ class _Linker:
         if isinstance(ref, RefUsedBy):
             relation = Relation.USED_BY
 
-        Edge.create_or_get(
-            relation=relation,
-            source=node_src,
-            target=node_target
-        )
+        Edge.create_or_get(relation=relation, source=node_src, target=node_target)
 
-    def end_deploy(self, _deployer,
-                   _what: Union[ServiceGroup, GroupName],
-                   _result: Result):
+    def end_deploy(
+        self, _deployer, _what: Union[ServiceGroup, GroupName], _result: Result
+    ):
         """Called after the deployment of all services"""
         self._build_nodes()
 

@@ -150,7 +150,6 @@ def test_linker_unknown_service(mock_service, mock_deployer, result_success):
 
     events.end_deploy(mock_deployer, "mock", result_success)
 
-    print(Ref.all)
     assert len(Node.all) == 1, print(Node.all)
     assert len(Ref.all) == 1, print(Ref.all)
 
