@@ -6,7 +6,7 @@ import pytest  # NOQA
 from dataclasses import dataclass, field
 from pygcloud.graph_models import Group, Node, Edge, Relation
 from pygcloud.models import ServiceNode
-from pygcloud.base_types import Base, BypassConstructor
+from pygcloud.base_types import Base, BypassConstructor, FrozenField
 
 
 @dataclass
@@ -29,9 +29,7 @@ class MockNode(Node):
 
 
 def test_node_invalid_name():
-    """
-    If the 'after_init' method was properly invoked
-    """
+
     with pytest.raises(AssertionError):
         Node.create_or_get(name=..., kind=MockServiceNode)
 
@@ -170,3 +168,18 @@ def test_group_idempotence():
     g1b = MockGroup.create_or_get(name="mock_group")
 
     assert id(g1a) == id(g1b)
+
+
+def test_node_immutable():
+
+    Node.clear()
+
+    n = Node.create_or_get(name="node", kind=MockServiceNode)
+
+    with pytest.raises(FrozenField):
+        n.name = ...
+
+    with pytest.raises(FrozenField):
+        n.kind = ...
+
+    n.obj = object()  # field not frozen

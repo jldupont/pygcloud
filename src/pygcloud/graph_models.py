@@ -107,15 +107,16 @@ class Group(Base):
 
 
 @idempotent
+@frozen_field_support
 @dataclass
 class Edge(Base):
     """
     An edge between two nodes or two groups
     """
 
-    relation: Relation
-    source: Union[Node, Group]
-    target: Union[Node, Group]
+    relation: Relation = field(metadata={"frozen": True})
+    source: Union[Node, Group] = field(metadata={"frozen": True})
+    target: Union[Node, Group] = field(metadata={"frozen": True})
 
     def __post_init__(self):
         assert isinstance(self.source, (Node, Group))
