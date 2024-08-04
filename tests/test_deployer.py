@@ -70,7 +70,7 @@ class MockServiceDoesNotExists(MockServiceUpdatable):
 
 def test_deployer_already_exists(deployer, mock_sg):
 
-    s = MockServiceAlreadyExists("already_exists", "service")
+    s = MockServiceAlreadyExists("already_exists", ns="service")
 
     mock_sg + s
     deployer.deploy(mock_sg)
@@ -92,7 +92,7 @@ def test_deployer_already_exists(deployer, mock_sg):
 
 def test_deployer_needs_creation(deployer, mock_sg):
 
-    s = MockServiceDoesNotExists()
+    s = MockServiceDoesNotExists("MockServiceDoesNotExists")
 
     mock_sg + s
     deployer.deploy(mock_sg)
@@ -116,7 +116,7 @@ def test_deployer_with_common_params(deployer, mock_sg, common_params):
 
     deployer.set_common_params(common_params)
 
-    s = MockServiceAlreadyExists()
+    s = MockServiceAlreadyExists("MockServiceAlreadyExists")
     mock_sg + s
     deployer.deploy(mock_sg)
 
@@ -198,7 +198,7 @@ class MockServiceRevisionBased(GCPServiceRevisionBased):
 
 def test_revision_based_normal(deployer, mock_sg):
 
-    s = MockServiceRevisionBased()
+    s = MockServiceRevisionBased(name="MockServiceRevisionBased")
     mock_sg + s
     deployer.deploy(mock_sg)
 

@@ -12,9 +12,10 @@ from pygcloud.models import (
     GCPServiceUnknown,
 )
 from pygcloud.deployer import Deployer
+from pygcloud.models import service_groups
 from pygcloud.gcp.linker import Linker
 from pygcloud.gcp.models import Ref, RefSelfLink, RefUsedBy, UnknownRef
-from pygcloud.graph_models import Node, Edge, Relation
+from pygcloud.graph_models import Node, Edge, Relation, Group
 from pygcloud.gcp.services.fwd_rules import FwdRuleHTTPSProxyService
 from pygcloud.gcp.services.addresses import ServicesAddress
 from pygcloud.gcp.services.proxies import HTTPSProxyService
@@ -49,7 +50,11 @@ def mock_service():
 
 
 def test_linker_simple(mock_deployer, result_success, mock_services_address_gen):
+    service_groups.clear()
     Linker.clear()
+    Node.clear()
+    Edge.clear()
+    Group.clear()
 
     # We need to do a proper reset before creating stuff
     srv = mock_services_address_gen()  # NOQA
@@ -97,7 +102,11 @@ def test_linker_simple(mock_deployer, result_success, mock_services_address_gen)
 def test_linker_full_edge(
     mock_services_address_gen, mock_https_proxy_gen, mock_deployer, result_success
 ):
+    service_groups.clear()
     Linker.clear()
+    Node.clear()
+    Edge.clear()
+    Group.clear()
 
     proxy_srv = mock_https_proxy_gen()
     ip_srv = mock_services_address_gen()
@@ -135,6 +144,7 @@ def test_linker_full_edge(
 def test_linker_unknown_service(mock_service, mock_deployer, result_success):
     """A ref to an unknown service type"""
 
+    service_groups.clear()
     Linker.clear()
     Node.clear()
     Edge.clear()

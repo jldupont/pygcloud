@@ -734,7 +734,17 @@ class ServiceGroups(list):
         super().__init__()
         self._map = dict()
 
+    def empty(self):
+        """
+        Empties each service group
+        """
+        [
+            group.clear()
+            for group in self
+        ]
+
     def clear(self):
+        self.empty()
         super().clear()
         self._map.clear()
 

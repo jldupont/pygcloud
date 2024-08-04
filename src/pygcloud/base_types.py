@@ -204,6 +204,7 @@ def frozen_field_support(cls):
 
     @raises FrozenField
     """
+
     def _setattr_(this, name, value):
         _field = cls.__dataclass_fields__.get(name, {})
         _meta = getattr(_field, "metadata", {})

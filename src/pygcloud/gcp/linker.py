@@ -58,8 +58,8 @@ NOTE There are provisions for Group -- ? --> Group edges
 @author: jldupont
 """
 
+import logging
 from typing import Union, Type
-from collections.abc import Callable
 from pygcloud import events
 from pygcloud.hooks import Hooks
 from pygcloud.models import (
@@ -74,6 +74,9 @@ from pygcloud.models import (
 from pygcloud.gcp.models import Ref, RefUses, RefUsedBy, RefSelfLink
 from pygcloud.graph_models import Node, Relation, Edge, Group, ServiceNodeUnknown
 from pygcloud.gcp.catalog import lookup_service_class_from_ref
+
+
+debug = logging.debug
 
 
 class _Linker:
@@ -98,7 +101,6 @@ class _Linker:
 
         Hooks.register_callback("start_deploy", self.hook_start_deploy)
         Hooks.register_callback("end_deploy", self.hook_end_deploy)
-        Hooks.register_callback("after_deploy", self.hook_after_deploy)
 
     @property
     def all(self):
@@ -152,7 +154,35 @@ class _Linker:
 
         self._build_edge(ref, source, dest)
 
-    def _build_nodes(self):
+    def _build_nodes_and_groups_from_service_groups(self):
+        """
+        Go through all service groups in order to build
+        the nodes ahead of processing the refs
+
+        This is beneficial as sometimes not all services
+        are deployed during a deployment: we get more a
+        more detailed graph which can of course be
+        post-processed.
+        """
+        group: ServiceGroup
+
+        for service_group in service_groups:
+            group = Group.create_or_get(name=service_group.name)
+            for service in service_group:
+                if not isinstance(service, GCPService):
+                    continue
+
+                if service.name is None:
+                    debug(f"Skipping service type: {service.__class__.__name__}")
+                    continue
+
+                print(f"Group({group.name}) Service({service.name})")
+
+                node = Node.create_or_get(name=service.name,
+                                          kind=service.__class__)
+                #group.add(node)
+
+    def _build_nodes_from_refs(self):
         """
         A Ref contains the "origin" (one end of a Relation)
         whilst 'service_type' and 'name' identify the other
@@ -209,24 +239,6 @@ class _Linker:
 
         Edge.create_or_get(relation=relation, source=node_src, target=node_target)
 
-    def _build_groups(self):
-        """
-        Build the Groups from the supporting Service Groups
-        and Nodes we have just built
-
-        Nodes have a ref (when available) to their underlying service instance:
-        it is with this service instance that group membership can be traced.
-        """
-        service_group: ServiceGroup
-        service: Union[GCPService, Callable]
-        group: Group
-
-        for service_group in service_groups:
-            group = Group.create_or_get(name=service_group.name)
-            for service in service_group:
-                if not isinstance(service, GCPService):
-                    continue
-
     def hook_start_deploy(self, *p):
         Ref.clear()
         Node.clear()
@@ -237,11 +249,9 @@ class _Linker:
         self, _deployer, _what: Union[ServiceGroup, GroupName], _result: Result
     ):
         """Called after the deployment of all services"""
-        self._build_nodes()
+        self._build_nodes_and_groups_from_service_groups()
+        self._build_nodes_from_refs()
         Hooks.queue("end_linker", events.end_linker)
-
-    def hook_after_deploy(self, _deployer, service: GCPService):
-        self.add(service)
 
 
 Linker = _Linker()

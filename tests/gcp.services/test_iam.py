@@ -16,7 +16,7 @@ def mock_bidon_binding():
     return IAMBinding(email="ns:whatever_email", role="whatever_role")
 
 
-class MockCR(CloudRun): ...
+class MockCR(CloudRun): ...  # NOQA
 
 
 class MockProjectIAMBindingService(ProjectIAMBindingService):
