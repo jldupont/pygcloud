@@ -49,12 +49,39 @@ def mock_service():
     return MockService("mock_service")
 
 
-def test_linker_simple(mock_deployer, result_success, mock_services_address_gen):
+def reset():
     service_groups.clear()
+    Ref.clear()
     Linker.clear()
     Node.clear()
     Edge.clear()
     Group.clear()
+
+
+def test_linker_group(mock_service, mock_deployer, result_success):
+    """
+    There should be 1 Group create with 1 member Node
+    """
+    reset()
+
+    sg = service_groups.create("mock_sg")
+    sg + mock_service
+
+    Linker.add(mock_service)
+    events.end_deploy(mock_deployer, "mock_sg", result_success)
+
+    assert len(Group.all) == 1, print(Group.all)
+
+    g0 = Group.all[0]
+    assert len(g0.members) == 1, print(g0.members)
+
+    m0 = list(g0.members)[0]
+    assert isinstance(m0, Node), print(m0)
+    assert m0.obj == mock_service, print(m0)
+
+
+def test_linker_simple(mock_deployer, result_success, mock_services_address_gen):
+    reset()
 
     # We need to do a proper reset before creating stuff
     srv = mock_services_address_gen()  # NOQA
@@ -102,11 +129,7 @@ def test_linker_simple(mock_deployer, result_success, mock_services_address_gen)
 def test_linker_full_edge(
     mock_services_address_gen, mock_https_proxy_gen, mock_deployer, result_success
 ):
-    service_groups.clear()
-    Linker.clear()
-    Node.clear()
-    Edge.clear()
-    Group.clear()
+    reset()
 
     proxy_srv = mock_https_proxy_gen()
     ip_srv = mock_services_address_gen()
@@ -124,9 +147,11 @@ def test_linker_full_edge(
     # Proxy --uses-->   UrlMap
     assert len(Edge.all) == 3, print(Edge.all)
 
-    e0 = Edge.all[0]
-    e1 = Edge.all[1]
-    e2 = Edge.all[2]
+    edges = sorted(Edge.all, key=lambda x: x.name)
+
+    e0 = edges[0]
+    e1 = edges[1]
+    e2 = edges[2]
 
     assert repr(e0) == "Edge(ingress-proxy-ip, used_by, fwd-proxy-service)"
     assert isinstance(e0.source.obj, ServicesAddress), print(e0.source)
@@ -144,11 +169,7 @@ def test_linker_full_edge(
 def test_linker_unknown_service(mock_service, mock_deployer, result_success):
     """A ref to an unknown service type"""
 
-    service_groups.clear()
-    Linker.clear()
-    Node.clear()
-    Edge.clear()
-    Ref.clear()
+    reset()
 
     RefSelfLink(
         project="project",

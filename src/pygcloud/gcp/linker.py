@@ -168,6 +168,7 @@ class _Linker:
 
         for service_group in service_groups:
             group = Group.create_or_get(name=service_group.name)
+
             for service in service_group:
                 if not isinstance(service, GCPService):
                     continue
@@ -179,8 +180,9 @@ class _Linker:
                 print(f"Group({group.name}) Service({service.name})")
 
                 node = Node.create_or_get(name=service.name,
-                                          kind=service.__class__)
-                #group.add(node)
+                                          kind=service.__class__,
+                                          obj=service)
+                group.add(node)
 
     def _build_nodes_from_refs(self):
         """
