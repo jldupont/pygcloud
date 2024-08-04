@@ -15,6 +15,13 @@ class BypassConstructor(Exception):
     """
 
 
+class FrozenField(Exception):
+    """
+    Exception raised when an attempt is made
+    to mutate a frozen field
+    """
+
+
 class BaseType(type):
     """
     Collect derived classes
@@ -177,6 +184,44 @@ def idempotent(cls):
 
     setattr(cls, "__init__", __init)
 
+    return cls
+
+
+def frozen_field_support(cls):
+    """
+    Class decorator support dataclass field level freezing
+    Support for idempotency i.e. if value is unchanged, no exception is raised
+
+    Example:
+
+    @frozen_field_support
+    @dataclass
+    class X:
+        name: str = field(metadata={"frozen": True})
+
+    x = X(name="whatever")
+    x.name = "somethingelse" # FrozenField exception raised
+
+    @raises FrozenField
+    """
+    def _setattr_(this, name, value):
+        _field = cls.__dataclass_fields__.get(name, {})
+        _meta = getattr(_field, "metadata", {})
+        is_frozen = _meta.get("frozen", False)
+        if not is_frozen:
+            return super(cls, this).__setattr__(name, value)
+
+        try:
+            current_value = getattr(this, name)
+            if value != current_value:
+                raise FrozenField(f"Field '{name}' already has value= {current_value}")
+        except AttributeError:  # NOQA
+            # dataclass not initialized yet...
+            pass
+
+        super(cls, this).__setattr__(name, value)
+
+    setattr(cls, "__setattr__", _setattr_)
     return cls
 
 

@@ -16,14 +16,11 @@ class MockGroup(Group):
         return hash(f"{self.name}--{self.__class__.__name__}")
 
 
-class MockServiceNode(ServiceNode): ...
+class MockServiceNode(ServiceNode): ...  # NOQA
 
 
 @dataclass
 class MockNode(Node):
-    """
-    Inherits IDEMPOTENCY_ENABLED
-    """
 
     mock: bool = field(default=True)
 
@@ -46,8 +43,6 @@ def test_node_idempotent():
     i1a = Node.create_or_get(name="node", kind=MockServiceNode)
     i1b = Node.create_or_get(name="node", kind=MockServiceNode)
     assert id(i1a) == id(i1b)
-
-    assert Node.IDEMPOTENCY_ENABLED
 
 
 def test_bypass_create_or_get_constructor():

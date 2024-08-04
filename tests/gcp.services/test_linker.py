@@ -40,7 +40,7 @@ class MockEdge(Edge):
         )
 
 
-class MockService(GCPService): ...
+class MockService(GCPService): ...  # NOQA
 
 
 @pytest.fixture

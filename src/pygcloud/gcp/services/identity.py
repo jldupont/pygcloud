@@ -15,8 +15,8 @@ class ServicesIdentityIAP(GCPServiceSingletonImmutable):
     https://cloud.google.com/sdk/gcloud/reference/beta/identity
     """
 
-    DEPENDS_ON_API = "iap.googleapis.com"
     LISTING_CAPABLE = False
+    DEPENDS_ON_API = "iap.googleapis.com"
 
     def __init__(self):
         super().__init__("iap", ns="iap")

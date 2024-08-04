@@ -66,7 +66,7 @@ def sample_fake_binding():
     return IAMBinding(email="some_email", role="roles/editor", ns="user")
 
 
-class MockServiceNode(GCPService, LabelGenerator): ...
+class MockServiceNode(GCPService, LabelGenerator): ...  # NOQA
 
 
 @pytest.fixture

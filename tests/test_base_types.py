@@ -3,9 +3,10 @@
 """
 
 import pytest
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pygcloud.base_types import BaseForDerived, derived
 from pygcloud.base_types import Base, idempotent, BypassConstructor
+from pygcloud.base_types import frozen_field_support, FrozenField
 
 
 @idempotent
@@ -100,3 +101,24 @@ def test_derived():
     class X4(OtherBase, BaseForDerived): ...  # NOQA
 
     assert len(BaseForDerived.derived_classes) == 4
+
+
+def test_frozen_field():
+
+    @frozen_field_support
+    @dataclass
+    class X(Base):
+        not_frozen: str
+        champ: str = field(metadata={"frozen": True})
+
+    x = X(champ="whatever", not_frozen="frozen_not")
+
+    x.not_frozen = "someother_value"
+
+    with pytest.raises(FrozenField):
+        x.champ = "something_else"
+
+    # idempotency
+    x.champ = "whatever"
+
+    assert x.champ == "whatever"

@@ -7,7 +7,7 @@ import logging
 
 from functools import cache
 from collections import UserList
-from typing import List, Tuple, Union, Any, Type, Set
+from typing import List, Tuple, Union, Any, Type, Set, Dict
 from collections.abc import Callable
 from abc import abstractmethod
 from dataclasses import dataclass, field
@@ -688,20 +688,11 @@ class ServiceGroup(list):
 
     @property
     def name(self):
-        return GroupNameUtility.resolve_group_name(self._name)
+        return self._name
 
     def __init__(self, name: Union[str, EnvValue]):
-        self._name = None
+        self._name = GroupNameUtility.resolve_group_name(name)
         self._all = set()
-
-        if isinstance(name, str):
-            self._name = name
-
-        if isinstance(name, EnvValue):
-            self._name = name
-
-        if self._name is None:
-            raise Exception(f"Expecting a valid name, got: {name}")
 
     def clear(self):
         self._all.clear()
@@ -748,7 +739,7 @@ class ServiceGroups(list):
         self._map.clear()
 
     @property
-    def all(self):
+    def all(self) -> Dict[str, ServiceGroup]:
         return self._map
 
     def __getitem__(self, what: Union[str, GroupName]):
@@ -762,6 +753,8 @@ class ServiceGroups(list):
     def create(self, name: GroupName) -> ServiceGroup:
         """
         Create or retrieve a group by name
+
+        NOTE Idempotent operation
         """
         str_name = GroupNameUtility.resolve_group_name(name)
 
@@ -769,7 +762,7 @@ class ServiceGroups(list):
             return group
 
         # create a new one and keep track of it
-        group = ServiceGroup(name)
+        group: ServiceGroup = ServiceGroup(name)
 
         self._map[str_name] = group
         self.append(group)

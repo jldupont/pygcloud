@@ -1,19 +1,14 @@
 """
 # Graph module
 
-NOTE: the usual "__post_init__" is replaced with "after_init"
-      in order to support the implementation of idempotency check.
-
-      See "BaseType" class type declaration for more details.
-
 @author: jldupont
 """
 
-from typing import Union, Set, Type, ClassVar
+from typing import Union, Set, Type
 from enum import Enum
 from dataclasses import dataclass, field
 from .models import ServiceNode
-from .base_types import Base, idempotent
+from .base_types import Base, idempotent, frozen_field_support
 
 Str = Union[str, None]
 
@@ -49,30 +44,25 @@ class Relation(Enum):
 
 
 @idempotent
+@frozen_field_support
 @dataclass
 class Node(Base):
     """
     Node type
-
-    Only the service type is exposed in order
-    to maximize our chances of backward compatibility
-    as the API evolves. If we expose too much information
-    outright, it will be difficult to course correct without
-    introducing breaking changes.
     """
 
-    IDEMPOTENCY_ENABLED: ClassVar[bool] = True
-
-    name: str
-    kind: Type[ServiceNode]
+    name: str = field(metadata={"frozen": True})
+    kind: Type[ServiceNode] = field(metadata={"frozen": True})
     obj: ServiceNode = field(default=None)
 
     def __post_init__(self):
         assert isinstance(self.name, str)
         assert issubclass(self.kind, ServiceNode), print(self.kind)
+        if self.obj is not None:
+            assert isinstance(self.obj, ServiceNode)
 
     def __hash__(self):
-        """This cannot be moved to base type class"""
+        """This cannot be moved to base class"""
         vector = f"{self.name}-{self.kind.__name__}"
         return hash(vector)
 
@@ -81,16 +71,14 @@ class Node(Base):
 
 
 @idempotent
+@frozen_field_support
 @dataclass
 class Group(Base):
     """
     A bare minimum definition of the group type
-
-    Derived class declarations will be collected automatically
-    and available using 'Group.derived_classes' attribute
     """
 
-    name: Str
+    name: Str = field(metadata={"frozen": True})
     members: Set[Node] = field(default_factory=set)
 
     def __post_init__(self):
@@ -111,11 +99,11 @@ class Group(Base):
         assert isinstance(member, Node), print(f"Got: {member}")
         return member in self.members
 
-    def __repr__(self):
-        return f"{self.__class__.__name__}({self.name})"
-
     def __hash__(self):
         return hash(self.name)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.name})"
 
 
 @idempotent

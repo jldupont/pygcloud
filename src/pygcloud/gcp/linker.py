@@ -1,20 +1,78 @@
 """
+Service Class: base definition
+Service: an instance of a service class
+Service*: instantiated and deployed/described
+ServiceGroup: instance of declared ServiceGroup class
+ServiceGroup*: selected & deployed group of GCP services
+Node: associated with Service
+Node*: associated with Service*
+
+Before deployment / describe:
+=============================
+
+    What is declared by the user:
+    -----------------------------
+    Service -- member_of --> ServiceGroup
+
+    What can be built without deployment / describe phase:
+    ------------------------------------------------------
+    Node --> Service --> ServiceGroup
+
+After deployment / describe
+===========================
+
+    The Refs come from "describing" / "listing" GCP services.
+    They are automatically populated in the Spec of the Services*.
+
+    Ref -- selfLink --> Service
+    Ref -- uses     --> Ref
+    Ref -- used_by  --> Ref
+
+    Ref --> Service Class
+    Ref --> Service Class Unknown
+    Ref --> Service
+    Ref --> Service*
+
+    At this point, we can build Nodes and Edges:
+
+    Service  --> Node
+    Service* --> Node*
+
+    Edge: Node* -- uses --> Node
+    Edge: Node* -- uses --> Node*
+
+    Edge: Node* -- used_by --> Node
+    Edge: Node* -- used_by --> Node*
+
+NOTE Without the deployment / describe phase, we do not have
+     access to the Refs and thus cannot be building Edges.
+
+     But we can have Groups of Nodes though.
+
+     Node  -- member_of --> Group
+     Node* -- member_of --> Group
+
+NOTE There are provisions for Group -- ? --> Group edges
+     but no use-case nor implementation yet.
+
 @author: jldupont
 """
 
 from typing import Union, Type
+from collections.abc import Callable
 from pygcloud import events
 from pygcloud.hooks import Hooks
 from pygcloud.models import (
     GCPService,
     ServiceGroup,
+    service_groups,
     GroupName,
     Result,
     GCPServiceUnknown,
     GCPServiceInstanceNotAvailable,
 )
 from pygcloud.gcp.models import Ref, RefUses, RefUsedBy, RefSelfLink
-from pygcloud.graph_models import Node, Relation, Edge, ServiceNodeUnknown
+from pygcloud.graph_models import Node, Relation, Edge, Group, ServiceNodeUnknown
 from pygcloud.gcp.catalog import lookup_service_class_from_ref
 
 
@@ -150,6 +208,24 @@ class _Linker:
             relation = Relation.USED_BY
 
         Edge.create_or_get(relation=relation, source=node_src, target=node_target)
+
+    def _build_groups(self):
+        """
+        Build the Groups from the supporting Service Groups
+        and Nodes we have just built
+
+        Nodes have a ref (when available) to their underlying service instance:
+        it is with this service instance that group membership can be traced.
+        """
+        service_group: ServiceGroup
+        service: Union[GCPService, Callable]
+        group: Group
+
+        for service_group in service_groups:
+            group = Group.create_or_get(name=service_group.name)
+            for service in service_group:
+                if not isinstance(service, GCPService):
+                    continue
 
     def hook_start_deploy(self, *p):
         Ref.clear()
