@@ -4,7 +4,7 @@
 
 import os
 import logging
-
+import re
 from functools import cache
 from collections import UserList
 from typing import List, Tuple, Union, Any, Type, Set, Dict
@@ -390,6 +390,7 @@ class GCPService(ServiceNode):
     SPEC_CLASS: Union[Type["Spec"], None] = None
     GROUP: List[str] = []
     GROUP_SUB_DESCRIBE: List[str] = []
+    NAME_PATTERN: str = re.compile(r"^([0-9a-zA-Z\_\-]+)$")
 
     @property
     def category(self):
@@ -408,6 +409,13 @@ class GCPService(ServiceNode):
         name: string (optional)
         ns: string (optional)
         """
+        if name is not None:
+            assert isinstance(name, str), print(name)
+            if self.NAME_PATTERN.fullmatch(name) is None:
+                raise ValueError(f"Invalid name: {name}")
+        if ns is not None:
+            assert isinstance(ns, str)
+
         self.already_exists: Bool = None  # indeterminated
         self.last_result: Union[Result, None] = None
         self._name: Str = name
