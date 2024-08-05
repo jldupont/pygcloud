@@ -39,4 +39,5 @@ jobs:
       run: |
         export PYTHONPATH=$PYTHONPATH:$(pwd)/src
         pip install -e .
+        pip install graphviz
         pytest
