@@ -390,7 +390,7 @@ class GCPService(ServiceNode):
     SPEC_CLASS: Union[Type["Spec"], None] = None
     GROUP: List[str] = []
     GROUP_SUB_DESCRIBE: List[str] = []
-    NAME_PATTERN: str = re.compile(r"^([0-9a-zA-Z\_\-]+)$")
+    NAME_PATTERN: str = re.compile(r"^([0-9a-zA-Z\_\-\.]+)$")
 
     @property
     def category(self):
