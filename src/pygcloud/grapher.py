@@ -3,11 +3,22 @@
 
 @author: jldupont
 """
-
+import logging
 from typing import Type, Dict
 from .models import ServiceNode, service_groups, ServiceGroup, GCPService
 from .graph_models import Relation, Edge, Node, Group
 from .hooks import Hooks
+
+try:
+    import graphviz  # NOQA
+    GRAPHVIZ_AVAILABLE = True
+except:  # NOQA
+    GRAPHVIZ_AVAILABLE = False
+
+
+debug = logging.debug
+info = logging.info
+warning = logging.warning
 
 
 class _Grapher:
@@ -24,45 +35,22 @@ class _Grapher:
         if self.__instance is not None:
             raise Exception("Singleton class")
         self.__instance = self
-        Hooks.register_callback("after_deploy", self.after_deploy)
+        Hooks.register_callback("end_linker", self.end_linker)
 
-    def after_deploy(self, _deployer, service: GCPService):
-        """Called after the deployment of a single service"""
+    def end_linker(self):
+        """
+        Called after the Linker has finished
+
+        The graph entities are available in Group, Node and Edge classes
+        """
+        if not GRAPHVIZ_AVAILABLE:
+            warning("Grapher module loaded but graphviz python package is not available")
+            return
+
+        self._build_dot()
+
+    def _build_dot(self):
+        ...
 
 
 Grapher = _Grapher()
-
-
-def generate():
-    """
-    Generator for the graph of all services defined in the
-    deployment `service_groups` as well as any other groups
-
-    The generator yields Groups first and Edges last.
-
-    A service instance can be part of multiple groups.
-    """
-
-    nodes: Dict = dict()
-    service: ServiceNode
-    service_group: ServiceGroup
-    group: Group
-
-    #
-    # Start with the groups
-    #
-    for service_group in service_groups:
-
-        group = Group.create_or_get(name=service_group.name)
-
-        for service in service_group:
-
-            service_class: Type[ServiceNode] = service.__class__
-            node = Node.create_or_get(name=service.name, kind=service_class)
-
-            # If it's already in there, then idempotence protects it
-            unique_id = (node.name, node.kind)
-            nodes[unique_id] = node
-            group.add(node)
-
-        yield group

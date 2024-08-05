@@ -11,6 +11,8 @@
     pkgs.openssh
     pkgs.docker
     pkgs.gnumake
+    pkgs.gcc
+    pkgs.graphviz
   ];
   # Sets environment variables in the workspace
   env = {};
