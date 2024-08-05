@@ -69,6 +69,11 @@ class Node(Base):
     def __repr__(self):
         return f"Node({self.name}, {self.kind.__name__})"
 
+    @property
+    def id(self):
+        """NOTE Graphviz does not like ':' in identifiers"""
+        return f"{self.kind.__name__}__{self.name}"
+
 
 @idempotent
 @frozen_field_support
@@ -105,6 +110,10 @@ class Group(Base):
     def __repr__(self):
         return f"{self.__class__.__name__}({self.name})"
 
+    @property
+    def id(self):
+        return f"{self.name}"
+
 
 @idempotent
 @frozen_field_support
@@ -132,3 +141,8 @@ class Edge(Base):
 
     def __repr__(self):
         return f"Edge({self.source.name}, {self.relation.value}, {self.target.name})"
+
+    @property
+    def id(self):
+        """NOTE Graphviz does not like ':' in identifiers"""
+        return f"{self.source.name}__{self.relation}__{self.target.name}"

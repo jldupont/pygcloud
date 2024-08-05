@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from pygcloud.graph_models import Group, Node, Edge, Relation
 from pygcloud.models import ServiceNode
 from pygcloud.base_types import Base, BypassConstructor, FrozenField
+from pygcloud.grapher import Grapher
+from pygcloud import events
 
 
 @dataclass
@@ -183,3 +185,36 @@ def test_node_immutable():
         n.kind = ...
 
     n.obj = object()  # field not frozen
+
+
+def node_from_service_node(sn: ServiceNode) -> Node:
+    return Node.create_or_get(
+        name=sn.name,
+        kind=sn.__class__,
+        obj=sn
+        )
+
+
+def test_graph(mock_service_node_gen):
+
+    Group.clear()
+    Node.clear()
+    Edge.clear()
+
+    g1 = Group.create_or_get(name="g1")
+    g2 = Group.create_or_get(name="g2")
+
+    sn1a = mock_service_node_gen("n1a", "ns1")
+    sn2a = mock_service_node_gen("n2a", "ns2")
+
+    n1a = node_from_service_node(sn1a)
+    n2a = node_from_service_node(sn2a)
+
+    g1 + n1a
+    g2 + n2a
+
+    e12 = Edge.create_or_get(relation=Relation.USES, source=n1a, target=n2a)  # NOQA
+
+    events.end_linker()
+
+    assert Grapher.is_graph_available(), print(Grapher.graph)

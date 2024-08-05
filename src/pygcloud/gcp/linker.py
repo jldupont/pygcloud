@@ -177,11 +177,9 @@ class _Linker:
                     debug(f"Skipping service type: {service.__class__.__name__}")
                     continue
 
-                print(f"Group({group.name}) Service({service.name})")
-
-                node = Node.create_or_get(name=service.name,
-                                          kind=service.__class__,
-                                          obj=service)
+                node = Node.create_or_get(
+                    name=service.name, kind=service.__class__, obj=service
+                )
                 group.add(node)
 
     def _build_nodes_from_refs(self):

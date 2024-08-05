@@ -76,7 +76,6 @@ def mock_sn():
 
 class MockSn(MockServiceNode):
     def __init__(self, name, ns):
-        print(f"MockSn({ns}, {name})")
         self._name = name
         self._ns = ns
 

@@ -746,10 +746,7 @@ class ServiceGroups(list):
         """
         Empties each service group
         """
-        [
-            group.clear()
-            for group in self
-        ]
+        [group.clear() for group in self]
 
     def clear(self):
         self.empty()
