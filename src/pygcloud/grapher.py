@@ -89,8 +89,9 @@ class _Grapher:
         edge: Edge
 
         for group in Group.all:
-            c = graphviz.Digraph(name=f'cluster_{group.name}',
-                                 node_attr={'shape': 'box'})
+            c = graphviz.Digraph(
+                name=f"cluster_{group.name}", node_attr={"shape": "box"}
+            )
 
             for node in group.members:
                 c.node(node.id, label=node.id)
