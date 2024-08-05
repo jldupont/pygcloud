@@ -145,12 +145,12 @@ class FlexJSONEncoder(json.JSONEncoder):
         return o.to_dict()
 
 
-ALLOWED_CHARS = set('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-')
+ALLOWED_CHARS = set('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_')
 
 
 def normalize_for_id(input: str) -> str:
     """
     Replace unsupported characters
     """
-    input = input.replace("://", "_")
+    input = input.replace("://", "_").replace("-", "_")
     return ''.join(c for c in input if c in ALLOWED_CHARS)

@@ -117,7 +117,8 @@ def test_flex_encoder():
 
 @pytest.mark.parametrize("input,expected", [
     ("allo", "allo"),
-    ("gs://bucket", "gs_bucket")
+    ("gs://bucket", "gs_bucket"),
+    ("first-second", "first_second")
 ])
 def test_normalize_for_id(input, expected):
     assert normalize_for_id(input) == expected
