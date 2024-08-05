@@ -173,6 +173,9 @@ class _Linker:
                 if not isinstance(service, GCPService):
                     continue
 
+                if service.EXCLUDE_FROM_GRAPH:
+                    continue
+
                 if service.name is None:
                     debug(f"Skipping service type: {service.__class__.__name__}")
                     continue

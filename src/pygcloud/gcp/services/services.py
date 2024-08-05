@@ -17,7 +17,7 @@ class ServiceEnable(GCPServiceSingletonImmutable):
           be handled through another class because
           this one is aimed at enabling services.
     """
-
+    EXCLUDE_FROM_GRAPH: bool = True
     LISTING_CAPABLE = False
     DEPENDS_ON_API = "serviceusage.googleapis.com"
     REQUIRES_DESCRIBE_BEFORE_CREATE = False
