@@ -7,6 +7,7 @@
 from typing import Union, Set, Type
 from enum import Enum
 from dataclasses import dataclass, field
+from .utils import normalize_for_id
 from .models import ServiceNode
 from .base_types import Base, idempotent, frozen_field_support
 
@@ -72,7 +73,7 @@ class Node(Base):
     @property
     def id(self):
         """NOTE Graphviz does not like ':' in identifiers"""
-        return f"{self.kind.__name__}__{self.name}"
+        return normalize_for_id(f"{self.kind.__name__}__{self.name}")
 
 
 @idempotent
@@ -112,7 +113,7 @@ class Group(Base):
 
     @property
     def id(self):
-        return f"{self.name}"
+        return normalize_for_id(self.name)
 
 
 @idempotent
@@ -145,4 +146,5 @@ class Edge(Base):
     @property
     def id(self):
         """NOTE Graphviz does not like ':' in identifiers"""
-        return f"{self.source.name}__{self.relation}__{self.target.name}"
+        _id = f"{self.source.name}__{self.relation}__{self.target.name}"
+        return normalize_for_id(_id)

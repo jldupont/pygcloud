@@ -9,6 +9,7 @@ from pygcloud.utils import (
     prepare_params,
     JsonObject,
     FlexJSONEncoder,
+    normalize_for_id
 )
 
 
@@ -112,3 +113,11 @@ def test_flex_encoder():
 
     liste = json.loads(js)
     assert liste == [555, "666"], print(liste)
+
+
+@pytest.mark.parametrize("input,expected", [
+    ("allo", "allo"),
+    ("gs://bucket", "gs_bucket")
+])
+def test_normalize_for_id(input, expected):
+    assert normalize_for_id(input) == expected
