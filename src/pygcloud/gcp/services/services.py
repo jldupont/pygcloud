@@ -5,8 +5,8 @@ https://cloud.google.com/sdk/gcloud/reference/services
 
 @author: jldupont
 """
-
-from pygcloud.models import GCPServiceSingletonImmutable
+from typing import Union, Type
+from pygcloud.models import GCPService, GCPServiceSingletonImmutable
 
 
 class ServiceEnable(GCPServiceSingletonImmutable):
@@ -25,8 +25,19 @@ class ServiceEnable(GCPServiceSingletonImmutable):
         "services",
     ]
 
-    def __init__(self, name: str):
-        assert isinstance(name, str)
+    def __init__(self, what: Union[str, Type[GCPService]]):
+
+        name = None
+
+        if isinstance(what, str):
+            name = what
+
+        if issubclass(what, GCPService):
+            name = what.DEPENDS_ON_API
+
+        if name is None:
+            raise Exception(f"Expecting a string name or GCPService class: {what}")
+
         super().__init__(name, ns="services")
 
     def params_create(self):
