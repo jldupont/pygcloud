@@ -31,9 +31,11 @@ class ServiceEnable(GCPServiceSingletonImmutable):
 
         if isinstance(what, str):
             name = what
-
-        if issubclass(what, GCPService):
-            name = what.DEPENDS_ON_API
+        try:
+            if issubclass(what, GCPService):
+                name = what.DEPENDS_ON_API
+        except:  # NOQA
+            pass
 
         if name is None:
             raise Exception(f"Expecting a string name or GCPService class: {what}")
