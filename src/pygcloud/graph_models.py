@@ -29,7 +29,7 @@ class ServiceNodeUnknown(ServiceNode):
         return self._ns
 
 
-class Relation(Enum):
+class Relation(str, Enum):
     """
     USES: when it is explicit that a node uses another node
     USED_BY: equivalent to "USES" but in reverse
@@ -42,6 +42,9 @@ class Relation(Enum):
     PARENT_IS = "parent_is"
     HAS_ACCESS = "has_access"
     MEMBER_OF = "member_of"
+
+    def __str__(self):
+        return self.value
 
 
 @idempotent

@@ -30,6 +30,10 @@ class MockNode(Node):
         return hash(f"{self.name}-{self.__class__.__name__}")
 
 
+def test_relation_str():
+    assert str(Relation.USES) == "uses"
+
+
 def test_node_invalid_name():
 
     with pytest.raises(AssertionError):
