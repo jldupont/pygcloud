@@ -61,7 +61,6 @@ class _Spec:
         result: dict = {}  # type: ignore
 
         for key, value in obj.items():
-
             _field = fields.get(key, None)
             if _field is None:
                 continue

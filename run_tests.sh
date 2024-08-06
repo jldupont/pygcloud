@@ -3,4 +3,4 @@
 #
 export PYTEST_ADDOPTS="--color=yes"
 export PYTHONPATH=$PYTHONPATH:$(pwd)/src
-pytest
+pytest $1

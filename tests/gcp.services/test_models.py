@@ -21,11 +21,14 @@ from pygcloud.gcp.models import (
     ProjectDescription,
     TaskQueue,
     UrlMap,
-    ServiceAccountSpec,
     IAMPolicy,
     IAMBinding,
     GCSBucket,
+    ServiceAccountSpec,
     ACL,
+)
+from pygcloud.gcp.services.iam import (
+    ServiceAccount,
 )
 
 
@@ -57,6 +60,42 @@ def test_spec_contains_derived_class_types():
                 service_type="networkEndpointGroups",
                 name="backend-neg",
             ),
+        ),
+        (
+            "215695389495-compute@developer.gserviceaccount.com",
+            Ref(
+                region=None,
+                project=None,
+                service_type=ServiceAccount,
+                name="215695389495-compute@developer.gserviceaccount.com"
+            )
+        ),
+        (
+            "serviceAccount:test777@PROJECT.iam.gserviceaccount.com",
+            Ref(
+                region=None,
+                project="PROJECT",
+                service_type=ServiceAccount,
+                name="test777@PROJECT.iam.gserviceaccount.com"
+            )
+        ),
+        (
+            "projectViewer:PROJECT",
+            Ref(
+                region=None,
+                project="PROJECT",
+                service_type=ServiceAccount,
+                name="projectViewer:PROJECT"
+            )
+        ),
+        (
+            "projects/PROJECT/serviceAccounts/215695389495-compute@developer.gserviceaccount.com",
+            Ref(
+                region=None,
+                project="PROJECT",
+                service_type=ServiceAccount,
+                name="215695389495-compute@developer.gserviceaccount.com"
+            )
         ),
     ],
 )
@@ -99,9 +138,9 @@ def test_cloud_run_revision_spec(sample_cloud_run_revision_spec):
     assert crr.name == "SERVICE"
     assert crr.status.url == "https://SERVICE-4ro7a33l3a-nn.a.run.app"
     assert (
-        crr.spec.template.spec.serviceAccountName
+        crr.spec.template.spec.serviceAccountName.name
         == "215695389495-compute@developer.gserviceaccount.com"
-    )
+    ), print(crr.spec.template.spec.serviceAccountName)
 
 
 def test_cloud_run_revision_spec_list(sample_cloud_run_revision_spec):
@@ -254,7 +293,7 @@ def test_url_map(sample_url_map):
 def test_service_account_spec(sample_service_account_spec):
 
     sa = ServiceAccountSpec.from_string(sample_service_account_spec)
-    assert sa.name == "215695389495-compute@developer.gserviceaccount.com"
+    assert sa.email == "215695389495-compute@developer.gserviceaccount.com"
     assert sa.is_default()
 
 

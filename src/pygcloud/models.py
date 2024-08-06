@@ -44,6 +44,10 @@ class Spec(_Spec):
         if not getattr(self, "name", False):
             return
 
+        # it might be a Ref
+        if not isinstance(self.name, str):
+            return
+
         parts = self.name.split("/")
         if len(parts) != 6:
             self.name = parts[-1]

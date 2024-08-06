@@ -1,30 +1,21 @@
 """
 @author: jldupont
+
+Service Account patterns:
+
+service-$projectNumber@firebase-rules.iam.gserviceaccount.com
+                                          -------------------
+$projectNumber-compute@developer.gserviceaccount.com
+                                 -------------------
+$name@$projectId.iam.gserviceaccount.com
+                    -------------------
+
+NOTE The presence of the segment 'iam' does not guarantee a non-default
+     service account.
 """
 
-import re
 from typing import List, Dict, Union, ClassVar
-from .models import GCPService
-
-EXCEPT_SLASH = "([^/]+)"
-
-# CloudRun example...
-# /apis/serving.knative.dev/v1/namespaces/215695389495/services/SERVICE'
-
-PROJECT = f"/projects/(?P<project>{EXCEPT_SLASH})"
-REGION = f"/regions/(?P<region>{EXCEPT_SLASH})"
-GLOBAL = "/(?P<region>global)"
-SERVICE_TYPE_NAME = f"/(?:(?P<service_type>{EXCEPT_SLASH}))/(?P<name>{EXCEPT_SLASH})"
-
-#
-# The order is important: longest first
-#
-PATTERNS = [
-    re.compile(PROJECT + REGION + SERVICE_TYPE_NAME),
-    re.compile(PROJECT + GLOBAL + SERVICE_TYPE_NAME),
-    re.compile(PROJECT + GLOBAL),
-    re.compile(PROJECT + REGION),
-]
+from pygcloud.models import GCPService
 
 
 def _hash(cls):
@@ -66,9 +57,10 @@ class _Ref:
 
     @classmethod
     def match(cls, input):
+        from .models import PATTERNS
 
         result = None
-        for pattern in PATTERNS:
+        for pattern, data in PATTERNS:
             result = pattern.search(input)
             if result is not None:
                 break
@@ -78,7 +70,15 @@ class _Ref:
 
             raise UnknownRef(repr(input))
 
-        return result.groupdict()
+        service_type = data.get("service_type", None)
+        if isinstance(service_type, str):
+            from .catalog import lookup
+            st = lookup(service_type)
+            data['service_type'] = st
+
+        dic = result.groupdict()
+        dic.update(data)
+        return dic
 
     @classmethod
     def from_link(cls, link: str, origin_service: GCPService = None):

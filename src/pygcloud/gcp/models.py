@@ -7,11 +7,40 @@ NOTE The classvar `REF_NAME` contains the string
 
 @author: jldupont
 """
-
+import re
 from typing import List, Dict, Union, ClassVar
 from dataclasses import dataclass, field
 from pygcloud.models import Spec, spec, GCPService
 from ._models import _Ref, _hash
+
+
+EXCEPT_SLASH = "([^/]+)"
+
+# CloudRun example...
+# /apis/serving.knative.dev/v1/namespaces/215695389495/services/SERVICE'
+
+PROJECT = f"/projects/(?P<project>{EXCEPT_SLASH})"
+PROJECT2 = f"projects/(?P<project>{EXCEPT_SLASH})"
+REGION = f"/regions/(?P<region>{EXCEPT_SLASH})"
+GLOBAL = "/(?P<region>global)"
+SERVICE_TYPE_NAME = f"/(?:(?P<service_type>{EXCEPT_SLASH}))/(?P<name>{EXCEPT_SLASH})"
+SERVICE_ACCOUNT = r"^(?:user\:)?(?:serviceAccount\:)?(?P<name>([\w\-\.]+)\@(?P<project>[\w\-]+)\.iam\.gserviceaccount\.com)$"
+SERVICE_ACCOUNT2 = r"^(?:user\:)?(?:serviceAccount\:)?(?P<name>([\w\-\.]+)\@([\w\-\.]+)\.gserviceaccount\.com)$"
+SERVICE_ACCOUNT3 = r"^(?P<name>project[\w]+\:(?P<project>.*))$"
+SERVICE_ACCOUNT4 = r"\/serviceAccounts\/(?P<name>.*)$"
+#
+# The order is important: longest first
+#
+PATTERNS = [
+    (re.compile(SERVICE_ACCOUNT),  {"service_type": "ServiceAccount"}),
+    (re.compile(SERVICE_ACCOUNT2), {"service_type": "ServiceAccount"}),
+    (re.compile(SERVICE_ACCOUNT3), {"service_type": "ServiceAccount"}),
+    (re.compile(PROJECT + REGION + SERVICE_TYPE_NAME), {}),
+    (re.compile(PROJECT + GLOBAL + SERVICE_TYPE_NAME), {}),
+    (re.compile(PROJECT + GLOBAL), {}),
+    (re.compile(PROJECT + REGION), {}),
+    (re.compile(PROJECT2 + SERVICE_ACCOUNT4), {"service_type": "ServiceAccount"}),
+]
 
 
 class UnknownRef(Exception):
@@ -35,10 +64,10 @@ class Ref(_Ref):
     origin_service: the GCP service instance where this ref comes from
     """
 
-    project: str
-    region: str
-    service_type: Str = field(default_factory=str)
+    project: Str = field(default=None)
+    region: Str = field(default=None)
     name: Str = field(default_factory=str)
+    service_type: Str = field(default=None)
     origin_service: GCPService = field(default=None)
 
 
@@ -65,6 +94,30 @@ class UnknownSpecType(Spec):
     """
     Placeholder for unknown / unsupported spec types
     """
+
+
+@spec
+@dataclass
+class ServiceAccountSpec(Spec):
+    """
+    "name":
+        "projects/$project/serviceAccounts/
+            $project_number-compute@developer.gserviceaccount.com"
+    """
+
+    name: RefSelfLink
+    email: str
+    projectId: str
+    uniqueId: str
+    oauth2ClientId: str
+    displayName: str = field(default_factory=str)
+    description: str = field(default_factory=str)
+
+    def is_default(self):
+        """
+        Is this service account a default one
+        """
+        return "iam.gserviceaccount.com" not in self.email
 
 
 @spec
@@ -159,6 +212,8 @@ class IAMMember(_IAMMember, Spec):
     NOTE in some cases, 'email' is really a name or id
          e.g. ns: projectEditor
               email: $project_id
+
+    TODO attach to Ref system
     """
 
     ns: str
@@ -237,7 +292,7 @@ class CloudRunMetadata(Spec):
 
 @dataclass
 class CloudRunTemplateSpec(Spec):
-    serviceAccountName: str = field(default=None)
+    serviceAccountName: RefUses = field(default=None)
 
 
 @dataclass
@@ -508,27 +563,3 @@ class UrlMap(Spec):
     id: str = field(default_factory=str)
     name: str = field(default_factory=str)
     defaultService: str = field(default_factory=str)
-
-
-@spec
-@dataclass
-class ServiceAccountSpec(Spec):
-    """
-    "name":
-        "projects/$project/serviceAccounts/
-            $project_number-compute@developer.gserviceaccount.com"
-    """
-
-    name: str
-    email: str
-    projectId: str
-    uniqueId: str
-    oauth2ClientId: str
-    displayName: str = field(default_factory=str)
-    description: str = field(default_factory=str)
-
-    def is_default(self):
-        """
-        Is this service account a default one
-        """
-        return "iam.gserviceaccount.com" not in self.email
