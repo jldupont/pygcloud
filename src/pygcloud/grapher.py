@@ -79,7 +79,8 @@ class _Grapher:
     def build_subgraph(self, group: Group):
         return graphviz.Digraph(
             name=f"cluster_{group.name}",
-            node_attr={"shape": "box", "label": group.name}
+            graph_attr={"label": group.name},
+            node_attr={"shape": "box"}
         )
 
     def build_node(self, graph, node: Node):
