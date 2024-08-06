@@ -76,6 +76,21 @@ class _Grapher:
 
         self._build_dot()
 
+    def build_subgraph(self, group: Group):
+        return graphviz.Digraph(
+            name=f"cluster_{group.name}", node_attr={"shape": "box"}
+        )
+
+    def build_node(self, graph, node: Node):
+        classname = node.kind.__name__
+        name = node.name
+        graph.node(node.id, label=f"<{classname}<br/><B>{name}</B>>")
+
+    def build_edge(self, graph, edge: Edge):
+        src: Node = edge.source
+        tgt: Node = edge.target
+        graph.edge(src.id, tgt.id, label=str(edge.relation))
+
     def _build_dot(self):
         """
         Build the DOT representation
@@ -89,19 +104,15 @@ class _Grapher:
         edge: Edge
 
         for group in Group.all:
-            c = graphviz.Digraph(
-                name=f"cluster_{group.name}", node_attr={"shape": "box"}
-            )
+            c = self.build_subgraph(group)
 
             for node in group.members:
-                c.node(node.id, label=node.id)
+                self.build_node(c, node)
 
             self._graph.subgraph(c)
 
         for edge in Edge.all:
-            src: Node = edge.source
-            tgt: Node = edge.target
-            self._graph.edge(src.id, tgt.id)
+            self.build_edge(self._graph, edge)
 
 
 Grapher = _Grapher()
