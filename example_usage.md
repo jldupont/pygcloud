@@ -32,6 +32,8 @@ from pygcloud.gcp.models import BackendServiceSpec, BackendGroup, FwdRule, IPAdd
 from pygcloud.deployer import Deployer
 from pygcloud.policer import Policer, PolicyProjectLevelBindings
 from pygcloud.tools import cd, cp, cptree, ls, mkdir
+from pygcloud.gcp.models import RefUses
+from pygcloud.grapher import Grapher
 
 try:
     # for local development because
@@ -40,7 +42,7 @@ try:
 except:
     pass
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("builder")
 info = logger.info
 debug = logger.debug
@@ -93,13 +95,8 @@ srv_group_common = service_groups.create("common")
 #
 # Storage related
 #
-storage_enable = ServiceEnable("storage.googleapis.com")
-storage_api_enable = ServiceEnable("storage-api.googleapis.com")
-storage_component_enable = ServiceEnable("storage-component.googleapis.com")
-
+storage_enable = ServiceEnable(StorageBucket)
 srv_group_common.append(storage_enable)
-srv_group_common.append(storage_api_enable)
-srv_group_common.append(storage_component_enable)
 
 srv_group_common.append(sa_jeeves)
 
@@ -248,7 +245,7 @@ srv_group_ingress.append(partial(get_cloud_run_url, cr))
 srv_group_ingress.append(cr)
 
 neg = CloudRunNeg(BACKEND_NEG, [
-    "--cloud-run-service", LazyAttrValue(cr, "spec.url")
+    "--cloud-run-service", LazyAttrValue(cr, "spec.status.url")
 ], region=REGION)
 
 srv_group_ingress.append(neg)
@@ -270,11 +267,16 @@ def maybe_connect_backend_to_neg():
     be_spec:BackendServiceSpec = srv_backend.spec
     group: BackendGroup
     already_connected = False
+
     for group in be_spec.backends:
-        if "networkEndpointGroups" in group.group:
-            if BACKEND_NEG in group.group:
+
+        ref_uses: RefUses = group.group
+        
+        if "networkEndpointGroups" in ref_uses.service_type:
+            if BACKEND_NEG in ref_uses.name:
                 already_connected = True
                 break
+
     if already_connected:
         return Instruction.ABORT_DEPLOY
 
@@ -338,7 +340,12 @@ def check_fwd_rule():
     if spec_address.address != spec_rule.IPAddress:
         exit("IP address mismatch")
 
-    if f"targetHttpsProxies/{HTTPS_PROXY_NAME}" not in spec_rule.target:
+    target: RefUses = spec_rule.target
+
+    if not "targetHttpsProxies" in target.service_type:
+        exit("Unexpected service type")
+
+    if not HTTPS_PROXY_NAME in target.name:
         exit("backend target mismatch")
 
     info("FwdRule checks out")
@@ -359,6 +366,10 @@ deployer = Deployer(common_params=[PROJECT])
 # The actual deployment tasks happen here
 #
 deployer.deploy(srv_group_name)
+
+graph = Grapher.graph
+print(graph)
+
 ```
 
 # Example output
@@ -384,3 +395,7 @@ INFO:pygcloud.deployer:Before deploying https-proxy:proxy-service
 INFO:pygcloud.deployer:Before deploying fwd-rule:fwd-proxy-service
 INFO:builder:FwdRule checks out
 ```
+
+# Diagram Sample
+
+![Diagram of deployment](assets/diagram_sample.svg "Diagram")
