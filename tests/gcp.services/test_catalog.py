@@ -5,6 +5,7 @@
 from pygcloud.models import GCPService, GCPServiceUnknown
 from pygcloud.gcp.models import ServiceDescription, Ref
 from pygcloud.gcp.services.addresses import ServicesAddress
+from pygcloud.gcp.services.iam import ServiceAccount
 from pygcloud.gcp.catalog import (
     ServiceNode,
     lookup,
@@ -26,6 +27,11 @@ def test_catalog():
 def test_lookup():
     classe = lookup("FirestoreDatabase")
     assert issubclass(classe, GCPService), print(type(classe))
+
+
+def test_lookup2():
+    classe = lookup("ServiceAccount")
+    assert issubclass(classe, GCPService), print(classe)
 
 
 def test_listable():
@@ -64,3 +70,14 @@ def test_catalog_lookup_service_class_from_ref_unknown():
 
     result: GCPService = lookup_service_class_from_ref(r)
     assert result == GCPServiceUnknown
+
+
+def test_lookup_service_class_from_ref2():
+
+    r = Ref(project="PROJECT",
+            region="REGION",
+            service_type=ServiceAccount,
+            name="projects/PROJECT/serviceAccounts/215695389495-compute@developer.gserviceaccount.com")
+
+    result: GCPService = lookup_service_class_from_ref(r)
+    assert result == ServiceAccount, print(result)

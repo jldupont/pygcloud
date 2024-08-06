@@ -291,10 +291,13 @@ def test_url_map(sample_url_map):
 
 
 def test_service_account_spec(sample_service_account_spec):
-
+    Ref.clear()
     sa = ServiceAccountSpec.from_string(sample_service_account_spec)
+    # assert sa.name == sa.email, print(sa.name)
     assert sa.email == "215695389495-compute@developer.gserviceaccount.com"
     assert sa.is_default()
+    assert len(Ref.all) == 1, print(Ref.all)
+    assert Ref.all[0].name == sa.email, print(Ref.all[0])
 
 
 def test_iam_policy(sample_bucket_iam_policy):

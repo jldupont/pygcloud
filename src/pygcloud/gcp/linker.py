@@ -148,7 +148,9 @@ class _Linker:
             if obj is None:
                 # The service instance might not be available
                 # because it is deployed / described
-                obj = GCPServiceInstanceNotAvailable(ref.name, ns="n/a")
+                # NOTE that ref.name might be of incompatible
+                #      format with the service name
+                obj = GCPServiceInstanceNotAvailable("na", ns="na")
 
         dest: None = Node.create_or_get(name=ref.name, kind=target_type, obj=obj)
 

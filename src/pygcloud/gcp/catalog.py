@@ -55,6 +55,11 @@ def lookup_service_class_from_ref(ref: Ref) -> Type[GCPService]:
     Lookup a service class from a name used by GCP
     to refer to a service type
     """
+    try:
+        if issubclass(ref.service_type, GCPService):
+            return ref.service_type
+    except:  # NOQA
+        pass
 
     service_classes: List[GCPService] = get_listable_services()
 
