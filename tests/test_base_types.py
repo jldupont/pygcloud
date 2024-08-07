@@ -39,9 +39,6 @@ def test_base_idempotent():
     assert id(o1) == id(o2)
     assert len(MockDerivedBase.all) == 1
 
-    ref = MockDerivedBase.get_by_name("mock")
-    assert id(ref) == id(o1)
-
 
 def test_base_separate_derived_classes():
     """

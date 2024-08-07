@@ -185,6 +185,7 @@ class _Linker:
                 node = Node.create_or_get(
                     name=service.name, kind=service.__class__, obj=service
                 )
+                logging.debug(f"Created: from {service} in group {service_group}: {node}")
                 group.add(node)
 
     def _build_nodes_from_refs(self):

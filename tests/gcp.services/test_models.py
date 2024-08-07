@@ -30,6 +30,7 @@ from pygcloud.gcp.models import (
 from pygcloud.gcp.services.iam import (
     ServiceAccount,
 )
+from pygcloud.gcp.services.run import CloudRun
 
 
 def test_spec_contains_derived_class_types():
@@ -97,6 +98,14 @@ def test_spec_contains_derived_class_types():
                 name="215695389495-compute@developer.gserviceaccount.com"
             )
         ),
+        (
+            "/apis/serving.knative.dev/v1/namespaces/215695389495/services/SERVICE",
+            Ref(
+                service_type=CloudRun,
+                project_number="215695389495",
+                name="SERVICE"
+            )
+        ),
     ],
 )
 def test_ref(input, expected):
@@ -132,7 +141,7 @@ def test_refs(sample_ip_json):
 
 
 def test_cloud_run_revision_spec(sample_cloud_run_revision_spec):
-
+    Ref.clear()
     crr = CloudRunRevisionSpec.from_string(sample_cloud_run_revision_spec)
 
     assert crr.name == "SERVICE"
@@ -141,6 +150,9 @@ def test_cloud_run_revision_spec(sample_cloud_run_revision_spec):
         crr.spec.template.spec.serviceAccountName.name
         == "215695389495-compute@developer.gserviceaccount.com"
     ), print(crr.spec.template.spec.serviceAccountName)
+
+    # SelfLink + 1 Uses (ServiceAccount)
+    assert len(Ref.all) == 2, print(Ref.all)
 
 
 def test_cloud_run_revision_spec_list(sample_cloud_run_revision_spec):
