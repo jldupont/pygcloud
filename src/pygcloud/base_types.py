@@ -259,20 +259,13 @@ class Base:
         return _instance
 
     @classmethod
-    def gen_id(cls, instance):
-        assert isinstance(instance, cls), print(cls)
-        return f"{instance.name}-{instance.__class__.__name__}"
-
-    @classmethod
     def lookup(cls, instance):
         """Verifies if an instance already exists"""
-        id_ = cls.gen_id(instance)
-        return cls.__all_instances__.get(id_, None)
+        return cls.__all_instances__.get(instance.id, None)
 
     @classmethod
     def _store(cls, instance):
-        id_ = cls.gen_id(instance)
-        cls.__all_instances__[id_] = instance
+        cls.__all_instances__[instance.id] = instance
 
     @classmethod
     @property
@@ -282,6 +275,11 @@ class Base:
     @classmethod
     def clear(cls):
         cls.__all_instances__.clear()
+
+    @property
+    def id(self):
+        """This default is most probably wrong"""
+        return self.name
 
 
 class BaseForDerived:
