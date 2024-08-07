@@ -394,7 +394,7 @@ class GCPService(ServiceNode):
     SPEC_CLASS: Union[Type["Spec"], None] = None
     GROUP: List[str] = []
     GROUP_SUB_DESCRIBE: List[str] = []
-    NAME_PATTERN: str = re.compile(r"^([0-9a-zA-Z\_\-\.\/\:]+)$")
+    # NAME_PATTERN: str = re.compile(r"^([0-9a-zA-Z\_\-\.\/\:]+)$")
     EXCLUDE_FROM_GRAPH: bool = False
 
     @property
@@ -416,8 +416,8 @@ class GCPService(ServiceNode):
         """
         if name is not None:
             assert isinstance(name, str), print(name)
-            if self.NAME_PATTERN.fullmatch(name) is None:
-                raise ValueError(f"Invalid name: {name}")
+            # if self.NAME_PATTERN.fullmatch(name) is None:
+            #    raise ValueError(f"Invalid name: {name}")
         if ns is not None:
             assert isinstance(ns, str)
 
