@@ -576,7 +576,7 @@ class UrlMap(Spec):
 
     REF_NAME: ClassVar[str] = "urlMaps"
 
-    selfLink: str
+    selfLink: RefSelfLink
     id: str = field(default_factory=str)
     name: str = field(default_factory=str)
     defaultService: str = field(default_factory=str)
