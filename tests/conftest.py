@@ -3,7 +3,7 @@ import os
 from dataclasses import dataclass
 from pygcloud.deployer import Deployer
 from pygcloud.core import CommandLine
-from pygcloud.models import GCPService, LazyEnvValue, service_groups, Spec, Result, ServiceNode
+from pygcloud.models import GCPService, LazyEnvValue, service_groups, Spec, Result
 from pygcloud.constants import ServiceCategory
 from pygcloud.gcp.models import RefSelfLink
 
@@ -109,7 +109,7 @@ def deployer(cmd_echo):
     return Deployer(cmd_echo)
 
 
-class MockServiceNodeSimple(ServiceNode):
+class MockServiceNodeSimple(GCPService):
 
     def __init__(self, name, ns):
         self._name = name

@@ -14,6 +14,7 @@ from pygcloud.models import (
     LazyEnvValue,
     LazyAttrValue,
     OptionalParamFromAttribute,
+    GCPService
 )
 
 
@@ -202,3 +203,27 @@ def test_OptionalParamFromAttribute():
 
     op2 = OptionalParamFromAttribute("--param", d, "whatever")
     assert op2 == []
+
+
+def test_stem_class():
+
+    with pytest.raises(ValueError):
+        GCPService.stem_class_from_class()
+
+    class Mock(GCPService):
+        """Stem class i.e. first level down GCPService"""
+        ...
+
+    o = Mock()
+
+    assert o.stem_class_from_self() == Mock
+    assert Mock.stem_class_from_class() == Mock
+
+    class Mock2(Mock):
+        ...
+
+    assert Mock2.stem_class_from_class() == Mock
+
+    o2 = Mock2()
+    assert o2.stem_class_from_self() == Mock
+    assert Mock2.stem_class_from_class() == Mock

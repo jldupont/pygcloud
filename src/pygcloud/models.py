@@ -4,7 +4,6 @@
 
 import os
 import logging
-import re
 from functools import cache
 from collections import UserList
 from typing import List, Tuple, Union, Any, Type, Set, Dict
@@ -396,6 +395,52 @@ class GCPService(ServiceNode):
     GROUP_SUB_DESCRIBE: List[str] = []
     # NAME_PATTERN: str = re.compile(r"^([0-9a-zA-Z\_\-\.\/\:]+)$")
     EXCLUDE_FROM_GRAPH: bool = False
+
+    @classmethod
+    def stem_class_from_class(cls) -> Type:
+        assert issubclass(cls, ServiceNode)
+
+        def check_class(classe):
+
+            if classe.__name__ == "GCPService":
+                raise ValueError("GCPService is the base class")
+
+            if classe.__name__ == "ServiceNode":
+                raise ValueError("ServiceNode is the base class")
+
+            if classe.__name__ == "type":
+                raise ValueError("Type is a class constructor")
+
+            try:
+                parent = classe.__bases__[0]
+                if parent.__name__.startswith("GCPService"):
+                    return classe
+            except:  # NOQA
+                pass
+            return None
+
+        classe = cls
+        depth = 0
+        MAX_DEPTH = 3
+
+        while True:
+            klass = check_class(classe)
+            if klass is not None:
+                return classe
+
+            classe = classe.__bases__[0]
+            depth += 1
+            if depth > MAX_DEPTH:
+                break
+
+        raise ValueError(f"Could not find the stem for: {cls}")
+
+    def stem_class_from_self(self) -> Type:
+        """
+        Returns the class type of the first level derived class
+        """
+        assert isinstance(self, ServiceNode)
+        return self.stem_class_from_class()
 
     @property
     def category(self):

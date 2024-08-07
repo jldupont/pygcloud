@@ -269,3 +269,8 @@ def mock_https_proxy_gen(sample_https_proxy):
         return mock
 
     return gen
+
+
+@pytest.fixture
+def sample_url_map_spec():
+    return URL_MAP_SPEC

@@ -125,11 +125,26 @@ class _Linker:
     def clear(self):
         self.__all_service_instances.clear()
 
+    def _build_node(self, name, kind: GCPService, obj):
+        """
+        Builds a Node whilst observing stemming requirement
+        to account for derived classes of GCP Service.
+
+        Stemming is imporant in order to properly link Refs:
+        the first example where this is pertinent is with the UrlMap service.
+        """
+        stem = kind.stem_class_from_class()
+        if kind != stem:
+            logging.debug(f"Substituting stem class on {kind}: {stem}")
+            kind = stem
+
+        return Node.create_or_get(name=name, kind=kind, obj=obj)
+
     def _build_self(self, ref: Ref, service: GCPService):
         """
         Build a selfLink node
         """
-        Node.create_or_get(name=ref.name, kind=service.__class__, obj=service)
+        self._build_node(ref.name, service.__class__, service)
 
     def _build_link(self, ref: Ref, source: Node, target_type: Type[GCPService]):
 
@@ -152,7 +167,7 @@ class _Linker:
                 #      format with the service name
                 obj = GCPServiceInstanceNotAvailable("na", ns="na")
 
-        dest: None = Node.create_or_get(name=ref.name, kind=target_type, obj=obj)
+        dest: None = self._build_node(ref.name, target_type, obj)
 
         self._build_edge(ref, source, dest)
 
@@ -182,8 +197,8 @@ class _Linker:
                     debug(f"Skipping service type: {service.__class__.__name__}")
                     continue
 
-                node = Node.create_or_get(
-                    name=service.name, kind=service.__class__, obj=service
+                node = self._build_node(
+                    service.name, service.__class__, service
                 )
                 logging.debug(f"Created: from {service} in group {service_group}: {node}")
                 group.add(node)
@@ -218,10 +233,10 @@ class _Linker:
                     f"a service instance is invalid: {ref}"
                 )
 
-            source: Node = Node.create_or_get(
-                name=ref.origin_service.name,
-                kind=ref.origin_service.__class__,
-                obj=ref.origin_service,
+            source: Node = self._build_node(
+                ref.origin_service.name,
+                ref.origin_service.__class__,
+                ref.origin_service,
             )
 
             self._build_link(ref, source, target_type)

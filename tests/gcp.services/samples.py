@@ -350,7 +350,7 @@ BACKEND_SERVICE = """
   "timeoutSec": 30,
   "usedBy": [
     {
-      "reference": "https://www.googleapis.com/compute/v1/projects/SERVICE/global/urlMaps/urlmap-backend-service"
+      "reference": "https://www.googleapis.com/compute/v1/projects/PROJECT/global/urlMaps/urlmap-backend-service"
     }
   ]
 }

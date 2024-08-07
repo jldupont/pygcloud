@@ -5,7 +5,7 @@
 import pytest  # NOQA
 from dataclasses import dataclass, field
 from pygcloud.graph_models import Group, Node, Edge, Relation
-from pygcloud.models import ServiceNode
+from pygcloud.models import ServiceNode, GCPService
 from pygcloud.base_types import Base, BypassConstructor, FrozenField
 from pygcloud.grapher import Grapher
 from pygcloud import events
@@ -18,7 +18,7 @@ class MockGroup(Group):
         return hash(f"{self.name}--{self.__class__.__name__}")
 
 
-class MockServiceNode(ServiceNode): ...  # NOQA
+class MockServiceNode(GCPService): ...  # NOQA
 
 
 @dataclass
