@@ -34,6 +34,10 @@ class ServiceAccount(GCPServiceSingletonImmutable):
         self._project_id = project_id
 
     @property
+    def id(self):
+        return self.name.partition("@")[0]
+
+    @property
     def email(self):
         if self.spec is None:
             return None
@@ -41,9 +45,7 @@ class ServiceAccount(GCPServiceSingletonImmutable):
         return self.spec.email
 
     def params_describe(self):
-        sa = f"{self.name}@{self._project_id}.iam.gserviceaccount.com"
-
-        return ["describe", sa, "--format", "json"]
+        return ["describe", self.name, "--format", "json"]
 
     def params_create(self):
         return ["create", self.name, "--format", "json"]

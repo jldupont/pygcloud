@@ -310,6 +310,7 @@ def test_service_account_spec(sample_service_account_spec):
     assert sa.is_default()
     assert len(Ref.all) == 1, print(Ref.all)
     assert Ref.all[0].name == sa.email, print(Ref.all[0])
+    assert sa.id == "215695389495-compute"
 
 
 def test_iam_policy(sample_bucket_iam_policy):

@@ -5,7 +5,7 @@
 import pytest
 from pygcloud.models import Result
 from pygcloud.gcp.models import IAMBinding, IAMBindings, IAMPolicy, IAMMember
-from pygcloud.gcp.services.iam import IAMBindingService
+from pygcloud.gcp.services.iam import IAMBindingService, ServiceAccount
 from pygcloud.gcp.services.run import CloudRun
 from pygcloud.gcp.services.projects import ProjectIAMBindingService
 from samples import PROJECT_BINDINGS
@@ -125,3 +125,10 @@ def test_iam_binding_service(deployer, mock_sg, mock_bidon_binding):
         ["--region", "some_region"],
         [],
     ], print(srv.captured_create_params)
+
+
+def test_service_account():
+
+    sa = ServiceAccount("sa_name", "project_id")
+    assert "@" in sa.name and "project_id" in sa.name
+    assert sa.id == "sa_name"

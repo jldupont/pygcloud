@@ -131,6 +131,11 @@ class ServiceAccountSpec(Spec):
             return f"{input}@{project_id}.iam.gserviceaccount.com"
         return input
 
+    @property
+    def id(self):
+        ref = self.name
+        return ref.name.partition("@")[0]
+
 
 @spec
 @dataclass
