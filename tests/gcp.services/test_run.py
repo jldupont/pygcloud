@@ -35,6 +35,7 @@ def cr():
 
 
 def test_run_deploy(deployer, mock_sg, cr):
+    Ref.clear()
 
     common_params = [Param("--project", "my-project")]
 
@@ -60,6 +61,8 @@ def test_run_deploy(deployer, mock_sg, cr):
         "--project",
         "my-project",
     ], print(deployer.cmd.last_command_args)
+
+    assert len(Ref.all) == 2, print(Ref.all)
 
 
 def test_run_with_use(deployer, mock_sg, cr, sn1):

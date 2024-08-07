@@ -28,10 +28,12 @@ SERVICE_ACCOUNT = r"^(?:user\:)?(?:serviceAccount\:)?(?P<name>([\w\-\.]+)\@(?P<p
 SERVICE_ACCOUNT2 = r"^(?:user\:)?(?:serviceAccount\:)?(?P<name>([\w\-\.]+)\@([\w\-\.]+)\.gserviceaccount\.com)$"
 SERVICE_ACCOUNT3 = r"^(?P<name>project[\w]+\:(?P<project>.*))$"
 SERVICE_ACCOUNT4 = r"\/serviceAccounts\/(?P<name>.*)$"
+CLOUD_RUN_SELFLINK = r"^\/apis\/serving\.knative\.dev\/v[0-9]{1,2}\/namespaces\/(?P<project_number>[0-9]+)\/services\/(?P<name>[\w\-\_]+)$"  # NOQA
 #
 # The order is important: longest first
 #
 PATTERNS = [
+    (re.compile(CLOUD_RUN_SELFLINK), {"service_type": "CloudRun"}),
     (re.compile(SERVICE_ACCOUNT),  {"service_type": "ServiceAccount"}),
     (re.compile(SERVICE_ACCOUNT2), {"service_type": "ServiceAccount"}),
     (re.compile(SERVICE_ACCOUNT3), {"service_type": "ServiceAccount"}),
@@ -65,6 +67,7 @@ class Ref(_Ref):
     """
 
     project: Str = field(default=None)
+    project_number: Str = field(default=None)
     region: Str = field(default=None)
     name: Str = field(default_factory=str)
     service_type: Str = field(default=None)
@@ -287,7 +290,7 @@ class CloudRunMetadata(Spec):
 
     name: str
     annotations: dict
-    selfLink: str  # RefSelfLink
+    selfLink: RefSelfLink
 
 
 @dataclass

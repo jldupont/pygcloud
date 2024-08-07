@@ -20,7 +20,7 @@ class ServiceAccount(GCPServiceSingletonImmutable):
 
     LISTING_CAPABLE = True
     SPEC_CLASS = ServiceAccountSpec
-    EXCLUDE_FROM_GRAPH: bool = True
+    EXCLUDE_FROM_GRAPH: bool = False
     REQUIRES_DESCRIBE_BEFORE_CREATE = True
     REF_NAME = "serviceAccounts"
     DEPENDS_ON_API = "iam.googleapis.com"
