@@ -122,6 +122,15 @@ class ServiceAccountSpec(Spec):
         """
         return "iam.gserviceaccount.com" not in self.email
 
+    @classmethod
+    def build_name(cls, input: str, project_id: str):
+        """
+        Builds the name (email)
+        """
+        if "@" not in input or "iam.gserviceaccount.com" not in input:
+            return f"{input}@{project_id}.iam.gserviceaccount.com"
+        return input
+
 
 @spec
 @dataclass

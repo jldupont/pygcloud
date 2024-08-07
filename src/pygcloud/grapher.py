@@ -76,6 +76,11 @@ class _Grapher:
 
         self._build_dot()
 
+    def normalize_node_name(self, name: str) -> str:
+        if len(name) > 32:
+            return f"{name[0:30]}..."
+        return name
+
     def build_subgraph(self, group: Group):
         return graphviz.Digraph(
             name=f"cluster_{group.name}",
@@ -85,8 +90,9 @@ class _Grapher:
 
     def build_node(self, graph, node: Node):
         classname = node.kind.__name__
-        name = node.name
-        graph.node(node.id, label=f"<{classname}<br/><B>{name}</B>>")
+        name = self.normalize_node_name(node.name)
+        tooltip = node.name
+        graph.node(node.id, label=f"<{classname}<br/><B>{name}</B>>", tooltip=tooltip)
 
     def build_edge(self, graph, edge: Edge):
         src: Node = edge.source
