@@ -379,7 +379,7 @@ class BackendServiceSpec(Spec):
     portName: str
     protocol: str
     selfLink: RefSelfLink
-    backends: List[BackendGroup]
+    backends: List[BackendGroup] = field(default_factory=list)
     iap: Dict = field(default_factory=dict)
     usedBy: List[RefUsedBy] = field(default_factory=list)
 

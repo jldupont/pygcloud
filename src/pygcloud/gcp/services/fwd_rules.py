@@ -40,6 +40,10 @@ class FwdRuleHTTPSProxyService(GCPServiceSingletonImmutable):
             self._ip_address_name,
             "--ports",
             "443",
+            "--load-balancing-scheme",
+            "EXTERNAL_MANAGED",
+            "--network-tier",
+            "PREMIUM",
             "--format",
             "json",
         ]

@@ -55,4 +55,3 @@ def test_build_url_map_ref_from_link():
 
     ref = Ref.from_link(link)
     assert ref.service_type == "urlMaps"
-
