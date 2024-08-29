@@ -161,8 +161,6 @@ class Deployer:
             self.after_deploy(service, service.last_result)
             return service.last_result
 
-        self.create(service)
-
         result = self.create(service)
         return self.after_deploy(service, result)
 
