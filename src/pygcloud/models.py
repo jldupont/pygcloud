@@ -641,6 +641,10 @@ class GCPService(ServiceNode):
                 self._spec = self.SPEC_CLASS.from_string(
                     result.message, origin_service=self
                 )
+                if isinstance(self._spec, list):
+                    if len(self._spec) > 1:
+                        logging.error(f"Unexpected list > 1 item: {self._spec}")
+                    self._spec = self._spec[0]
 
         return result
 
